@@ -46,8 +46,9 @@ class ServerNotReady(Exception):
 
 
 class PgConn:
-    def __init__(self, sockdir, port, user="postgres", database="postgres"):
+    def __init__(self, sockdir, port, user="postgres", database="postgres", timeout=None):
         self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        self.sock.settimeout(timeout)  # None = block forever; socket.timeout on expiry
         try:
             self.sock.connect(os.path.join(sockdir, ".s.PGSQL.%d" % port))
             params = b"user\0" + user.encode() + b"\0database\0" + database.encode() + b"\0\0"

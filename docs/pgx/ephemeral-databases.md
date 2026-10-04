@@ -162,20 +162,9 @@ Smaller points:
 
 ## Stability finding
 
-A database-wide `VACUUM ANALYZE` straight after creating the template's 50
-tables intermittently wedges the whole server: the statement never returns,
-the checkpointer stalls, and new connections hang too. Seen in 4 of about 43
-template builds (default settings and with `autovacuum = off`), all in the
-plain template build, never in mint, reap or pool code. It did not occur in
-the final benchmark runs. Thread samples of the hung server and a repro
-script are in `results/ephemeral-823d8d0738/vacuum-analyze-hang/`; the
-release binary is stripped, so the samples show only that the threads are
-blocked on condition variables. The benchmark detects the hang, retries on a
-fresh server and records it.
-
-For a system whose point is running agent migrations, an intermittent
-whole-server hang matters more than any number above and should be
-reproduced with a symbolized build before anything is built on top.
+A database-wide `VACUUM ANALYZE` after building the template intermittently
+wedged the whole server. This has since been diagnosed and fixed; see
+`docs/pgx/vacuum-analyze-hang.md`.
 
 ## Not measured
 
@@ -191,7 +180,7 @@ reproduced with a symbolized build before anything is built on top.
 Do not design a new shared runtime yet. The existing feature covers the core
 of it, and the open questions are narrower than "build Phase 2":
 
-1. Reproduce and diagnose the `VACUUM ANALYZE` hang.
+1. ~~Reproduce and diagnose the `VACUUM ANALYZE` hang.~~ Done.
 2. Find what holds about 0.7 MB per idle database and why reaping does not
    release it.
 3. Test whether a reflink or ZFS copy can replace the file copy in the mint

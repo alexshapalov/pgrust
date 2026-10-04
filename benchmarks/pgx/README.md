@@ -77,6 +77,13 @@ per database up to 300, idle cost, reaping, isolation, and plain
 `CREATE DATABASE` as a reference (`createdb --engine postgres` for stock
 PostgreSQL). `--conf` and `--guc` select the server configuration.
 
+## Hang reproducer
+
+`repro-vacuum-hang.py --out <dir>` loops a template build plus
+`VACUUM ANALYZE` on fresh servers until one hangs, then records which
+connections still answer, the server's wait states, thread backtraces and
+the log. See `docs/pgx/vacuum-analyze-hang.md`.
+
 ## Results
 
 `results/<label>/` holds `env.json`, `startup.json`, `idle.json`,

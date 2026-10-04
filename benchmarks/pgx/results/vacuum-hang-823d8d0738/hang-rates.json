@@ -1,0 +1,132 @@
+{
+  "before_fix": {
+    "pgrust.runtime=off": {
+      "binary": "target-sym/release/postgres",
+      "settings": [
+        "pgrust.runtime=off",
+        "pgrust.ephemeral_db_prefix=tdb_",
+        "pgrust.ephemeral_db_mint_roles=postgres",
+        "pgrust.ephemeral_db_grace=3600"
+      ],
+      "statement": "VACUUM ANALYZE",
+      "schema": {
+        "tables": 50,
+        "rows_per_table": 200
+      },
+      "timeout_s": 10.0,
+      "tries": 40,
+      "hangs": 0,
+      "hung_iterations": [],
+      "errors": []
+    },
+    "pgrust.runtime_vacuum_pool=off": {
+      "binary": "target-sym/release/postgres",
+      "settings": [
+        "pgrust.runtime_vacuum_pool=off",
+        "pgrust.ephemeral_db_prefix=tdb_",
+        "pgrust.ephemeral_db_mint_roles=postgres",
+        "pgrust.ephemeral_db_grace=3600"
+      ],
+      "statement": "VACUUM ANALYZE",
+      "schema": {
+        "tables": 50,
+        "rows_per_table": 200
+      },
+      "timeout_s": 10.0,
+      "tries": 40,
+      "hangs": 0,
+      "hung_iterations": [],
+      "errors": []
+    },
+    "no ephemeral janitor (INVALID: binary was replaced mid-run)": {
+      "binary": "target-sym/release/postgres",
+      "settings": [],
+      "statement": "VACUUM ANALYZE",
+      "schema": {
+        "tables": 50,
+        "rows_per_table": 200
+      },
+      "timeout_s": 10.0,
+      "tries": 40,
+      "hangs": 6,
+      "hung_iterations": [
+        2,
+        13,
+        23,
+        24,
+        25,
+        28
+      ],
+      "errors": []
+    },
+    "default": {
+      "binary": "target-sym/release/postgres",
+      "settings": [
+        "pgrust.ephemeral_db_prefix=tdb_",
+        "pgrust.ephemeral_db_mint_roles=postgres",
+        "pgrust.ephemeral_db_grace=3600"
+      ],
+      "statement": "VACUUM ANALYZE",
+      "schema": {
+        "tables": 50,
+        "rows_per_table": 200
+      },
+      "timeout_s": 10.0,
+      "tries": 40,
+      "hangs": 12,
+      "hung_iterations": [
+        3,
+        4,
+        9,
+        11,
+        16,
+        20,
+        22,
+        23,
+        25,
+        26,
+        33,
+        37
+      ],
+      "errors": []
+    }
+  },
+  "after_fix": {
+    "binary": "target-sym/release/postgres",
+    "settings": [
+      "pgrust.ephemeral_db_prefix=tdb_",
+      "pgrust.ephemeral_db_mint_roles=postgres",
+      "pgrust.ephemeral_db_grace=3600"
+    ],
+    "statement": "VACUUM ANALYZE",
+    "schema": {
+      "tables": 50,
+      "rows_per_table": 200
+    },
+    "timeout_s": 10.0,
+    "tries": 100,
+    "hangs": 0,
+    "hung_iterations": [],
+    "errors": []
+  },
+  "first_reproduction_stripped_binary": {
+    "binary": "target/release/postgres",
+    "settings": [
+      "pgrust.ephemeral_db_prefix=tdb_",
+      "pgrust.ephemeral_db_mint_roles=postgres",
+      "pgrust.ephemeral_db_grace=3600"
+    ],
+    "statement": "VACUUM ANALYZE",
+    "schema": {
+      "tables": 50,
+      "rows_per_table": 200
+    },
+    "timeout_s": 30.0,
+    "tries": 8,
+    "hangs": 1,
+    "hung_iterations": [
+      8
+    ],
+    "errors": []
+  }
+}

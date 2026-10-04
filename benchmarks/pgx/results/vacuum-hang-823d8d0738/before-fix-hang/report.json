@@ -1,0 +1,272 @@
+{
+  "iteration": 2,
+  "hung_in": "VACUUM ANALYZE",
+  "pid": 23552,
+  "blast_radius": {
+    "existing connection, same database": {
+      "answered": true,
+      "ms": 1.4
+    },
+    "existing connection, other database": {
+      "answered": true,
+      "ms": 0.5
+    },
+    "new connection, same database": {
+      "answered": false,
+      "error": "no answer in 5 s"
+    },
+    "new connection, other database": {
+      "answered": false,
+      "error": "no answer in 5 s"
+    },
+    "new connection, existing ephemeral database": {
+      "answered": false,
+      "error": "no answer in 5 s"
+    },
+    "mint a new ephemeral database": {
+      "answered": false,
+      "error": "no answer in 5 s"
+    }
+  },
+  "activity": [
+    [
+      "1000",
+      null,
+      "checkpointer",
+      null,
+      "LWLock",
+      "BufferContent",
+      ""
+    ],
+    [
+      "1001",
+      null,
+      "background writer",
+      null,
+      "Activity",
+      "BgwriterMain",
+      ""
+    ],
+    [
+      "1003",
+      null,
+      null,
+      "starting",
+      "LWLock",
+      "RelCacheInit",
+      ""
+    ],
+    [
+      "1004",
+      null,
+      null,
+      "starting",
+      "LWLock",
+      "RelCacheInit",
+      ""
+    ],
+    [
+      "1005",
+      null,
+      null,
+      "starting",
+      "LWLock",
+      "RelCacheInit",
+      ""
+    ],
+    [
+      "1006",
+      null,
+      null,
+      "starting",
+      "LWLock",
+      "RelCacheInit",
+      ""
+    ],
+    [
+      "1007",
+      null,
+      null,
+      "starting",
+      "LWLock",
+      "RelCacheInit",
+      ""
+    ],
+    [
+      "1008",
+      null,
+      null,
+      "starting",
+      "LWLock",
+      "BufferContent",
+      ""
+    ],
+    [
+      "1009",
+      null,
+      null,
+      "starting",
+      "LWLock",
+      "RelCacheInit",
+      ""
+    ],
+    [
+      "1010",
+      "tpl_app",
+      null,
+      null,
+      null,
+      null,
+      ""
+    ],
+    [
+      "1011",
+      "tpl_app",
+      null,
+      null,
+      null,
+      null,
+      ""
+    ],
+    [
+      "1012",
+      null,
+      null,
+      "starting",
+      "LWLock",
+      "RelCacheInit",
+      ""
+    ],
+    [
+      "1013",
+      null,
+      null,
+      "starting",
+      "LWLock",
+      "RelCacheInit",
+      ""
+    ],
+    [
+      "1014",
+      "tpl_app",
+      null,
+      null,
+      null,
+      null,
+      ""
+    ],
+    [
+      "1034",
+      null,
+      "walwriter",
+      null,
+      "Activity",
+      "WalWriterMain",
+      ""
+    ],
+    [
+      "1035",
+      null,
+      "autovacuum launcher",
+      null,
+      "Activity",
+      "AutovacuumMain",
+      ""
+    ],
+    [
+      "1036",
+      null,
+      "logical replication launcher",
+      null,
+      "Activity",
+      "LogicalLauncherMain",
+      ""
+    ],
+    [
+      "1037",
+      "postgres",
+      "pgrust ephemeral-db janitor",
+      null,
+      "IPC",
+      "CheckpointDone",
+      ""
+    ],
+    [
+      "1039",
+      "postgres",
+      "client backend",
+      "idle",
+      "Client",
+      "ClientRead",
+      "CREATE DATABASE tpl_app"
+    ],
+    [
+      "1044",
+      "tpl_app",
+      "client backend",
+      "active",
+      "LWLock",
+      "RelCacheInit",
+      "VACUUM ANALYZE"
+    ],
+    [
+      "1045",
+      "tpl_app",
+      "client backend",
+      "idle",
+      "Client",
+      "ClientRead",
+      "SELECT 1"
+    ],
+    [
+      "1046",
+      "postgres",
+      "client backend",
+      "active",
+      null,
+      null,
+      "SELECT pid, datname, backend_type, state, wait_event_type, wait_event, left(query, 120) FROM pg_stat_activity ORDER BY p"
+    ],
+    [
+      "1047",
+      null,
+      "client backend",
+      "starting",
+      "LWLock",
+      "BufferContent",
+      ""
+    ],
+    [
+      "1048",
+      null,
+      "client backend",
+      "starting",
+      "LWLock",
+      "RelCacheInit",
+      ""
+    ],
+    [
+      "1049",
+      null,
+      "client backend",
+      "starting",
+      "LWLock",
+      "RelCacheInit",
+      ""
+    ],
+    [
+      "1050",
+      null,
+      "client backend",
+      "starting",
+      "Extension",
+      "Extension",
+      ""
+    ]
+  ],
+  "ungranted_locks": [],
+  "threads": 46,
+  "footprint_bytes": 155113216,
+  "rss_bytes": 34701312,
+  "cpu_ns_during_3s_sample": 6647708
+}
