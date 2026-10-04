@@ -1334,6 +1334,15 @@ fn write_relcache_init_file(shared: bool) -> PgResult<()> {
         }
         encode_entry(&mut buf, rel, *nailed);
     }
+    // Release the snapshot before the recheck below. While these clones are
+    // alive every entry looks in use to RelationFlushRelation (refcount_zero
+    // counts Rc holders), so AcceptInvalidationMessages under
+    // RelCacheInitLock would REBUILD each invalidated entry — a pg_class
+    // scan while holding the lock. An in-place updater holds the pg_class
+    // buffer lock while waiting for RelCacheInitLock (PreInplace_Inval), so
+    // that is a lock-order inversion that wedges every new connection. In C
+    // nothing is open here and the entries are only marked invalid.
+    drop(entries);
 
     // Temp file + rename: a backend starting concurrently must never see a
     // partially written file. C's temp name is unique per WRITER because
