@@ -42,7 +42,8 @@ def plan_lines(path):
 def main():
     outdir = sys.argv[1]
     tests, cur = {}, None
-    with open(os.path.join(outdir, "regression.diffs"), errors="replace") as f:
+    diffs = os.path.join(outdir, "regression.diffs")
+    with open(diffs if os.path.exists(diffs) else os.devnull, errors="replace") as f:
         for line in f:
             line = line.rstrip("\n")
             m = DIFF_RE.match(line)

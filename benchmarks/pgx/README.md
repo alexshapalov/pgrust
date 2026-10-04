@@ -62,6 +62,13 @@ differing file into plan-only (only `EXPLAIN` output changed) or semantic.
 `--server-arg` turns a run into a diagnostic. See the docstring for how its verdict differs from
 upstream pgrust's own gate, whose driver script is not part of this fork.
 
+## Configuration experiments
+
+`run-config-groups.sh` runs a fresh baseline and then each file in
+`configs/pgx/groups/` on its own through the full benchmark set and the
+regression suite, one result directory per group. Pass specific `.conf`
+files to run only those.
+
 ## Results
 
 `results/<label>/` holds `env.json`, `startup.json`, `idle.json`,

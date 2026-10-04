@@ -1,0 +1,179 @@
+{
+  "plan_only": [
+    "box",
+    "cluster",
+    "collate.icu.utf8",
+    "create_index",
+    "geometry",
+    "groupingsets",
+    "incremental_sort",
+    "join",
+    "limit",
+    "memoize",
+    "partition_aggregate",
+    "partition_join",
+    "partition_prune",
+    "portals",
+    "rangetypes",
+    "returning",
+    "select_distinct",
+    "subselect",
+    "tidscan",
+    "uuid",
+    "with"
+  ],
+  "semantic": [
+    "inet"
+  ],
+  "tests": {
+    "uuid": {
+      "plan_lines": 12,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "rangetypes": {
+      "plan_lines": 12,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "box": {
+      "plan_lines": 120,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "inet": {
+      "plan_lines": 68,
+      "semantic_lines": 16,
+      "semantic_examples": [
+        "+ 192.168.1.0/26 | 192.168.1.226",
+        "- 192.168.1.0/26 | 192.168.1.226",
+        "- 192.168.1.0/24 | 192.168.1.0/24",
+        "- 192.168.1.0/24 | 192.168.1.255/24",
+        "+ 192.168.1.0/26 | 192.168.1.226",
+        "+ 192.168.1.0/24 | 192.168.1.0/24",
+        "+ 192.168.1.0/24 | 192.168.1.255/24",
+        "- 192.168.1.0/26 | 192.168.1.226",
+        "- 192.168.1.0/24 | 192.168.1.0/24",
+        "- 192.168.1.0/24 | 192.168.1.255/24",
+        "+ 192.168.1.0/26 | 192.168.1.226",
+        "+ 192.168.1.0/24 | 192.168.1.0/24",
+        "+ 192.168.1.0/24 | 192.168.1.255/24",
+        "- 192.168.1.0/26 | 192.168.1.226",
+        "+ 192.168.1.0/26 | 192.168.1.226",
+        "- 192.168.1.0/26 | 192.168.1.226"
+      ],
+      "class": "semantic"
+    },
+    "geometry": {
+      "plan_lines": 20,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "create_index": {
+      "plan_lines": 29,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "select_distinct": {
+      "plan_lines": 25,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "subselect": {
+      "plan_lines": 61,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "join": {
+      "plan_lines": 212,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "portals": {
+      "plan_lines": 16,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "groupingsets": {
+      "plan_lines": 10,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "tidscan": {
+      "plan_lines": 48,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "collate.icu.utf8": {
+      "plan_lines": 20,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "incremental_sort": {
+      "plan_lines": 41,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "cluster": {
+      "plan_lines": 26,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "limit": {
+      "plan_lines": 11,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "returning": {
+      "plan_lines": 34,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "with": {
+      "plan_lines": 61,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "partition_join": {
+      "plan_lines": 150,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "partition_prune": {
+      "plan_lines": 331,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "partition_aggregate": {
+      "plan_lines": 194,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "memoize": {
+      "plan_lines": 39,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    }
+  }
+}

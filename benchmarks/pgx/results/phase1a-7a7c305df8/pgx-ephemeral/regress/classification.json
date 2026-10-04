@@ -1,0 +1,72 @@
+{
+  "plan_only": [
+    "incremental_sort",
+    "partition_aggregate",
+    "partition_prune",
+    "plpgsql",
+    "portals",
+    "select_distinct"
+  ],
+  "semantic": [
+    "select_parallel",
+    "stats"
+  ],
+  "tests": {
+    "select_distinct": {
+      "plan_lines": 8,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "portals": {
+      "plan_lines": 16,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "incremental_sort": {
+      "plan_lines": 27,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "select_parallel": {
+      "plan_lines": 26,
+      "semantic_lines": 4,
+      "semantic_examples": [
+        "-CONTEXT:  parallel worker",
+        "-parallel worker",
+        "- t             | t",
+        "+ t             | f"
+      ],
+      "class": "semantic"
+    },
+    "plpgsql": {
+      "plan_lines": 14,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "partition_prune": {
+      "plan_lines": 58,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "partition_aggregate": {
+      "plan_lines": 194,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "stats": {
+      "plan_lines": 0,
+      "semantic_lines": 2,
+      "semantic_examples": [
+        "- t",
+        "+ f"
+      ],
+      "class": "semantic"
+    }
+  }
+}

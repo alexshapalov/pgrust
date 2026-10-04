@@ -1,0 +1,346 @@
+{
+  "benchmark": "conns",
+  "engine": "pgrust",
+  "git_commit": "7a7c305df8b5b6b0c370cbdf594cc993a0431e97",
+  "load_average_at_end": [
+    5.63330078125,
+    8.248046875,
+    12.95947265625
+  ],
+  "system_cpu_idle_percent_at_end": 81.14,
+  "recorded_at_utc": "2026-10-04T07:19:02+00:00",
+  "definition": "fresh server per measurement; N connections opened over a Unix socket, each runs SELECT 1 and stays idle; memory sampled after settle_s. per_connection_bytes = (median at N - median at lowest N) / delta N using phys_footprint_bytes_sum",
+  "settle_s": 5.0,
+  "iterations": 3,
+  "summary": {
+    "0": {
+      "rss_bytes_sum_median": 19382272.0,
+      "phys_footprint_bytes_sum_median": 70652800.0,
+      "process_count": 1,
+      "thread_count": 36
+    },
+    "1": {
+      "rss_bytes_sum_median": 21495808.0,
+      "phys_footprint_bytes_sum_median": 72078144.0,
+      "process_count": 1,
+      "thread_count": 37,
+      "per_connection_bytes": 1425344.0
+    },
+    "10": {
+      "rss_bytes_sum_median": 20185088.0,
+      "phys_footprint_bytes_sum_median": 85874176.0,
+      "process_count": 1,
+      "thread_count": 46,
+      "per_connection_bytes": 1522137.6
+    },
+    "100": {
+      "rss_bytes_sum_median": 26116096.0,
+      "phys_footprint_bytes_sum_median": 228225728.0,
+      "process_count": 1,
+      "thread_count": 136,
+      "per_connection_bytes": 1575729.28
+    }
+  },
+  "samples": [
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 15712,
+          "rss_bytes": 19365888,
+          "phys_footprint_bytes": 71553856,
+          "cpu_user_ns": 30428333,
+          "cpu_system_ns": 44129125,
+          "idle_wakeups": 3,
+          "disk_read_bytes": 1519616,
+          "disk_written_bytes": 274432
+        }
+      ],
+      "thread_count": 36,
+      "rss_bytes_sum": 19365888,
+      "phys_footprint_bytes_sum": 71553856,
+      "cpu_user_ns_sum": 30428333,
+      "cpu_system_ns_sum": 44129125,
+      "idle_wakeups_sum": 3,
+      "disk_read_bytes_sum": 1519616,
+      "disk_written_bytes_sum": 274432,
+      "connections": 0,
+      "repetition": 0
+    },
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 16053,
+          "rss_bytes": 22249472,
+          "phys_footprint_bytes": 72078144,
+          "cpu_user_ns": 29463791,
+          "cpu_system_ns": 36431791,
+          "idle_wakeups": 6,
+          "disk_read_bytes": 1585152,
+          "disk_written_bytes": 274432
+        }
+      ],
+      "thread_count": 37,
+      "rss_bytes_sum": 22249472,
+      "phys_footprint_bytes_sum": 72078144,
+      "cpu_user_ns_sum": 29463791,
+      "cpu_system_ns_sum": 36431791,
+      "idle_wakeups_sum": 6,
+      "disk_read_bytes_sum": 1585152,
+      "disk_written_bytes_sum": 274432,
+      "connections": 1,
+      "repetition": 0
+    },
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 16220,
+          "rss_bytes": 22020096,
+          "phys_footprint_bytes": 86005376,
+          "cpu_user_ns": 36759666,
+          "cpu_system_ns": 51981083,
+          "idle_wakeups": 5,
+          "disk_read_bytes": 1499136,
+          "disk_written_bytes": 274432
+        }
+      ],
+      "thread_count": 46,
+      "rss_bytes_sum": 22020096,
+      "phys_footprint_bytes_sum": 86005376,
+      "cpu_user_ns_sum": 36759666,
+      "cpu_system_ns_sum": 51981083,
+      "idle_wakeups_sum": 5,
+      "disk_read_bytes_sum": 1499136,
+      "disk_written_bytes_sum": 274432,
+      "connections": 10,
+      "repetition": 0
+    },
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 16391,
+          "rss_bytes": 26066944,
+          "phys_footprint_bytes": 227750592,
+          "cpu_user_ns": 76884125,
+          "cpu_system_ns": 79091333,
+          "idle_wakeups": 76,
+          "disk_read_bytes": 1548288,
+          "disk_written_bytes": 274432
+        }
+      ],
+      "thread_count": 136,
+      "rss_bytes_sum": 26066944,
+      "phys_footprint_bytes_sum": 227750592,
+      "cpu_user_ns_sum": 76884125,
+      "cpu_system_ns_sum": 79091333,
+      "idle_wakeups_sum": 76,
+      "disk_read_bytes_sum": 1548288,
+      "disk_written_bytes_sum": 274432,
+      "connections": 100,
+      "repetition": 0
+    },
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 16634,
+          "rss_bytes": 19382272,
+          "phys_footprint_bytes": 70652800,
+          "cpu_user_ns": 28917000,
+          "cpu_system_ns": 40586750,
+          "idle_wakeups": 2,
+          "disk_read_bytes": 1503232,
+          "disk_written_bytes": 274432
+        }
+      ],
+      "thread_count": 36,
+      "rss_bytes_sum": 19382272,
+      "phys_footprint_bytes_sum": 70652800,
+      "cpu_user_ns_sum": 28917000,
+      "cpu_system_ns_sum": 40586750,
+      "idle_wakeups_sum": 2,
+      "disk_read_bytes_sum": 1503232,
+      "disk_written_bytes_sum": 274432,
+      "connections": 0,
+      "repetition": 1
+    },
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 16868,
+          "rss_bytes": 19464192,
+          "phys_footprint_bytes": 72192832,
+          "cpu_user_ns": 29344083,
+          "cpu_system_ns": 43034500,
+          "idle_wakeups": 5,
+          "disk_read_bytes": 1499136,
+          "disk_written_bytes": 274432
+        }
+      ],
+      "thread_count": 37,
+      "rss_bytes_sum": 19464192,
+      "phys_footprint_bytes_sum": 72192832,
+      "cpu_user_ns_sum": 29344083,
+      "cpu_system_ns_sum": 43034500,
+      "idle_wakeups_sum": 5,
+      "disk_read_bytes_sum": 1499136,
+      "disk_written_bytes_sum": 274432,
+      "connections": 1,
+      "repetition": 1
+    },
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 17254,
+          "rss_bytes": 20185088,
+          "phys_footprint_bytes": 85874176,
+          "cpu_user_ns": 33750375,
+          "cpu_system_ns": 46288541,
+          "idle_wakeups": 4,
+          "disk_read_bytes": 1495040,
+          "disk_written_bytes": 274432
+        }
+      ],
+      "thread_count": 46,
+      "rss_bytes_sum": 20185088,
+      "phys_footprint_bytes_sum": 85874176,
+      "cpu_user_ns_sum": 33750375,
+      "cpu_system_ns_sum": 46288541,
+      "idle_wakeups_sum": 4,
+      "disk_read_bytes_sum": 1495040,
+      "disk_written_bytes_sum": 274432,
+      "connections": 10,
+      "repetition": 1
+    },
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 17409,
+          "rss_bytes": 28393472,
+          "phys_footprint_bytes": 228225728,
+          "cpu_user_ns": 74593041,
+          "cpu_system_ns": 72902125,
+          "idle_wakeups": 63,
+          "disk_read_bytes": 1544192,
+          "disk_written_bytes": 274432
+        }
+      ],
+      "thread_count": 136,
+      "rss_bytes_sum": 28393472,
+      "phys_footprint_bytes_sum": 228225728,
+      "cpu_user_ns_sum": 74593041,
+      "cpu_system_ns_sum": 72902125,
+      "idle_wakeups_sum": 63,
+      "disk_read_bytes_sum": 1544192,
+      "disk_written_bytes_sum": 274432,
+      "connections": 100,
+      "repetition": 1
+    },
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 17597,
+          "rss_bytes": 19415040,
+          "phys_footprint_bytes": 69898944,
+          "cpu_user_ns": 30034958,
+          "cpu_system_ns": 43504000,
+          "idle_wakeups": 4,
+          "disk_read_bytes": 1556480,
+          "disk_written_bytes": 274432
+        }
+      ],
+      "thread_count": 36,
+      "rss_bytes_sum": 19415040,
+      "phys_footprint_bytes_sum": 69898944,
+      "cpu_user_ns_sum": 30034958,
+      "cpu_system_ns_sum": 43504000,
+      "idle_wakeups_sum": 4,
+      "disk_read_bytes_sum": 1556480,
+      "disk_written_bytes_sum": 274432,
+      "connections": 0,
+      "repetition": 2
+    },
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 17761,
+          "rss_bytes": 21495808,
+          "phys_footprint_bytes": 71209792,
+          "cpu_user_ns": 29088083,
+          "cpu_system_ns": 37859791,
+          "idle_wakeups": 8,
+          "disk_read_bytes": 1511424,
+          "disk_written_bytes": 274432
+        }
+      ],
+      "thread_count": 37,
+      "rss_bytes_sum": 21495808,
+      "phys_footprint_bytes_sum": 71209792,
+      "cpu_user_ns_sum": 29088083,
+      "cpu_system_ns_sum": 37859791,
+      "idle_wakeups_sum": 8,
+      "disk_read_bytes_sum": 1511424,
+      "disk_written_bytes_sum": 274432,
+      "connections": 1,
+      "repetition": 2
+    },
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 18016,
+          "rss_bytes": 20004864,
+          "phys_footprint_bytes": 85563072,
+          "cpu_user_ns": 30439416,
+          "cpu_system_ns": 36480083,
+          "idle_wakeups": 0,
+          "disk_read_bytes": 1531904,
+          "disk_written_bytes": 274432
+        }
+      ],
+      "thread_count": 46,
+      "rss_bytes_sum": 20004864,
+      "phys_footprint_bytes_sum": 85563072,
+      "cpu_user_ns_sum": 30439416,
+      "cpu_system_ns_sum": 36480083,
+      "idle_wakeups_sum": 0,
+      "disk_read_bytes_sum": 1531904,
+      "disk_written_bytes_sum": 274432,
+      "connections": 10,
+      "repetition": 2
+    },
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 18256,
+          "rss_bytes": 26116096,
+          "phys_footprint_bytes": 228963072,
+          "cpu_user_ns": 80004291,
+          "cpu_system_ns": 85692541,
+          "idle_wakeups": 22,
+          "disk_read_bytes": 1499136,
+          "disk_written_bytes": 274432
+        }
+      ],
+      "thread_count": 136,
+      "rss_bytes_sum": 26116096,
+      "phys_footprint_bytes_sum": 228963072,
+      "cpu_user_ns_sum": 80004291,
+      "cpu_system_ns_sum": 85692541,
+      "idle_wakeups_sum": 22,
+      "disk_read_bytes_sum": 1499136,
+      "disk_written_bytes_sum": 274432,
+      "connections": 100,
+      "repetition": 2
+    }
+  ]
+}

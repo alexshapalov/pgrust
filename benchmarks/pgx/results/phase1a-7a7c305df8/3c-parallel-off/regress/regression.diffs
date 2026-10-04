@@ -1,0 +1,508 @@
+diff -U3 /Users/alex/GPT/postgresrun/pgrust-pgx/crates/postgres-18.6-reference/src/test/regress/expected/select_distinct.out /Users/alex/GPT/postgresrun/pgrust-pgx/benchmarks/pgx/results/phase1a-7a7c305df8/3c-parallel-off/regress/results/select_distinct.out
+--- /Users/alex/GPT/postgresrun/pgrust-pgx/crates/postgres-18.6-reference/src/test/regress/expected/select_distinct.out	2026-10-03 23:20:22.100131172 -0700
++++ /Users/alex/GPT/postgresrun/pgrust-pgx/benchmarks/pgx/results/phase1a-7a7c305df8/3c-parallel-off/regress/results/select_distinct.out	2026-10-04 01:28:36.922761464 -0700
+@@ -279,15 +279,15 @@
+ -- Ensure we do parallel distinct now that the function is parallel safe
+ EXPLAIN (COSTS OFF)
+ SELECT DISTINCT distinct_func(1) FROM tenk1;
+-                     QUERY PLAN                     
+-----------------------------------------------------
++                                  QUERY PLAN                                   
++-------------------------------------------------------------------------------
+  Unique
+    ->  Gather Merge
+-         Workers Planned: 2
++         Workers Planned: 1
+          ->  Unique
+                ->  Sort
+                      Sort Key: (distinct_func(1))
+-                     ->  Parallel Seq Scan on tenk1
++                     ->  Parallel Index Only Scan using tenk1_hundred on tenk1
+ (7 rows)
+ 
+ RESET max_parallel_workers_per_gather;
+diff -U3 /Users/alex/GPT/postgresrun/pgrust-pgx/crates/postgres-18.6-reference/src/test/regress/expected/portals.out /Users/alex/GPT/postgresrun/pgrust-pgx/benchmarks/pgx/results/phase1a-7a7c305df8/3c-parallel-off/regress/results/portals.out
+--- /Users/alex/GPT/postgresrun/pgrust-pgx/crates/postgres-18.6-reference/src/test/regress/expected/portals.out	2026-10-03 23:20:22.090224079 -0700
++++ /Users/alex/GPT/postgresrun/pgrust-pgx/benchmarks/pgx/results/phase1a-7a7c305df8/3c-parallel-off/regress/results/portals.out	2026-10-04 01:28:36.955486520 -0700
+@@ -1493,11 +1493,10 @@
+ explain (costs off) declare c1 scroll cursor for select (select 42) as x;
+    QUERY PLAN   
+ ----------------
+- Materialize
++ Result
+    InitPlan 1
+      ->  Result
+-   ->  Result
+-(4 rows)
++(3 rows)
+ 
+ declare c1 scroll cursor for select (select 42) as x;
+ fetch all in c1;
+@@ -1522,12 +1521,11 @@
+ (2 rows)
+ 
+ explain (costs off) declare c2 scroll cursor for select generate_series(1,3) as g;
+-     QUERY PLAN     
+---------------------
+- Materialize
+-   ->  ProjectSet
+-         ->  Result
+-(3 rows)
++  QUERY PLAN  
++--------------
++ ProjectSet
++   ->  Result
++(2 rows)
+ 
+ declare c2 scroll cursor for select generate_series(1,3) as g;
+ fetch all in c2;
+diff -U3 /Users/alex/GPT/postgresrun/pgrust-pgx/crates/postgres-18.6-reference/src/test/regress/expected/incremental_sort.out /Users/alex/GPT/postgresrun/pgrust-pgx/benchmarks/pgx/results/phase1a-7a7c305df8/3c-parallel-off/regress/results/incremental_sort.out
+--- /Users/alex/GPT/postgresrun/pgrust-pgx/crates/postgres-18.6-reference/src/test/regress/expected/incremental_sort.out	2026-10-03 23:20:22.069236516 -0700
++++ /Users/alex/GPT/postgresrun/pgrust-pgx/benchmarks/pgx/results/phase1a-7a7c305df8/3c-parallel-off/regress/results/incremental_sort.out	2026-10-04 01:28:38.977935481 -0700
+@@ -1706,19 +1706,22 @@
+ select * from
+   (select * from tenk1 order by four) t1 join tenk1 t2 on t1.four = t2.four and t1.two = t2.two
+ order by t1.four, t1.two limit 1;
+-                              QUERY PLAN                               
+------------------------------------------------------------------------
++                        QUERY PLAN                        
++----------------------------------------------------------
+  Limit
+    ->  Merge Join
+-         Merge Cond: ((tenk1.four = t2.four) AND (tenk1.two = t2.two))
+-         ->  Incremental Sort
+-               Sort Key: tenk1.four, tenk1.two
+-               Presorted Key: tenk1.four
++         Merge Cond: (t2.four = tenk1.four)
++         Join Filter: (tenk1.two = t2.two)
++         ->  Gather Merge
++               Workers Planned: 1
+                ->  Sort
+-                     Sort Key: tenk1.four
+-                     ->  Seq Scan on tenk1
+-         ->  Sort
+-               Sort Key: t2.four, t2.two
+-               ->  Seq Scan on tenk1 t2
+-(12 rows)
++                     Sort Key: t2.four, t2.two
++                     ->  Parallel Seq Scan on tenk1 t2
++         ->  Materialize
++               ->  Gather Merge
++                     Workers Planned: 1
++                     ->  Sort
++                           Sort Key: tenk1.four
++                           ->  Parallel Seq Scan on tenk1
++(15 rows)
+ 
+diff -U3 /Users/alex/GPT/postgresrun/pgrust-pgx/crates/postgres-18.6-reference/src/test/regress/expected/select_parallel.out /Users/alex/GPT/postgresrun/pgrust-pgx/benchmarks/pgx/results/phase1a-7a7c305df8/3c-parallel-off/regress/results/select_parallel.out
+--- /Users/alex/GPT/postgresrun/pgrust-pgx/crates/postgres-18.6-reference/src/test/regress/expected/select_parallel.out	2026-10-03 23:20:22.101293340 -0700
++++ /Users/alex/GPT/postgresrun/pgrust-pgx/benchmarks/pgx/results/phase1a-7a7c305df8/3c-parallel-off/regress/results/select_parallel.out	2026-10-04 01:28:40.699979405 -0700
+@@ -592,10 +592,10 @@
+                Rows Removed by Filter: 9990
+          ->  Gather (actual rows=9800.00 loops=10)
+                Workers Planned: 4
+-               Workers Launched: 4
+-               ->  Parallel Seq Scan on tenk1 (actual rows=1960.00 loops=50)
++               Workers Launched: 0
++               ->  Parallel Seq Scan on tenk1 (actual rows=9800.00 loops=10)
+                      Filter: (hundred > 1)
+-                     Rows Removed by Filter: 40
++                     Rows Removed by Filter: 200
+ (11 rows)
+ 
+ alter table tenk2 reset (parallel_workers);
+@@ -623,17 +623,13 @@
+    ->  Values Scan on "*VALUES*" (actual rows=3.00 loops=1)
+    ->  Gather Merge (actual rows=10000.00 loops=3)
+          Workers Planned: 4
+-         Workers Launched: 4
+-         ->  Sort (actual rows=2000.00 loops=15)
++         Workers Launched: 0
++         ->  Sort (actual rows=10000.00 loops=3)
+                Sort Key: tenk1.ten
+                Sort Method: quicksort  Memory: xxx
+-               Worker 0:  Sort Method: quicksort  Memory: xxx
+-               Worker 1:  Sort Method: quicksort  Memory: xxx
+-               Worker 2:  Sort Method: quicksort  Memory: xxx
+-               Worker 3:  Sort Method: quicksort  Memory: xxx
+-               ->  Parallel Seq Scan on tenk1 (actual rows=2000.00 loops=15)
++               ->  Parallel Seq Scan on tenk1 (actual rows=10000.00 loops=3)
+                      Filter: (ten < 100)
+-(14 rows)
++(10 rows)
+ 
+ reset enable_indexscan;
+ reset enable_hashjoin;
+@@ -1171,12 +1167,12 @@
+ SAVEPOINT settings;
+ SET LOCAL debug_parallel_query = 1;
+ EXPLAIN (analyze, timing off, summary off, costs off, buffers off) SELECT * FROM tenk1;
+-                           QUERY PLAN                           
+-----------------------------------------------------------------
++                           QUERY PLAN                            
++-----------------------------------------------------------------
+  Gather (actual rows=10000.00 loops=1)
+    Workers Planned: 4
+-   Workers Launched: 4
+-   ->  Parallel Seq Scan on tenk1 (actual rows=2000.00 loops=5)
++   Workers Launched: 0
++   ->  Parallel Seq Scan on tenk1 (actual rows=10000.00 loops=1)
+ (4 rows)
+ 
+ ROLLBACK TO SAVEPOINT settings;
+@@ -1186,7 +1182,6 @@
+ SET LOCAL debug_parallel_query = 1;
+ select (stringu1 || repeat('abcd', 5000))::int2 from tenk1 where unique1 = 1;
+ ERROR:  invalid input syntax for type smallint: "BAAAAAabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd"
+-CONTEXT:  parallel worker
+ ROLLBACK TO SAVEPOINT settings;
+ -- test interaction with set-returning functions
+ SAVEPOINT settings;
+@@ -1390,7 +1385,6 @@
+ select set_role_and_error(0);
+ ERROR:  division by zero
+ CONTEXT:  SQL function "set_role_and_error" statement 1
+-parallel worker
+ reset debug_parallel_query;
+ drop function set_and_report_role();
+ drop function set_role_and_error(int);
+@@ -1432,6 +1426,6 @@
+   where datname = current_database();
+  wrk_to_launch | wrk_launched 
+ ---------------+--------------
+- t             | t
++ t             | f
+ (1 row)
+ 
+diff -U3 /Users/alex/GPT/postgresrun/pgrust-pgx/crates/postgres-18.6-reference/src/test/regress/expected/plpgsql.out /Users/alex/GPT/postgresrun/pgrust-pgx/benchmarks/pgx/results/phase1a-7a7c305df8/3c-parallel-off/regress/results/plpgsql.out
+--- /Users/alex/GPT/postgresrun/pgrust-pgx/crates/postgres-18.6-reference/src/test/regress/expected/plpgsql.out	2026-10-03 23:20:22.088416618 -0700
++++ /Users/alex/GPT/postgresrun/pgrust-pgx/benchmarks/pgx/results/phase1a-7a7c305df8/3c-parallel-off/regress/results/plpgsql.out	2026-10-04 01:28:42.282069401 -0700
+@@ -4111,15 +4111,11 @@
+ $$ language plpgsql parallel safe;
+ set debug_parallel_query to on;
+ explain (verbose, costs off) select error_trap_test();
+-            QUERY PLAN             
+------------------------------------
+- Gather
+-   Output: (error_trap_test())
+-   Workers Planned: 1
+-   Single Copy: true
+-   ->  Result
+-         Output: error_trap_test()
+-(6 rows)
++         QUERY PLAN          
++-----------------------------
++ Result
++   Output: error_trap_test()
++(2 rows)
+ 
+ select error_trap_test();
+       error_trap_test      
+diff -U3 /Users/alex/GPT/postgresrun/pgrust-pgx/crates/postgres-18.6-reference/src/test/regress/expected/partition_prune.out /Users/alex/GPT/postgresrun/pgrust-pgx/benchmarks/pgx/results/phase1a-7a7c305df8/3c-parallel-off/regress/results/partition_prune.out
+--- /Users/alex/GPT/postgresrun/pgrust-pgx/crates/postgres-18.6-reference/src/test/regress/expected/partition_prune.out	2026-10-03 23:20:22.086631658 -0700
++++ /Users/alex/GPT/postgresrun/pgrust-pgx/benchmarks/pgx/results/phase1a-7a7c305df8/3c-parallel-off/regress/results/partition_prune.out	2026-10-04 01:28:43.295816308 -0700
+@@ -4202,19 +4202,16 @@
+ -- Ensure that listp_12_2 is not scanned.  (The nested Append is not seen in
+ -- the plan as it's pulled in setref.c due to having just a single subnode).
+ select explain_parallel_append('select * from listp where a = (select 1);');
+-                       explain_parallel_append                        
+-----------------------------------------------------------------------
+- Gather (actual rows=N loops=N)
+-   Workers Planned: 2
+-   Workers Launched: N
++                   explain_parallel_append                    
++--------------------------------------------------------------
++ Append (actual rows=N loops=N)
+    InitPlan 1
+      ->  Result (actual rows=N loops=N)
+-   ->  Parallel Append (actual rows=N loops=N)
+-         ->  Seq Scan on listp_12_1 listp_1 (actual rows=N loops=N)
+-               Filter: (a = (InitPlan 1).col1)
+-         ->  Parallel Seq Scan on listp_12_2 listp_2 (never executed)
+-               Filter: (a = (InitPlan 1).col1)
+-(10 rows)
++   ->  Seq Scan on listp_12_1 listp_1 (actual rows=N loops=N)
++         Filter: (a = (InitPlan 1).col1)
++   ->  Seq Scan on listp_12_2 listp_2 (never executed)
++         Filter: (a = (InitPlan 1).col1)
++(7 rows)
+ 
+ -- Like the above but throw some more complexity at the planner by adding
+ -- a UNION ALL.  We expect both sides of the union not to scan the
+@@ -4223,27 +4220,24 @@
+ 'select * from listp where a = (select 1)
+   union all
+ select * from listp where a = (select 2);');
+-                              explain_parallel_append                              
+------------------------------------------------------------------------------------
+- Gather (actual rows=N loops=N)
+-   Workers Planned: 2
+-   Workers Launched: N
+-   ->  Parallel Append (actual rows=N loops=N)
+-         ->  Parallel Append (actual rows=N loops=N)
+-               InitPlan 2
+-                 ->  Result (actual rows=N loops=N)
+-               ->  Seq Scan on listp_12_1 listp_1 (never executed)
+-                     Filter: (a = (InitPlan 2).col1)
+-               ->  Parallel Seq Scan on listp_12_2 listp_2 (actual rows=N loops=N)
+-                     Filter: (a = (InitPlan 2).col1)
+-         ->  Parallel Append (actual rows=N loops=N)
+-               InitPlan 1
+-                 ->  Result (actual rows=N loops=N)
+-               ->  Seq Scan on listp_12_1 listp_4 (actual rows=N loops=N)
+-                     Filter: (a = (InitPlan 1).col1)
+-               ->  Parallel Seq Scan on listp_12_2 listp_5 (never executed)
+-                     Filter: (a = (InitPlan 1).col1)
+-(18 rows)
++                      explain_parallel_append                       
++--------------------------------------------------------------------
++ Append (actual rows=N loops=N)
++   ->  Append (actual rows=N loops=N)
++         InitPlan 1
++           ->  Result (actual rows=N loops=N)
++         ->  Seq Scan on listp_12_1 listp_1 (actual rows=N loops=N)
++               Filter: (a = (InitPlan 1).col1)
++         ->  Seq Scan on listp_12_2 listp_2 (never executed)
++               Filter: (a = (InitPlan 1).col1)
++   ->  Append (actual rows=N loops=N)
++         InitPlan 2
++           ->  Result (actual rows=N loops=N)
++         ->  Seq Scan on listp_12_1 listp_4 (never executed)
++               Filter: (a = (InitPlan 2).col1)
++         ->  Seq Scan on listp_12_2 listp_5 (actual rows=N loops=N)
++               Filter: (a = (InitPlan 2).col1)
++(15 rows)
+ 
+ drop table listp;
+ reset parallel_tuple_cost;
+diff -U3 /Users/alex/GPT/postgresrun/pgrust-pgx/crates/postgres-18.6-reference/src/test/regress/expected/partition_aggregate.out /Users/alex/GPT/postgresrun/pgrust-pgx/benchmarks/pgx/results/phase1a-7a7c305df8/3c-parallel-off/regress/results/partition_aggregate.out
+--- /Users/alex/GPT/postgresrun/pgrust-pgx/crates/postgres-18.6-reference/src/test/regress/expected/partition_aggregate.out	2026-10-03 23:20:22.085307990 -0700
++++ /Users/alex/GPT/postgresrun/pgrust-pgx/benchmarks/pgx/results/phase1a-7a7c305df8/3c-parallel-off/regress/results/partition_aggregate.out	2026-10-04 01:28:43.244987079 -0700
+@@ -1062,40 +1062,42 @@
+ -- PARTITION KEY, thus we will have a partial aggregation for them.
+ EXPLAIN (COSTS OFF)
+ SELECT a, sum(b), count(*) FROM pagg_tab_ml GROUP BY a HAVING avg(b) < 3 ORDER BY 1, 2, 3;
+-                                   QUERY PLAN                                    
+----------------------------------------------------------------------------------
++                                      QUERY PLAN                                       
++---------------------------------------------------------------------------------------
+  Sort
+    Sort Key: pagg_tab_ml.a, (sum(pagg_tab_ml.b)), (count(*))
+-   ->  Append
+-         ->  HashAggregate
+-               Group Key: pagg_tab_ml.a
+-               Filter: (avg(pagg_tab_ml.b) < '3'::numeric)
+-               ->  Seq Scan on pagg_tab_ml_p1 pagg_tab_ml
+-         ->  Finalize GroupAggregate
+-               Group Key: pagg_tab_ml_2.a
+-               Filter: (avg(pagg_tab_ml_2.b) < '3'::numeric)
+-               ->  Sort
+-                     Sort Key: pagg_tab_ml_2.a
+-                     ->  Append
+-                           ->  Partial HashAggregate
+-                                 Group Key: pagg_tab_ml_2.a
+-                                 ->  Seq Scan on pagg_tab_ml_p2_s1 pagg_tab_ml_2
+-                           ->  Partial HashAggregate
+-                                 Group Key: pagg_tab_ml_3.a
+-                                 ->  Seq Scan on pagg_tab_ml_p2_s2 pagg_tab_ml_3
+-         ->  Finalize GroupAggregate
+-               Group Key: pagg_tab_ml_5.a
+-               Filter: (avg(pagg_tab_ml_5.b) < '3'::numeric)
+-               ->  Sort
+-                     Sort Key: pagg_tab_ml_5.a
+-                     ->  Append
+-                           ->  Partial HashAggregate
+-                                 Group Key: pagg_tab_ml_5.a
+-                                 ->  Seq Scan on pagg_tab_ml_p3_s1 pagg_tab_ml_5
+-                           ->  Partial HashAggregate
+-                                 Group Key: pagg_tab_ml_6.a
+-                                 ->  Seq Scan on pagg_tab_ml_p3_s2 pagg_tab_ml_6
+-(31 rows)
++   ->  Gather
++         Workers Planned: 2
++         ->  Parallel Append
++               ->  HashAggregate
++                     Group Key: pagg_tab_ml.a
++                     Filter: (avg(pagg_tab_ml.b) < '3'::numeric)
++                     ->  Seq Scan on pagg_tab_ml_p1 pagg_tab_ml
++               ->  Finalize GroupAggregate
++                     Group Key: pagg_tab_ml_5.a
++                     Filter: (avg(pagg_tab_ml_5.b) < '3'::numeric)
++                     ->  Sort
++                           Sort Key: pagg_tab_ml_5.a
++                           ->  Append
++                                 ->  Partial HashAggregate
++                                       Group Key: pagg_tab_ml_5.a
++                                       ->  Seq Scan on pagg_tab_ml_p3_s1 pagg_tab_ml_5
++                                 ->  Partial HashAggregate
++                                       Group Key: pagg_tab_ml_6.a
++                                       ->  Seq Scan on pagg_tab_ml_p3_s2 pagg_tab_ml_6
++               ->  Finalize GroupAggregate
++                     Group Key: pagg_tab_ml_2.a
++                     Filter: (avg(pagg_tab_ml_2.b) < '3'::numeric)
++                     ->  Sort
++                           Sort Key: pagg_tab_ml_2.a
++                           ->  Append
++                                 ->  Partial HashAggregate
++                                       Group Key: pagg_tab_ml_2.a
++                                       ->  Seq Scan on pagg_tab_ml_p2_s1 pagg_tab_ml_2
++                                 ->  Partial HashAggregate
++                                       Group Key: pagg_tab_ml_3.a
++                                       ->  Seq Scan on pagg_tab_ml_p2_s2 pagg_tab_ml_3
++(33 rows)
+ 
+ SELECT a, sum(b), count(*) FROM pagg_tab_ml GROUP BY a HAVING avg(b) < 3 ORDER BY 1, 2, 3;
+  a  | sum  | count 
+@@ -1115,31 +1117,33 @@
+ -- PARTITION KEY
+ EXPLAIN (COSTS OFF)
+ SELECT b, sum(a), count(*) FROM pagg_tab_ml GROUP BY b ORDER BY 1, 2, 3;
+-                                QUERY PLAN                                 
+----------------------------------------------------------------------------
++                                        QUERY PLAN                                        
++------------------------------------------------------------------------------------------
+  Sort
+    Sort Key: pagg_tab_ml.b, (sum(pagg_tab_ml.a)), (count(*))
+    ->  Finalize GroupAggregate
+          Group Key: pagg_tab_ml.b
+-         ->  Sort
+-               Sort Key: pagg_tab_ml.b
+-               ->  Append
+-                     ->  Partial HashAggregate
+-                           Group Key: pagg_tab_ml.b
+-                           ->  Seq Scan on pagg_tab_ml_p1 pagg_tab_ml
+-                     ->  Partial HashAggregate
+-                           Group Key: pagg_tab_ml_1.b
+-                           ->  Seq Scan on pagg_tab_ml_p2_s1 pagg_tab_ml_1
+-                     ->  Partial HashAggregate
+-                           Group Key: pagg_tab_ml_2.b
+-                           ->  Seq Scan on pagg_tab_ml_p2_s2 pagg_tab_ml_2
+-                     ->  Partial HashAggregate
+-                           Group Key: pagg_tab_ml_3.b
+-                           ->  Seq Scan on pagg_tab_ml_p3_s1 pagg_tab_ml_3
+-                     ->  Partial HashAggregate
+-                           Group Key: pagg_tab_ml_4.b
+-                           ->  Seq Scan on pagg_tab_ml_p3_s2 pagg_tab_ml_4
+-(22 rows)
++         ->  Gather Merge
++               Workers Planned: 2
++               ->  Sort
++                     Sort Key: pagg_tab_ml.b
++                     ->  Parallel Append
++                           ->  Partial HashAggregate
++                                 Group Key: pagg_tab_ml.b
++                                 ->  Parallel Seq Scan on pagg_tab_ml_p1 pagg_tab_ml
++                           ->  Partial HashAggregate
++                                 Group Key: pagg_tab_ml_3.b
++                                 ->  Parallel Seq Scan on pagg_tab_ml_p3_s1 pagg_tab_ml_3
++                           ->  Partial HashAggregate
++                                 Group Key: pagg_tab_ml_1.b
++                                 ->  Parallel Seq Scan on pagg_tab_ml_p2_s1 pagg_tab_ml_1
++                           ->  Partial HashAggregate
++                                 Group Key: pagg_tab_ml_4.b
++                                 ->  Parallel Seq Scan on pagg_tab_ml_p3_s2 pagg_tab_ml_4
++                           ->  Partial HashAggregate
++                                 Group Key: pagg_tab_ml_2.b
++                                 ->  Parallel Seq Scan on pagg_tab_ml_p2_s2 pagg_tab_ml_2
++(24 rows)
+ 
+ SELECT b, sum(a), count(*) FROM pagg_tab_ml GROUP BY b HAVING avg(a) < 15 ORDER BY 1, 2, 3;
+  b |  sum  | count 
+@@ -1154,32 +1158,34 @@
+ -- Full aggregation at all levels as GROUP BY clause matches with PARTITION KEY
+ EXPLAIN (COSTS OFF)
+ SELECT a, sum(b), count(*) FROM pagg_tab_ml GROUP BY a, b, c HAVING avg(b) > 7 ORDER BY 1, 2, 3;
+-                                 QUERY PLAN                                 
+-----------------------------------------------------------------------------
+- Sort
+-   Sort Key: pagg_tab_ml.a, (sum(pagg_tab_ml.b)), (count(*))
+-   ->  Append
+-         ->  HashAggregate
+-               Group Key: pagg_tab_ml.a, pagg_tab_ml.b, pagg_tab_ml.c
+-               Filter: (avg(pagg_tab_ml.b) > '7'::numeric)
+-               ->  Seq Scan on pagg_tab_ml_p1 pagg_tab_ml
+-         ->  HashAggregate
+-               Group Key: pagg_tab_ml_1.a, pagg_tab_ml_1.b, pagg_tab_ml_1.c
+-               Filter: (avg(pagg_tab_ml_1.b) > '7'::numeric)
+-               ->  Seq Scan on pagg_tab_ml_p2_s1 pagg_tab_ml_1
+-         ->  HashAggregate
+-               Group Key: pagg_tab_ml_2.a, pagg_tab_ml_2.b, pagg_tab_ml_2.c
+-               Filter: (avg(pagg_tab_ml_2.b) > '7'::numeric)
+-               ->  Seq Scan on pagg_tab_ml_p2_s2 pagg_tab_ml_2
+-         ->  HashAggregate
+-               Group Key: pagg_tab_ml_3.a, pagg_tab_ml_3.b, pagg_tab_ml_3.c
+-               Filter: (avg(pagg_tab_ml_3.b) > '7'::numeric)
+-               ->  Seq Scan on pagg_tab_ml_p3_s1 pagg_tab_ml_3
+-         ->  HashAggregate
+-               Group Key: pagg_tab_ml_4.a, pagg_tab_ml_4.b, pagg_tab_ml_4.c
+-               Filter: (avg(pagg_tab_ml_4.b) > '7'::numeric)
+-               ->  Seq Scan on pagg_tab_ml_p3_s2 pagg_tab_ml_4
+-(23 rows)
++                                    QUERY PLAN                                    
++----------------------------------------------------------------------------------
++ Gather Merge
++   Workers Planned: 2
++   ->  Sort
++         Sort Key: pagg_tab_ml.a, (sum(pagg_tab_ml.b)), (count(*))
++         ->  Parallel Append
++               ->  HashAggregate
++                     Group Key: pagg_tab_ml.a, pagg_tab_ml.b, pagg_tab_ml.c
++                     Filter: (avg(pagg_tab_ml.b) > '7'::numeric)
++                     ->  Seq Scan on pagg_tab_ml_p1 pagg_tab_ml
++               ->  HashAggregate
++                     Group Key: pagg_tab_ml_3.a, pagg_tab_ml_3.b, pagg_tab_ml_3.c
++                     Filter: (avg(pagg_tab_ml_3.b) > '7'::numeric)
++                     ->  Seq Scan on pagg_tab_ml_p3_s1 pagg_tab_ml_3
++               ->  HashAggregate
++                     Group Key: pagg_tab_ml_1.a, pagg_tab_ml_1.b, pagg_tab_ml_1.c
++                     Filter: (avg(pagg_tab_ml_1.b) > '7'::numeric)
++                     ->  Seq Scan on pagg_tab_ml_p2_s1 pagg_tab_ml_1
++               ->  HashAggregate
++                     Group Key: pagg_tab_ml_4.a, pagg_tab_ml_4.b, pagg_tab_ml_4.c
++                     Filter: (avg(pagg_tab_ml_4.b) > '7'::numeric)
++                     ->  Seq Scan on pagg_tab_ml_p3_s2 pagg_tab_ml_4
++               ->  HashAggregate
++                     Group Key: pagg_tab_ml_2.a, pagg_tab_ml_2.b, pagg_tab_ml_2.c
++                     Filter: (avg(pagg_tab_ml_2.b) > '7'::numeric)
++                     ->  Seq Scan on pagg_tab_ml_p2_s2 pagg_tab_ml_2
++(25 rows)
+ 
+ SELECT a, sum(b), count(*) FROM pagg_tab_ml GROUP BY a, b, c HAVING avg(b) > 7 ORDER BY 1, 2, 3;
+  a  | sum  | count 
+@@ -1523,20 +1529,22 @@
+ -----------------------------------------------------------------------------
+  Sort
+    Sort Key: pagg_tab_para.x, (sum(pagg_tab_para.y)), (avg(pagg_tab_para.y))
+-   ->  Append
+-         ->  HashAggregate
+-               Group Key: pagg_tab_para.x
+-               Filter: (avg(pagg_tab_para.y) < '7'::numeric)
+-               ->  Seq Scan on pagg_tab_para_p1 pagg_tab_para
+-         ->  HashAggregate
+-               Group Key: pagg_tab_para_1.x
+-               Filter: (avg(pagg_tab_para_1.y) < '7'::numeric)
+-               ->  Seq Scan on pagg_tab_para_p2 pagg_tab_para_1
+-         ->  HashAggregate
+-               Group Key: pagg_tab_para_2.x
+-               Filter: (avg(pagg_tab_para_2.y) < '7'::numeric)
+-               ->  Seq Scan on pagg_tab_para_p3 pagg_tab_para_2
+-(15 rows)
++   ->  Gather
++         Workers Planned: 2
++         ->  Parallel Append
++               ->  HashAggregate
++                     Group Key: pagg_tab_para.x
++                     Filter: (avg(pagg_tab_para.y) < '7'::numeric)
++                     ->  Seq Scan on pagg_tab_para_p1 pagg_tab_para
++               ->  HashAggregate
++                     Group Key: pagg_tab_para_1.x
++                     Filter: (avg(pagg_tab_para_1.y) < '7'::numeric)
++                     ->  Seq Scan on pagg_tab_para_p2 pagg_tab_para_1
++               ->  HashAggregate
++                     Group Key: pagg_tab_para_2.x
++                     Filter: (avg(pagg_tab_para_2.y) < '7'::numeric)
++                     ->  Seq Scan on pagg_tab_para_p3 pagg_tab_para_2
++(17 rows)
+ 
+ SELECT x, sum(y), avg(y), count(*) FROM pagg_tab_para GROUP BY x HAVING avg(y) < 7 ORDER BY 1, 2, 3;
+  x  | sum  |        avg         | count 

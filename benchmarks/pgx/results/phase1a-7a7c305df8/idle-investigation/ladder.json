@@ -1,0 +1,592 @@
+[
+ {
+  "step": "baseline (defaults)",
+  "footprint_mb": 65.9,
+  "rss_mb": 18.5,
+  "threads": 36,
+  "startup_ms": 86.8,
+  "categories": {
+   "IOAccelerator": 49.0,
+   "MALLOC_MEDIUM": 8.7,
+   "__DATA_CONST": 2.2,
+   "stack": 1.6,
+   "page table": 1.2,
+   "__DATA": 1.1,
+   "MALLOC_NANO": 0.8
+  },
+  "thread_names": {
+   "DispatchQueue_1: com.a": 1,
+   "checkpointer": 1,
+   "bgwriter": 1,
+   "rtworker": 12,
+   "memwatchdog": 1,
+   "standby": 16,
+   "pg-timeout-timer": 1,
+   "wal_writer": 1,
+   "autovacuum launcher": 1,
+   "bgworker": 1
+  },
+  "settings": []
+ },
+ {
+  "step": "+ max_parallel_workers=0, per_gather=0",
+  "footprint_mb": 53.2,
+  "rss_mb": 18.5,
+  "threads": 20,
+  "startup_ms": 74.6,
+  "categories": {
+   "IOAccelerator": 40.0,
+   "MALLOC_MEDIUM": 5.8,
+   "__DATA_CONST": 2.2,
+   "__DATA": 1.1,
+   "page table": 0.9,
+   "stack": 0.9,
+   "MALLOC_NANO": 0.8
+  },
+  "thread_names": {
+   "DispatchQueue_1: com.a": 1,
+   "checkpointer": 1,
+   "bgwriter": 1,
+   "rtworker": 12,
+   "memwatchdog": 1,
+   "pg-timeout-timer": 1,
+   "wal_writer": 1,
+   "autovacuum launcher": 1,
+   "bgworker": 1
+  },
+  "settings": [
+   "max_parallel_workers=0",
+   "max_parallel_workers_per_gather=0"
+  ]
+ },
+ {
+  "step": "+ pgrust.runtime=off",
+  "footprint_mb": 41.4,
+  "rss_mb": 18.4,
+  "threads": 8,
+  "startup_ms": 86.8,
+  "categories": {
+   "IOAccelerator": 32.0,
+   "MALLOC_MEDIUM": 2.7,
+   "__DATA_CONST": 2.2,
+   "__DATA": 1.1,
+   "MALLOC_NANO": 0.9,
+   "page table": 0.6
+  },
+  "thread_names": {
+   "DispatchQueue_1: com.a": 1,
+   "checkpointer": 1,
+   "bgwriter": 1,
+   "memwatchdog": 1,
+   "pg-timeout-timer": 1,
+   "wal_writer": 1,
+   "autovacuum launcher": 1,
+   "bgworker": 1
+  },
+  "settings": [
+   "max_parallel_workers=0",
+   "max_parallel_workers_per_gather=0",
+   "pgrust.runtime=off"
+  ]
+ },
+ {
+  "step": "+ shared_buffers=16MB",
+  "footprint_mb": 29.0,
+  "rss_mb": 18.5,
+  "threads": 8,
+  "startup_ms": 96.7,
+  "categories": {
+   "IOAccelerator": 20.0,
+   "MALLOC_MEDIUM": 2.7,
+   "__DATA_CONST": 2.2,
+   "__DATA": 1.2,
+   "MALLOC_NANO": 0.8,
+   "page table": 0.6
+  },
+  "thread_names": {
+   "DispatchQueue_1: com.a": 1,
+   "checkpointer": 1,
+   "bgwriter": 1,
+   "memwatchdog": 1,
+   "pg-timeout-timer": 1,
+   "wal_writer": 1,
+   "autovacuum launcher": 1,
+   "bgworker": 1
+  },
+  "settings": [
+   "max_parallel_workers=0",
+   "max_parallel_workers_per_gather=0",
+   "pgrust.runtime=off",
+   "shared_buffers=16MB"
+  ]
+ },
+ {
+  "step": "+ wal_buffers=64kB",
+  "footprint_mb": 29.4,
+  "rss_mb": 18.4,
+  "threads": 8,
+  "startup_ms": 86.4,
+  "categories": {
+   "IOAccelerator": 20.0,
+   "MALLOC_MEDIUM": 3.0,
+   "__DATA_CONST": 2.2,
+   "__DATA": 1.2,
+   "MALLOC_NANO": 1.0,
+   "page table": 0.6
+  },
+  "thread_names": {
+   "DispatchQueue_1: com.a": 1,
+   "checkpointer": 1,
+   "bgwriter": 1,
+   "memwatchdog": 1,
+   "pg-timeout-timer": 1,
+   "wal_writer": 1,
+   "autovacuum launcher": 1,
+   "bgworker": 1
+  },
+  "settings": [
+   "max_parallel_workers=0",
+   "max_parallel_workers_per_gather=0",
+   "pgrust.runtime=off",
+   "shared_buffers=16MB",
+   "wal_buffers=64kB"
+  ]
+ },
+ {
+  "step": "+ max_connections=20",
+  "footprint_mb": 24.9,
+  "rss_mb": 18.4,
+  "threads": 8,
+  "startup_ms": 89.4,
+  "categories": {
+   "IOAccelerator": 16.0,
+   "MALLOC_MEDIUM": 2.5,
+   "__DATA_CONST": 2.2,
+   "__DATA": 1.2,
+   "MALLOC_NANO": 0.7,
+   "page table": 0.6
+  },
+  "thread_names": {
+   "DispatchQueue_1: com.a": 1,
+   "checkpointer": 1,
+   "bgwriter": 1,
+   "memwatchdog": 1,
+   "pg-timeout-timer": 1,
+   "wal_writer": 1,
+   "autovacuum launcher": 1,
+   "bgworker": 1
+  },
+  "settings": [
+   "max_parallel_workers=0",
+   "max_parallel_workers_per_gather=0",
+   "pgrust.runtime=off",
+   "shared_buffers=16MB",
+   "wal_buffers=64kB",
+   "max_connections=20"
+  ]
+ },
+ {
+  "step": "+ shared_buffers=1MB",
+  "footprint_mb": 24.5,
+  "rss_mb": 18.3,
+  "threads": 8,
+  "startup_ms": 98.3,
+  "categories": {
+   "IOAccelerator": 15.0,
+   "MALLOC_MEDIUM": 3.0,
+   "__DATA_CONST": 2.2,
+   "__DATA": 1.2,
+   "MALLOC_NANO": 0.9,
+   "page table": 0.6
+  },
+  "thread_names": {
+   "DispatchQueue_1: com.a": 1,
+   "checkpointer": 1,
+   "bgwriter": 1,
+   "memwatchdog": 1,
+   "pg-timeout-timer": 1,
+   "wal_writer": 1,
+   "autovacuum launcher": 1,
+   "bgworker": 1
+  },
+  "settings": [
+   "max_parallel_workers=0",
+   "max_parallel_workers_per_gather=0",
+   "pgrust.runtime=off",
+   "wal_buffers=64kB",
+   "max_connections=20",
+   "shared_buffers=1MB"
+  ]
+ },
+ {
+  "step": "+ max_connections=10",
+  "footprint_mb": 23.3,
+  "rss_mb": 18.1,
+  "threads": 8,
+  "startup_ms": 94.3,
+  "categories": {
+   "IOAccelerator": 14.0,
+   "MALLOC_MEDIUM": 2.9,
+   "__DATA_CONST": 2.2,
+   "__DATA": 1.2,
+   "MALLOC_NANO": 0.8,
+   "page table": 0.6
+  },
+  "thread_names": {
+   "DispatchQueue_1: com.a": 1,
+   "checkpointer": 1,
+   "bgwriter": 1,
+   "memwatchdog": 1,
+   "pg-timeout-timer": 1,
+   "wal_writer": 1,
+   "autovacuum launcher": 1,
+   "bgworker": 1
+  },
+  "settings": [
+   "max_parallel_workers=0",
+   "max_parallel_workers_per_gather=0",
+   "pgrust.runtime=off",
+   "wal_buffers=64kB",
+   "shared_buffers=1MB",
+   "max_connections=10",
+   "superuser_reserved_connections=1",
+   "reserved_connections=0"
+  ]
+ },
+ {
+  "step": "+ max_locks_per_transaction=10 (min)",
+  "footprint_mb": 23.3,
+  "rss_mb": 16.4,
+  "threads": 8,
+  "startup_ms": 107.1,
+  "categories": {
+   "IOAccelerator": 14.0,
+   "MALLOC_MEDIUM": 3.0,
+   "__DATA_CONST": 2.2,
+   "__DATA": 1.1,
+   "MALLOC_NANO": 1.0,
+   "page table": 0.6
+  },
+  "thread_names": {
+   "DispatchQueue_1: com.a": 1,
+   "checkpointer": 1,
+   "bgwriter": 1,
+   "memwatchdog": 1,
+   "pg-timeout-timer": 1,
+   "wal_writer": 1,
+   "autovacuum launcher": 1,
+   "bgworker": 1
+  },
+  "settings": [
+   "max_parallel_workers=0",
+   "max_parallel_workers_per_gather=0",
+   "pgrust.runtime=off",
+   "wal_buffers=64kB",
+   "shared_buffers=1MB",
+   "max_connections=10",
+   "superuser_reserved_connections=1",
+   "reserved_connections=0",
+   "max_locks_per_transaction=10"
+  ]
+ },
+ {
+  "step": "+ replication off (wal_level=minimal, senders/slots/logical workers=0)",
+  "footprint_mb": 21.3,
+  "rss_mb": 18.2,
+  "threads": 7,
+  "startup_ms": 190.6,
+  "categories": {
+   "IOAccelerator": 12.0,
+   "MALLOC_MEDIUM": 3.0,
+   "__DATA_CONST": 2.2,
+   "__DATA": 1.1,
+   "MALLOC_NANO": 0.7,
+   "page table": 0.6
+  },
+  "thread_names": {
+   "DispatchQueue_1: com.a": 1,
+   "checkpointer": 1,
+   "bgwriter": 1,
+   "memwatchdog": 1,
+   "pg-timeout-timer": 1,
+   "wal_writer": 1,
+   "autovacuum launcher": 1
+  },
+  "settings": [
+   "max_parallel_workers=0",
+   "max_parallel_workers_per_gather=0",
+   "pgrust.runtime=off",
+   "wal_buffers=64kB",
+   "shared_buffers=1MB",
+   "max_connections=10",
+   "superuser_reserved_connections=1",
+   "reserved_connections=0",
+   "max_locks_per_transaction=10",
+   "wal_level=minimal",
+   "max_wal_senders=0",
+   "max_replication_slots=0",
+   "max_logical_replication_workers=0"
+  ]
+ },
+ {
+  "step": "+ max_worker_processes=1, autovacuum_worker_slots=1",
+  "footprint_mb": 19.5,
+  "rss_mb": 18.2,
+  "threads": 7,
+  "startup_ms": 103.7,
+  "categories": {
+   "IOAccelerator": 11.0,
+   "MALLOC_MEDIUM": 2.7,
+   "__DATA_CONST": 2.2,
+   "__DATA": 1.2,
+   "MALLOC_NANO": 0.7,
+   "page table": 0.5
+  },
+  "thread_names": {
+   "DispatchQueue_1: com.a": 1,
+   "checkpointer": 1,
+   "bgwriter": 1,
+   "memwatchdog": 1,
+   "pg-timeout-timer": 1,
+   "wal_writer": 1,
+   "autovacuum launcher": 1
+  },
+  "settings": [
+   "max_parallel_workers=0",
+   "max_parallel_workers_per_gather=0",
+   "pgrust.runtime=off",
+   "wal_buffers=64kB",
+   "shared_buffers=1MB",
+   "max_connections=10",
+   "superuser_reserved_connections=1",
+   "reserved_connections=0",
+   "max_locks_per_transaction=10",
+   "wal_level=minimal",
+   "max_wal_senders=0",
+   "max_replication_slots=0",
+   "max_logical_replication_workers=0",
+   "max_worker_processes=1",
+   "autovacuum_worker_slots=1",
+   "autovacuum_max_workers=1"
+  ]
+ },
+ {
+  "step": "+ autovacuum=off",
+  "footprint_mb": 18.3,
+  "rss_mb": 18.1,
+  "threads": 6,
+  "startup_ms": 102.8,
+  "categories": {
+   "IOAccelerator": 9.4,
+   "MALLOC_MEDIUM": 3.0,
+   "__DATA_CONST": 2.2,
+   "__DATA": 1.2,
+   "MALLOC_NANO": 0.7,
+   "page table": 0.6
+  },
+  "thread_names": {
+   "DispatchQueue_1: com.a": 1,
+   "checkpointer": 1,
+   "bgwriter": 1,
+   "memwatchdog": 1,
+   "pg-timeout-timer": 1,
+   "wal_writer": 1
+  },
+  "settings": [
+   "max_parallel_workers=0",
+   "max_parallel_workers_per_gather=0",
+   "pgrust.runtime=off",
+   "wal_buffers=64kB",
+   "shared_buffers=1MB",
+   "max_connections=10",
+   "superuser_reserved_connections=1",
+   "reserved_connections=0",
+   "max_locks_per_transaction=10",
+   "wal_level=minimal",
+   "max_wal_senders=0",
+   "max_replication_slots=0",
+   "max_logical_replication_workers=0",
+   "max_worker_processes=1",
+   "autovacuum_worker_slots=1",
+   "autovacuum_max_workers=1",
+   "autovacuum=off"
+  ]
+ },
+ {
+  "step": "+ pgrust.memory_watchdog=off",
+  "footprint_mb": 19.0,
+  "rss_mb": 18.0,
+  "threads": 6,
+  "startup_ms": 107.2,
+  "categories": {
+   "IOAccelerator": 9.6,
+   "MALLOC_MEDIUM": 3.2,
+   "__DATA_CONST": 2.2,
+   "__DATA": 1.1,
+   "MALLOC_NANO": 0.9,
+   "page table": 0.6
+  },
+  "thread_names": {
+   "DispatchQueue_1: com.a": 1,
+   "checkpointer": 1,
+   "bgwriter": 1,
+   "memwatchdog": 1,
+   "pg-timeout-timer": 1,
+   "wal_writer": 1
+  },
+  "settings": [
+   "max_parallel_workers=0",
+   "max_parallel_workers_per_gather=0",
+   "pgrust.runtime=off",
+   "wal_buffers=64kB",
+   "shared_buffers=1MB",
+   "max_connections=10",
+   "superuser_reserved_connections=1",
+   "reserved_connections=0",
+   "max_locks_per_transaction=10",
+   "wal_level=minimal",
+   "max_wal_senders=0",
+   "max_replication_slots=0",
+   "max_logical_replication_workers=0",
+   "max_worker_processes=1",
+   "autovacuum_worker_slots=1",
+   "autovacuum_max_workers=1",
+   "autovacuum=off",
+   "pgrust.memory_watchdog=off"
+  ]
+ },
+ {
+  "step": "+ shared_catalog_cache=off",
+  "footprint_mb": 17.4,
+  "rss_mb": 18.0,
+  "threads": 6,
+  "startup_ms": 141.7,
+  "categories": {
+   "IOAccelerator": 8.8,
+   "MALLOC_MEDIUM": 2.2,
+   "__DATA_CONST": 2.2,
+   "__DATA": 1.2,
+   "MALLOC_NANO": 1.0,
+   "page table": 0.6
+  },
+  "thread_names": {
+   "DispatchQueue_1: com.a": 1,
+   "checkpointer": 1,
+   "bgwriter": 1,
+   "memwatchdog": 1,
+   "pg-timeout-timer": 1,
+   "wal_writer": 1
+  },
+  "settings": [
+   "max_parallel_workers=0",
+   "max_parallel_workers_per_gather=0",
+   "pgrust.runtime=off",
+   "wal_buffers=64kB",
+   "shared_buffers=1MB",
+   "max_connections=10",
+   "superuser_reserved_connections=1",
+   "reserved_connections=0",
+   "max_locks_per_transaction=10",
+   "wal_level=minimal",
+   "max_wal_senders=0",
+   "max_replication_slots=0",
+   "max_logical_replication_workers=0",
+   "max_worker_processes=1",
+   "autovacuum_worker_slots=1",
+   "autovacuum_max_workers=1",
+   "autovacuum=off",
+   "pgrust.memory_watchdog=off",
+   "shared_catalog_cache=off"
+  ]
+ },
+ {
+  "step": "+ jit=off",
+  "footprint_mb": 18.4,
+  "rss_mb": 18.0,
+  "threads": 6,
+  "startup_ms": 122.9,
+  "categories": {
+   "IOAccelerator": 9.3,
+   "MALLOC_MEDIUM": 2.7,
+   "__DATA_CONST": 2.2,
+   "__DATA": 1.2,
+   "MALLOC_NANO": 1.1,
+   "page table": 0.6
+  },
+  "thread_names": {
+   "DispatchQueue_1: com.a": 1,
+   "checkpointer": 1,
+   "bgwriter": 1,
+   "memwatchdog": 1,
+   "pg-timeout-timer": 1,
+   "wal_writer": 1
+  },
+  "settings": [
+   "max_parallel_workers=0",
+   "max_parallel_workers_per_gather=0",
+   "pgrust.runtime=off",
+   "wal_buffers=64kB",
+   "shared_buffers=1MB",
+   "max_connections=10",
+   "superuser_reserved_connections=1",
+   "reserved_connections=0",
+   "max_locks_per_transaction=10",
+   "wal_level=minimal",
+   "max_wal_senders=0",
+   "max_replication_slots=0",
+   "max_logical_replication_workers=0",
+   "max_worker_processes=1",
+   "autovacuum_worker_slots=1",
+   "autovacuum_max_workers=1",
+   "autovacuum=off",
+   "pgrust.memory_watchdog=off",
+   "shared_catalog_cache=off",
+   "jit=off"
+  ]
+ },
+ {
+  "step": "+ shared_buffers=128kB (min)",
+  "footprint_mb": 16.9,
+  "rss_mb": 18.0,
+  "threads": 6,
+  "startup_ms": 96.7,
+  "categories": {
+   "IOAccelerator": 8.1,
+   "MALLOC_MEDIUM": 2.7,
+   "__DATA_CONST": 2.2,
+   "__DATA": 1.1,
+   "MALLOC_NANO": 0.8,
+   "page table": 0.6
+  },
+  "thread_names": {
+   "DispatchQueue_1: com.a": 1,
+   "checkpointer": 1,
+   "bgwriter": 1,
+   "memwatchdog": 1,
+   "pg-timeout-timer": 1,
+   "wal_writer": 1
+  },
+  "settings": [
+   "max_parallel_workers=0",
+   "max_parallel_workers_per_gather=0",
+   "pgrust.runtime=off",
+   "wal_buffers=64kB",
+   "max_connections=10",
+   "superuser_reserved_connections=1",
+   "reserved_connections=0",
+   "max_locks_per_transaction=10",
+   "wal_level=minimal",
+   "max_wal_senders=0",
+   "max_replication_slots=0",
+   "max_logical_replication_workers=0",
+   "max_worker_processes=1",
+   "autovacuum_worker_slots=1",
+   "autovacuum_max_workers=1",
+   "autovacuum=off",
+   "pgrust.memory_watchdog=off",
+   "shared_catalog_cache=off",
+   "jit=off",
+   "shared_buffers=128kB"
+  ]
+ }
+]

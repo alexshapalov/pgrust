@@ -62,6 +62,7 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--port", type=int, default=54330)
     ap.add_argument("--schedule", default=os.path.join(REGRESS_SRC, "parallel_schedule"))
+    ap.add_argument("--conf", help="file appended to postgresql.conf (a PGX experiment)")
     ap.add_argument("--server-arg", action="append", default=[],
                     help="extra server argument (repeatable); makes the run a diagnostic, not a baseline")
     ap.add_argument("--max-connections", type=int, default=None,
@@ -71,7 +72,7 @@ def main():
     prefix = pb.pg18_prefix()
     binary = args.binary or (os.path.join(pb.REPO, "target", "release", "postgres")
                              if args.engine == "pgrust" else os.path.join(prefix, "bin", "postgres"))
-    engine = pb.Engine(args.engine, binary, args.server_arg)
+    engine = pb.Engine(args.engine, binary, args.server_arg, args.conf)
     pg_regress = os.path.join(prefix, "lib", "postgresql", "pgxs", "src", "test", "regress", "pg_regress")
     pkglibdir = subprocess.run([os.path.join(prefix, "bin", "pg_config"), "--pkglibdir"],
                                capture_output=True, text=True, check=True).stdout.strip()

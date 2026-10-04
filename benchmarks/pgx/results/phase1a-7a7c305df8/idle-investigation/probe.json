@@ -1,0 +1,114 @@
+[
+ {
+  "name": "baseline",
+  "pre_fp": 63.942138671875,
+  "pre_threads": 36,
+  "fp": 67.03607177734375,
+  "threads": 36
+ },
+ {
+  "name": "shared_buffers=16MB",
+  "pre_fp": 51.05157470703125,
+  "pre_threads": 36,
+  "fp": 53.1297607421875,
+  "threads": 36
+ },
+ {
+  "name": "shared_buffers=1MB",
+  "pre_fp": 48.67657470703125,
+  "pre_threads": 36,
+  "fp": 51.67657470703125,
+  "threads": 36
+ },
+ {
+  "name": "max_connections=20",
+  "pre_fp": 57.5045166015625,
+  "pre_threads": 36,
+  "fp": 60.4263916015625,
+  "threads": 36
+ },
+ {
+  "name": "max_worker_processes=2,par=0",
+  "pre_fp": 48.34710693359375,
+  "pre_threads": 20,
+  "fp": 51.37835693359375,
+  "threads": 20
+ },
+ {
+  "name": "pgrust.runtime=off",
+  "pre_fp": 52.01934814453125,
+  "pre_threads": 24,
+  "fp": 54.7694091796875,
+  "threads": 24
+ },
+ {
+  "name": "jit=off",
+  "pre_fp": 63.41094970703125,
+  "pre_threads": 36,
+  "fp": 66.44219970703125,
+  "threads": 36
+ },
+ {
+  "name": "autovacuum=off",
+  "pre_fp": 62.19195556640625,
+  "pre_threads": 35,
+  "fp": 65.02008056640625,
+  "threads": 35
+ },
+ {
+  "name": "memory_watchdog=off",
+  "pre_fp": 62.59832763671875,
+  "pre_threads": 36,
+  "fp": 65.77020263671875,
+  "threads": 36
+ },
+ {
+  "name": "autoprewarm=off",
+  "pre_fp": 64.03582763671875,
+  "pre_threads": 36,
+  "fp": 66.942138671875,
+  "threads": 36
+ },
+ {
+  "name": "shared_catalog_cache=off",
+  "pre_fp": 63.457763671875,
+  "pre_threads": 36,
+  "fp": 65.97344970703125,
+  "threads": 36
+ },
+ {
+  "name": "pg_stat_statements.max=100",
+  "pre_fp": 63.94232177734375,
+  "pre_threads": 36,
+  "fp": 66.8173828125,
+  "threads": 36
+ },
+ {
+  "name": "wal_buffers=64kB",
+  "pre_fp": 59.176513671875,
+  "pre_threads": 36,
+  "fp": 61.973388671875,
+  "threads": 36
+ },
+ {
+  "name": "max_logical_replication_workers=0",
+  "pre_fp": 61.77001953125,
+  "pre_threads": 35,
+  "fp": 64.80133056640625,
+  "threads": 35
+ },
+ {
+  "name": "wal_level=minimal,senders=0",
+  "pre_fp": 62.629638671875,
+  "pre_threads": 36,
+  "fp": 65.55157470703125,
+  "threads": 36
+ },
+ {
+  "name": "max_locks_per_transaction=10",
+  "pre_fp": 60.4420166015625,
+  "pre_threads": 36,
+  "fp": 63.0982666015625,
+  "threads": 36
+ }
+]

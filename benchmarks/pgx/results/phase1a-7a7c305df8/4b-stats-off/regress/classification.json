@@ -1,0 +1,249 @@
+{
+  "plan_only": [
+    "box",
+    "cluster",
+    "collate.icu.utf8",
+    "create_index",
+    "geometry",
+    "groupingsets",
+    "incremental_sort",
+    "join",
+    "limit",
+    "memoize",
+    "partition_aggregate",
+    "partition_join",
+    "partition_prune",
+    "portals",
+    "rangetypes",
+    "returning",
+    "select_distinct",
+    "subselect",
+    "tidscan",
+    "uuid",
+    "with"
+  ],
+  "semantic": [
+    "copy",
+    "inet",
+    "stats",
+    "vacuum"
+  ],
+  "tests": {
+    "uuid": {
+      "plan_lines": 12,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "rangetypes": {
+      "plan_lines": 12,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "box": {
+      "plan_lines": 120,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "inet": {
+      "plan_lines": 68,
+      "semantic_lines": 16,
+      "semantic_examples": [
+        "+ 192.168.1.0/26 | 192.168.1.226",
+        "- 192.168.1.0/26 | 192.168.1.226",
+        "- 192.168.1.0/24 | 192.168.1.0/24",
+        "- 192.168.1.0/24 | 192.168.1.255/24",
+        "+ 192.168.1.0/26 | 192.168.1.226",
+        "+ 192.168.1.0/24 | 192.168.1.0/24",
+        "+ 192.168.1.0/24 | 192.168.1.255/24",
+        "- 192.168.1.0/26 | 192.168.1.226",
+        "- 192.168.1.0/24 | 192.168.1.0/24",
+        "- 192.168.1.0/24 | 192.168.1.255/24",
+        "+ 192.168.1.0/26 | 192.168.1.226",
+        "+ 192.168.1.0/24 | 192.168.1.0/24",
+        "+ 192.168.1.0/24 | 192.168.1.255/24",
+        "- 192.168.1.0/26 | 192.168.1.226",
+        "+ 192.168.1.0/26 | 192.168.1.226",
+        "- 192.168.1.0/26 | 192.168.1.226"
+      ],
+      "class": "semantic"
+    },
+    "geometry": {
+      "plan_lines": 20,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "copy": {
+      "plan_lines": 0,
+      "semantic_lines": 6,
+      "semantic_examples": [
+        "-INFO:  progress: {\"type\": \"PIPE\", \"command\": \"COPY FROM\", \"relname\": \"tab_progress_reporting\", \"tuples_skipped\": 0, \"has_bytes_total\": false, \"tuples_excluded\": 0, \"tuples_processed\": 3, \"has_bytes_processed\": true}",
+        "+INFO:  progress: <NULL>",
+        "-INFO:  progress: {\"type\": \"FILE\", \"command\": \"COPY FROM\", \"relname\": \"tab_progress_reporting\", \"tuples_skipped\": 0, \"has_bytes_total\": true, \"tuples_excluded\": 1, \"tuples_processed\": 2, \"has_bytes_processed\": true}",
+        "+INFO:  progress: <NULL>",
+        "-INFO:  progress: {\"type\": \"PIPE\", \"command\": \"COPY FROM\", \"relname\": \"tab_progress_reporting\", \"tuples_skipped\": 2, \"has_bytes_total\": false, \"tuples_excluded\": 0, \"tuples_processed\": 1, \"has_bytes_processed\": true}",
+        "+INFO:  progress: <NULL>"
+      ],
+      "class": "semantic"
+    },
+    "create_index": {
+      "plan_lines": 29,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "vacuum": {
+      "plan_lines": 0,
+      "semantic_lines": 36,
+      "semantic_examples": [
+        "- only_parted  | t        | f",
+        "+ only_parted  | f        | f",
+        "- only_parted  | t        | f",
+        "- only_parted1 | t        | f",
+        "+ only_parted  | f        | f",
+        "+ only_parted1 | f        | f",
+        "- only_inh_parent | t        | f",
+        "+ only_inh_parent | f        | f",
+        "- only_inh_child  | t        | f",
+        "- only_inh_parent | t        | f",
+        "+ only_inh_child  | f        | f",
+        "+ only_inh_parent | f        | f",
+        "- only_inh_child  | t        | f",
+        "- only_inh_parent | t        | t",
+        "+ only_inh_child  | f        | f",
+        "+ only_inh_parent | f        | f",
+        "- only_inh_child  | t        | t",
+        "- only_inh_parent | t        | t",
+        "+ only_inh_child  | f        | f",
+        "+ only_inh_parent | f        | f"
+      ],
+      "class": "semantic"
+    },
+    "select_distinct": {
+      "plan_lines": 25,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "subselect": {
+      "plan_lines": 61,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "join": {
+      "plan_lines": 212,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "portals": {
+      "plan_lines": 16,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "groupingsets": {
+      "plan_lines": 10,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "tidscan": {
+      "plan_lines": 48,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "collate.icu.utf8": {
+      "plan_lines": 20,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "incremental_sort": {
+      "plan_lines": 41,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "cluster": {
+      "plan_lines": 26,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "limit": {
+      "plan_lines": 11,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "returning": {
+      "plan_lines": 34,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "with": {
+      "plan_lines": 61,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "partition_join": {
+      "plan_lines": 150,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "partition_prune": {
+      "plan_lines": 331,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "partition_aggregate": {
+      "plan_lines": 194,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "memoize": {
+      "plan_lines": 39,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    },
+    "stats": {
+      "plan_lines": 0,
+      "semantic_lines": 88,
+      "semantic_examples": [
+        "- on",
+        "+ off",
+        "- trunc_stats_test  |         3 |         0 |         0 |          0 |          0",
+        "- trunc_stats_test1 |         4 |         2 |         1 |          1 |          0",
+        "- trunc_stats_test2 |         1 |         0 |         0 |          1 |          0",
+        "- trunc_stats_test3 |         4 |         0 |         0 |          2 |          2",
+        "- trunc_stats_test4 |         2 |         0 |         0 |          0 |          2",
+        "+ trunc_stats_test  |         0 |         0 |         0 |          0 |          0",
+        "+ trunc_stats_test1 |         0 |         0 |         0 |          0 |          0",
+        "+ trunc_stats_test2 |         0 |         0 |         0 |          0 |          0",
+        "+ trunc_stats_test3 |         0 |         0 |         0 |          0 |          0",
+        "+ trunc_stats_test4 |         0 |         0 |         0 |          0 |          0",
+        "- t        | t        | t        | t",
+        "+ f        | f        | f        | f",
+        "- t        | t",
+        "+ f        | f",
+        "-                       1",
+        "+                       0",
+        "-                       1",
+        "+                       0"
+      ],
+      "class": "semantic"
+    }
+  }
+}
