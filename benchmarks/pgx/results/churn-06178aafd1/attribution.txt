@@ -1,0 +1,22 @@
+Side tests for the churn result. Footprint in MB after each cycle of 100
+databases created, used and dropped; file_copy_method=clone, PGX profile.
+
+Shared catalog cache, default cap (262,144 entries), 3 cycles:
+  default                          141.6  201.3  257.2
+  shared_catalog_cache=off          81.8   85.0   89.5
+  pgrust.ephemeral_db_prewarm=off  139.2  195.9  270.6
+
+PGRUST_L2_CACHE_MAX_ENTRIES=20000, 6 cycles:
+  120.3  124.7  129.9  154.5  161.7  165.2
+
+PGRUST_L2_CACHE_MAX_ENTRIES=2000, 7 cycles (looking for the owner of the
+residual ~3.3 MB/cycle; none of these removes it):
+  no other change                   84.9   91.0   94.8   98.3  122.8  125.7  127.5
+  track_counts=off                  63.1   67.8   70.9   75.9   78.7   82.5   85.3
+  autovacuum=off                    85.0   90.0   93.8  118.1  121.8  125.5  130.0
+  pgrust.ephemeral_db_prewarm=off   83.2   86.2   89.3  112.0  115.4  117.6  119.9
+
+Memory watchdog ledger during churn (limit 150 MB), three firings:
+  accounted_contexts=2573 kB   allocator_committed=336384 kB
+  accounted_contexts=6561 kB   allocator_committed=378880 kB
+  accounted_contexts=3251 kB   allocator_committed=457600 kB

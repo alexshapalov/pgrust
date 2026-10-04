@@ -141,6 +141,8 @@ def main():
             f.write("\n")
         print("wrote", path)
     finally:
+        import shutil
+        shutil.copy(srv.log_path, os.path.join(args.out, "server.log"))
         srv.stop()
         ws.cleanup()
 

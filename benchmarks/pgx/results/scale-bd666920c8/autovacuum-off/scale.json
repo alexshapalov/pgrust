@@ -1,0 +1,131 @@
+{
+  "benchmark": "scale",
+  "git_commit": "bd666920c8d468b39a7807e5a680d991d0a294a2",
+  "conf": "/Users/alex/GPT/postgresrun/pgrust-pgx/configs/pgx-ephemeral.conf",
+  "settings": [
+    "pgrust.ephemeral_db_prefix=tdb_",
+    "pgrust.ephemeral_db_mint_roles=postgres",
+    "pgrust.ephemeral_db_grace=86400",
+    "max_connections=130",
+    "file_copy_method=clone",
+    "autovacuum=off"
+  ],
+  "template": {
+    "tables": 50,
+    "rows_per_table": 200
+  },
+  "idle": [
+    {
+      "databases": 0,
+      "mint_ms": null,
+      "footprint_bytes": 59820608,
+      "rss_bytes": 26329088,
+      "threads": 7,
+      "fds": 167,
+      "datadir_apparent_bytes": 72990720,
+      "idle_window_s": 60,
+      "idle_cpu_percent_per_10s": [
+        0.044,
+        0.0624,
+        0.0349,
+        0.0485,
+        0.0487,
+        0.0523
+      ],
+      "idle_cpu_percent_mean": 0.0485,
+      "idle_cpu_percent_last_minute": 0.0485,
+      "idle_disk_written_bytes": 0,
+      "idle_wakeups": 11,
+      "on_cpu": {
+        "samples_per_thread": 7898,
+        "busy_share_by_thread": {
+          "pg:bgworker": 0.0004,
+          "pg-timeout-timer": 0.0003,
+          "pg:wal_writer": 0.0001
+        }
+      }
+    },
+    {
+      "databases": 300,
+      "mint_ms": {
+        "n": 300000.0,
+        "min": 77.0,
+        "p50": 93.7,
+        "p95": 125.6,
+        "p99": 147.2,
+        "max": 213.6,
+        "mean": 97.0
+      },
+      "footprint_bytes": 226430016,
+      "rss_bytes": 26902528,
+      "threads": 7,
+      "fds": 102,
+      "datadir_apparent_bytes": 4698095616,
+      "idle_window_s": 60,
+      "idle_cpu_percent_per_10s": [
+        0.0878,
+        0.0881,
+        0.0927,
+        0.0862,
+        0.0559,
+        0.064
+      ],
+      "idle_cpu_percent_mean": 0.0791,
+      "idle_cpu_percent_last_minute": 0.0791,
+      "idle_disk_written_bytes": 0,
+      "idle_wakeups": 20,
+      "on_cpu": {
+        "samples_per_thread": 7755,
+        "busy_share_by_thread": {
+          "pg:bgworker": 0.0004,
+          "DispatchQueue_1: com.apple.main-thread  (serial)": 0.0001,
+          "pg:checkpointer": 0.0001,
+          "pg:memwatchdog": 0.0001
+        }
+      }
+    },
+    {
+      "databases": 1000,
+      "mint_ms": {
+        "n": 700000.0,
+        "min": 78.2,
+        "p50": 94.4,
+        "p95": 132.7,
+        "p99": 150.5,
+        "max": 184.9,
+        "mean": 99.1
+      },
+      "footprint_bytes": 635981696,
+      "rss_bytes": 22822912,
+      "threads": 7,
+      "fds": 104,
+      "datadir_apparent_bytes": 15490433024,
+      "idle_window_s": 60,
+      "idle_cpu_percent_per_10s": [
+        0.1411,
+        0.1595,
+        0.109,
+        0.1404,
+        0.1595,
+        0.1026
+      ],
+      "idle_cpu_percent_mean": 0.1353,
+      "idle_cpu_percent_last_minute": 0.1353,
+      "idle_disk_written_bytes": 0,
+      "idle_wakeups": 17,
+      "on_cpu": {
+        "samples_per_thread": 7830,
+        "busy_share_by_thread": {
+          "pg:bgworker": 0.0011,
+          "DispatchQueue_1: com.apple.main-thread  (serial)": 0.0003,
+          "pg:bgwriter": 0.0003,
+          "pg:memwatchdog": 0.0003,
+          "pg:checkpointer": 0.0001,
+          "pg-timeout-timer": 0.0001,
+          "pg:wal_writer": 0.0001
+        }
+      }
+    }
+  ],
+  "active": []
+}

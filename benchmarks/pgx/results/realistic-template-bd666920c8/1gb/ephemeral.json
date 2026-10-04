@@ -1,0 +1,193 @@
+{
+  "benchmark": "ephemeral",
+  "engine": "pgrust",
+  "conf": "configs/pgx-ephemeral.conf",
+  "extra_gucs": [],
+  "git_commit": "bd666920c8d468b39a7807e5a680d991d0a294a2",
+  "load_average": [
+    7.677734375,
+    9.4248046875,
+    7.81787109375
+  ],
+  "template_shape": {
+    "tables": 50,
+    "rows_per_table": 47000
+  },
+  "template": {
+    "tables": 50,
+    "rows_per_table": 47000,
+    "size_bytes": 483672591,
+    "build_s": 29.99592487490736,
+    "seal_s": 2.073498541954905
+  },
+  "density": {
+    "definition": "sequential mint-on-connect of N databases (connect to a new name, SELECT count(*), disconnect); memory and data directory sampled with no clients connected",
+    "mint_latency_ms": {
+      "n": 30,
+      "min": 104.29158294573426,
+      "p50": 132.62212451081723,
+      "p95": 199.83203307492658,
+      "p99": 373.3095978153871,
+      "max": 441.13437505438924,
+      "mean": 148.93403327247748
+    },
+    "mint_latency_first_30_ms": {
+      "n": 30,
+      "min": 104.29158294573426,
+      "p50": 132.62212451081723,
+      "p95": 199.83203307492658,
+      "p99": 373.3095978153871,
+      "max": 441.13437505438924,
+      "mean": 148.93403327247748
+    },
+    "mint_latency_last_30_ms": {
+      "n": 30,
+      "min": 104.29158294573426,
+      "p50": 132.62212451081723,
+      "p95": 199.83203307492658,
+      "p99": 373.3095978153871,
+      "max": 441.13437505438924,
+      "mean": 148.93403327247748
+    },
+    "curve": [
+      {
+        "databases": 0,
+        "footprint_bytes": 98601600,
+        "rss_bytes": 59949056,
+        "threads": 9,
+        "datadir_bytes": 659152896
+      },
+      {
+        "databases": 1,
+        "footprint_bytes": 102009472,
+        "rss_bytes": 31309824,
+        "threads": 9,
+        "datadir_bytes": 1142816768
+      },
+      {
+        "databases": 10,
+        "footprint_bytes": 108579584,
+        "rss_bytes": 27623424,
+        "threads": 9,
+        "datadir_bytes": 5497856000
+      },
+      {
+        "databases": 30,
+        "footprint_bytes": 125569792,
+        "rss_bytes": 59457536,
+        "threads": 9,
+        "datadir_bytes": 15175720960
+      }
+    ],
+    "per_database_footprint_bytes": 898939.7333333333,
+    "per_database_disk_bytes": 483885602.1333333,
+    "mint_latencies_s": [
+      0.44113437505438924,
+      0.1619276248384267,
+      0.181359666865319,
+      0.15160674997605383,
+      0.16143754217773676,
+      0.1328857080079615,
+      0.13226450001820922,
+      0.17553120804950595,
+      0.16213579196482897,
+      0.11967158294282854,
+      0.11427954095415771,
+      0.1083984998986125,
+      0.11268449993804097,
+      0.1907585000153631,
+      0.16983512486331165,
+      0.14879129198379815,
+      0.11283225007355213,
+      0.10728595801629126,
+      0.15235191700048745,
+      0.1242858748883009,
+      0.13634945801459253,
+      0.1222565839998424,
+      0.15014129201881588,
+      0.10741570917889476,
+      0.10429158294573426,
+      0.12829945795238018,
+      0.20725583285093307,
+      0.10719983279705048,
+      0.11099449987523258,
+      0.13235854101367295
+    ]
+  },
+  "idle": {
+    "databases": 30,
+    "window_s": 20.048674500081688,
+    "footprint_bytes": 124898112,
+    "cpu_percent_of_one_core": 0.2042487497107759,
+    "disk_written_bytes": 0,
+    "idle_wakeups": 0
+  },
+  "reconnect": {
+    "definition": "connect to an existing idle ephemeral database and run one query",
+    "latency_ms": {
+      "n": 30,
+      "min": 4.073415882885456,
+      "p50": 5.078749964013696,
+      "p95": 8.407162816729397,
+      "p99": 11.012491206638519,
+      "max": 12.015999993309379,
+      "mean": 5.688477827546498
+    }
+  },
+  "active": {
+    "databases_existing": 30,
+    "databases_active": 10,
+    "footprint_before_bytes": 128043904,
+    "footprint_active_bytes": 148180544,
+    "per_active_database_bytes": 2013664.0,
+    "threads_active": 19
+  },
+  "isolation": {
+    "rows_in_written_db": 47001,
+    "rows_in_sibling_db": 47000,
+    "sibling_sees_new_table": false,
+    "rows_in_fresh_mint": 47000,
+    "isolated": true
+  },
+  "burst": {
+    "clients": 8,
+    "succeeded": 8,
+    "errors": [],
+    "wall_s": 0.568030416034162,
+    "latency_ms": {
+      "n": 8,
+      "min": 144.39158397726715,
+      "p50": 565.5430625192821,
+      "p95": 566.8596958857961,
+      "p99": 567.1938055776991,
+      "max": 567.2773330006748,
+      "mean": 460.5143125227187
+    }
+  },
+  "server_log_tail": "t7\" from template \"tpl_app\" for role \"postgres\" (1 waiter(s))\n2026-10-04 13:26:30.212 PDT [1008] LOG:  pgrust ephemeral-db janitor: minted ephemeral database \"tdb_tpl_app__burst4\" from template \"tpl_app\" for role \"postgres\" (1 waiter(s))\n2026-10-04 13:26:30.212 PDT [1008] LOG:  pgrust ephemeral-db janitor: minted ephemeral database \"tdb_tpl_app__burst3\" from template \"tpl_app\" for role \"postgres\" (1 waiter(s))\n2026-10-04 13:26:30.212 PDT [1008] LOG:  pgrust ephemeral-db janitor: minted ephemeral database \"tdb_tpl_app__burst6\" from template \"tpl_app\" for role \"postgres\" (1 waiter(s))\n2026-10-04 13:26:30.227 PDT [1144] LOG:  pgrust ephemeral-db janitor: prewarmed ephemeral database oid 17385 (relcache init built, connect in 15.07 ms)\n2026-10-04 13:26:30.228 PDT [1141] LOG:  pgrust ephemeral-db janitor: prewarmed ephemeral database oid 17382 (relcache init built, connect in 15.46 ms)\n2026-10-04 13:26:30.228 PDT [1143] LOG:  pgrust ephemeral-db janitor: prewarmed ephemeral database oid 17384 (relcache init built, connect in 15.98 ms)\n2026-10-04 13:26:30.229 PDT [1142] LOG:  pgrust ephemeral-db janitor: prewarmed ephemeral database oid 17383 (relcache init built, connect in 16.24 ms)\n2026-10-04 13:26:30.230 PDT [1145] LOG:  pgrust ephemeral-db janitor: prewarmed ephemeral database oid 17386 (relcache init built, connect in 1.66 ms)\n2026-10-04 13:26:30.230 PDT [1146] LOG:  pgrust ephemeral-db janitor: prewarmed ephemeral database oid 17387 (relcache init built, connect in 1.65 ms)\n",
+  "pool": {
+    "pool_size": 8,
+    "spares_ready_before_test": 8,
+    "first_cold_mint_ms": 238.2829999551177,
+    "warm_mint_latency_ms": {
+      "n": 8,
+      "min": 8.960291976109147,
+      "p50": 9.840041515417397,
+      "p95": 211.95112492423516,
+      "p99": 298.49492487963283,
+      "max": 320.13087486848235,
+      "mean": 48.719156126026064
+    },
+    "warm_mint_latencies_s": [
+      0.009757207939401269,
+      0.00978541700169444,
+      0.009894666029140353,
+      0.008960291976109147,
+      0.009448666125535965,
+      0.32013087486848235,
+      0.011045875027775764,
+      0.010730250040069222
+    ],
+    "footprint_bytes": 115706688
+  }
+}

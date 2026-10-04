@@ -175,6 +175,11 @@ wedged the whole server. This has since been diagnosed and fixed; see
 - Noisy-neighbour behaviour.
 - Linux.
 
+## Follow-up
+
+The open points below were investigated afterwards; see
+`shared-runtime-findings.md`, `cow-cloning.md` and `vacuum-analyze-hang.md`.
+
 ## Recommendation
 
 Do not design a new shared runtime yet. The existing feature covers the core

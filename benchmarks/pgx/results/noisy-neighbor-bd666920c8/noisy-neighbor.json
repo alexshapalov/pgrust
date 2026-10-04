@@ -1,0 +1,4536 @@
+{
+  "benchmark": "noisy-neighbor",
+  "runs": {
+    "profile": {
+      "git_commit": "bd666920c8d468b39a7807e5a680d991d0a294a2",
+      "conf": "/Users/alex/GPT/postgresrun/pgrust-pgx/configs/pgx-ephemeral.conf",
+      "settings": [
+        "pgrust.ephemeral_db_prefix=tdb_",
+        "pgrust.ephemeral_db_mint_roles=postgres",
+        "pgrust.ephemeral_db_grace=3600",
+        "pgrust.memory_watchdog_limit=1024"
+      ],
+      "b_query": "SELECT count(*) FROM t1 WHERE account_id < 50",
+      "scenarios": {
+        "baseline": {
+          "a": {
+            "statements": [],
+            "total_s": 10.01
+          },
+          "b_select1_ms": {
+            "n": 3886,
+            "min": 0.04,
+            "p50": 0.07,
+            "p95": 0.24,
+            "p99": 0.53,
+            "max": 8.21,
+            "mean": 0.11
+          },
+          "b_query_ms": {
+            "n": 3886,
+            "min": 0.06,
+            "p50": 0.1,
+            "p95": 0.34,
+            "p99": 0.56,
+            "max": 6.9,
+            "mean": 0.14
+          },
+          "b_errors": 0,
+          "b_error_examples": [],
+          "b_new_connection_ms": {
+            "n": 47,
+            "min": 1.23,
+            "p50": 1.47,
+            "p95": 4.91,
+            "p99": 9.9,
+            "max": 12.69,
+            "mean": 2.1
+          },
+          "b_new_connection_errors": [],
+          "b_longest_gap_ms": 8.2,
+          "server_alive": true,
+          "peak_footprint_bytes": 70503360,
+          "peak_threads": 11
+        },
+        "sort": {
+          "a": {
+            "statements": [
+              {
+                "sql": "SET statement_timeout = 15000",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "SELECT count(*) FROM (SELECT g, md5(g::text) m FROM generate_series(1, 4000000) g ORDER BY",
+                "ok": true,
+                "s": 3.61,
+                "result": "[['4000000']]"
+              },
+              {
+                "sql": "SELECT sum(length(m)) FROM (SELECT md5(g::text) m FROM generate_series(1, 4000000) g GROUP",
+                "ok": true,
+                "s": 4.71,
+                "result": "[['128000000']]"
+              }
+            ],
+            "total_s": 8.32
+          },
+          "b_select1_ms": {
+            "n": 3395,
+            "min": 0.04,
+            "p50": 0.07,
+            "p95": 0.17,
+            "p99": 0.38,
+            "max": 4.01,
+            "mean": 0.09
+          },
+          "b_query_ms": {
+            "n": 3395,
+            "min": 0.06,
+            "p50": 0.09,
+            "p95": 0.21,
+            "p99": 0.46,
+            "max": 5.24,
+            "mean": 0.11
+          },
+          "b_errors": 0,
+          "b_error_examples": [],
+          "b_new_connection_ms": {
+            "n": 41,
+            "min": 1.23,
+            "p50": 1.45,
+            "p95": 4.75,
+            "p99": 6.81,
+            "max": 7.52,
+            "mean": 1.96
+          },
+          "b_new_connection_errors": [],
+          "b_longest_gap_ms": 5.2,
+          "server_alive": true,
+          "peak_footprint_bytes": 86281152,
+          "peak_threads": 11
+        },
+        "long_txn": {
+          "a": {
+            "statements": [
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "INSERT INTO t0(account_id, name, payload) SELECT 1, md5(g::text), jsonb_build_object('n', ",
+                "ok": true,
+                "s": 5.82,
+                "result": "[]"
+              },
+              {
+                "sql": "LOCK TABLE t2 IN ACCESS EXCLUSIVE MODE",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              }
+            ],
+            "total_s": 13.84
+          },
+          "b_select1_ms": {
+            "n": 5233,
+            "min": 0.04,
+            "p50": 0.06,
+            "p95": 0.15,
+            "p99": 0.32,
+            "max": 6.5,
+            "mean": 0.08
+          },
+          "b_query_ms": {
+            "n": 5233,
+            "min": 0.06,
+            "p50": 0.09,
+            "p95": 0.19,
+            "p99": 0.31,
+            "max": 1.76,
+            "mean": 0.11
+          },
+          "b_errors": 0,
+          "b_error_examples": [],
+          "b_new_connection_ms": {
+            "n": 62,
+            "min": 1.09,
+            "p50": 1.44,
+            "p95": 2.55,
+            "p99": 11.44,
+            "max": 23.67,
+            "mean": 1.92
+          },
+          "b_new_connection_errors": [],
+          "b_longest_gap_ms": 6.5,
+          "server_alive": true,
+          "peak_footprint_bytes": 283381184,
+          "peak_threads": 11
+        },
+        "memory": {
+          "a": {
+            "statements": [
+              {
+                "sql": "SET statement_timeout = 15000",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "SET work_mem = '8GB'",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "SELECT count(*) FROM (SELECT array_agg(md5(g::text) || md5((g+1)::text)) FROM generate_ser",
+                "ok": true,
+                "s": 1.85,
+                "result": "[['1']]"
+              }
+            ],
+            "total_s": 1.85
+          },
+          "b_select1_ms": {
+            "n": 1238,
+            "min": 0.04,
+            "p50": 0.08,
+            "p95": 0.26,
+            "p99": 0.62,
+            "max": 3.64,
+            "mean": 0.12
+          },
+          "b_query_ms": {
+            "n": 1238,
+            "min": 0.06,
+            "p50": 0.1,
+            "p95": 0.37,
+            "p99": 0.76,
+            "max": 11.41,
+            "mean": 0.16
+          },
+          "b_errors": 0,
+          "b_error_examples": [],
+          "b_new_connection_ms": {
+            "n": 15,
+            "min": 1.38,
+            "p50": 2.89,
+            "p95": 12.3,
+            "p99": 19.13,
+            "max": 20.83,
+            "mean": 4.63
+          },
+          "b_new_connection_errors": [],
+          "b_longest_gap_ms": 11.4,
+          "server_alive": true,
+          "peak_footprint_bytes": 1305646848,
+          "peak_threads": 11
+        },
+        "temp_spill": {
+          "a": {
+            "statements": [
+              {
+                "sql": "SET statement_timeout = 15000",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "SET work_mem = '64kB'",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "SELECT count(*) FROM (SELECT g, md5(g::text) m FROM generate_series(1, 4000000) g ORDER BY",
+                "ok": true,
+                "s": 5.31,
+                "result": "[['4000000']]"
+              }
+            ],
+            "total_s": 5.31
+          },
+          "b_select1_ms": {
+            "n": 2432,
+            "min": 0.04,
+            "p50": 0.06,
+            "p95": 0.15,
+            "p99": 0.43,
+            "max": 1.81,
+            "mean": 0.08
+          },
+          "b_query_ms": {
+            "n": 2432,
+            "min": 0.06,
+            "p50": 0.09,
+            "p95": 0.19,
+            "p99": 0.47,
+            "max": 3.37,
+            "mean": 0.11
+          },
+          "b_errors": 0,
+          "b_error_examples": [],
+          "b_new_connection_ms": {
+            "n": 29,
+            "min": 1.22,
+            "p50": 1.37,
+            "p95": 2.13,
+            "p99": 4.51,
+            "max": 5.38,
+            "mean": 1.57
+          },
+          "b_new_connection_errors": [],
+          "b_longest_gap_ms": 3.4,
+          "server_alive": true,
+          "peak_footprint_bytes": 81221376,
+          "peak_threads": 11
+        },
+        "pathological": {
+          "a": {
+            "statements": [
+              {
+                "sql": "SET statement_timeout = 15000",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "SELECT count(*) FROM generate_series(1, 100000) a, generate_series(1, 100000) b WHERE a + ",
+                "ok": false,
+                "s": 15.0,
+                "error": "SERROR VERROR C57014 Mcanceling statement due to statement timeout Fpostgres.c L3445 RProcessInterrupts  "
+              }
+            ],
+            "total_s": 15.01
+          },
+          "b_select1_ms": {
+            "n": 5584,
+            "min": 0.04,
+            "p50": 0.06,
+            "p95": 0.16,
+            "p99": 0.42,
+            "max": 8.31,
+            "mean": 0.09
+          },
+          "b_query_ms": {
+            "n": 5584,
+            "min": 0.06,
+            "p50": 0.09,
+            "p95": 0.21,
+            "p99": 0.44,
+            "max": 7.89,
+            "mean": 0.11
+          },
+          "b_errors": 0,
+          "b_error_examples": [],
+          "b_new_connection_ms": {
+            "n": 66,
+            "min": 1.15,
+            "p50": 1.35,
+            "p95": 2.32,
+            "p99": 3.29,
+            "max": 4.71,
+            "mean": 1.5
+          },
+          "b_new_connection_errors": [],
+          "b_longest_gap_ms": 8.3,
+          "server_alive": true,
+          "peak_footprint_bytes": 90363648,
+          "peak_threads": 12
+        },
+        "error": {
+          "a": {
+            "statements": [
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              }
+            ],
+            "total_s": 0.21
+          },
+          "b_select1_ms": {
+            "n": 748,
+            "min": 0.04,
+            "p50": 0.06,
+            "p95": 0.13,
+            "p99": 0.18,
+            "max": 1.53,
+            "mean": 0.07
+          },
+          "b_query_ms": {
+            "n": 748,
+            "min": 0.06,
+            "p50": 0.08,
+            "p95": 0.16,
+            "p99": 0.24,
+            "max": 0.8,
+            "mean": 0.1
+          },
+          "b_errors": 0,
+          "b_error_examples": [],
+          "b_new_connection_ms": {
+            "n": 9,
+            "min": 1.09,
+            "p50": 1.25,
+            "p95": 1.69,
+            "p99": 1.85,
+            "max": 1.89,
+            "mean": 1.3
+          },
+          "b_new_connection_errors": [],
+          "b_longest_gap_ms": 1.5,
+          "server_alive": true,
+          "peak_footprint_bytes": 84629248,
+          "peak_threads": 12
+        },
+        "abort": {
+          "a": {
+            "statements": [
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.01,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              }
+            ],
+            "total_s": 0.56
+          },
+          "b_select1_ms": {
+            "n": 838,
+            "min": 0.04,
+            "p50": 0.07,
+            "p95": 0.2,
+            "p99": 0.81,
+            "max": 2.45,
+            "mean": 0.1
+          },
+          "b_query_ms": {
+            "n": 838,
+            "min": 0.06,
+            "p50": 0.1,
+            "p95": 0.26,
+            "p99": 0.57,
+            "max": 3.71,
+            "mean": 0.13
+          },
+          "b_errors": 0,
+          "b_error_examples": [],
+          "b_new_connection_ms": {
+            "n": 10,
+            "min": 1.12,
+            "p50": 1.68,
+            "p95": 2.39,
+            "p99": 2.4,
+            "max": 2.4,
+            "mean": 1.7
+          },
+          "b_new_connection_errors": [],
+          "b_longest_gap_ms": 3.7,
+          "server_alive": true,
+          "peak_footprint_bytes": 88971008,
+          "peak_threads": 11
+        },
+        "cancel": {
+          "a": {
+            "statements": [
+              {
+                "sql": "SELECT count(*) FROM (SELECT g, md5(g::text) m FROM generate_series(1, 4000000) g ORDER BY",
+                "ok": false,
+                "s": 3.17,
+                "error": "SERROR VERROR C57014 Mcanceling statement due to user request Fpostgres.c L3465 RProcessInterrupts  "
+              }
+            ],
+            "total_s": 3.18
+          },
+          "b_select1_ms": {
+            "n": 1699,
+            "min": 0.04,
+            "p50": 0.06,
+            "p95": 0.2,
+            "p99": 0.44,
+            "max": 8.48,
+            "mean": 0.09
+          },
+          "b_query_ms": {
+            "n": 1699,
+            "min": 0.06,
+            "p50": 0.09,
+            "p95": 0.26,
+            "p99": 0.45,
+            "max": 1.15,
+            "mean": 0.11
+          },
+          "b_errors": 0,
+          "b_error_examples": [],
+          "b_new_connection_ms": {
+            "n": 21,
+            "min": 1.26,
+            "p50": 1.46,
+            "p95": 3.13,
+            "p99": 5.27,
+            "max": 5.81,
+            "mean": 1.89
+          },
+          "b_new_connection_errors": [],
+          "b_longest_gap_ms": 8.5,
+          "server_alive": true,
+          "peak_footprint_bytes": 95606528,
+          "peak_threads": 11
+        },
+        "terminate": {
+          "a": {
+            "statements": [
+              {
+                "sql": "SELECT count(*) FROM (SELECT g, md5(g::text) m FROM generate_series(1, 4000000) g ORDER BY",
+                "ok": false,
+                "s": 3.21,
+                "error": "SFATAL VFATAL C57P01 Mterminating connection due to administrator command Fpostgres.c L3355 RProcessInterrupts  "
+              }
+            ],
+            "total_s": 3.21
+          },
+          "b_select1_ms": {
+            "n": 1713,
+            "min": 0.04,
+            "p50": 0.06,
+            "p95": 0.19,
+            "p99": 0.69,
+            "max": 7.48,
+            "mean": 0.09
+          },
+          "b_query_ms": {
+            "n": 1713,
+            "min": 0.06,
+            "p50": 0.09,
+            "p95": 0.24,
+            "p99": 0.58,
+            "max": 3.9,
+            "mean": 0.12
+          },
+          "b_errors": 0,
+          "b_error_examples": [],
+          "b_new_connection_ms": {
+            "n": 21,
+            "min": 1.2,
+            "p50": 1.51,
+            "p95": 5.8,
+            "p99": 6.52,
+            "max": 6.7,
+            "mean": 2.06
+          },
+          "b_new_connection_errors": [],
+          "b_longest_gap_ms": 7.5,
+          "server_alive": true,
+          "peak_footprint_bytes": 99112704,
+          "peak_threads": 11
+        }
+      },
+      "server_log_tail": "\n2026-10-04 12:56:58.350 PDT [1483] STATEMENT:  SELECT 'x'::int\n2026-10-04 12:56:58.351 PDT [1484] ERROR:  duplicate key value violates unique constraint \"accounts_pkey\"\n2026-10-04 12:56:58.351 PDT [1484] DETAIL:  Key (id)=(1) already exists.\n2026-10-04 12:56:58.351 PDT [1484] STATEMENT:  INSERT INTO accounts(id, email) VALUES (1, 'dup')\n2026-10-04 12:56:58.352 PDT [1485] ERROR:  division by zero\n2026-10-04 12:56:58.352 PDT [1485] STATEMENT:  SELECT 1/0\n2026-10-04 12:56:58.353 PDT [1486] ERROR:  relation \"no_such_table\" does not exist at character 15\n2026-10-04 12:56:58.353 PDT [1486] STATEMENT:  SELECT * FROM no_such_table\n2026-10-04 12:56:58.354 PDT [1487] ERROR:  invalid input syntax for type integer: \"x\" at character 8\n2026-10-04 12:56:58.354 PDT [1487] STATEMENT:  SELECT 'x'::int\n2026-10-04 12:56:58.355 PDT [1488] ERROR:  duplicate key value violates unique constraint \"accounts_pkey\"\n2026-10-04 12:56:58.355 PDT [1488] DETAIL:  Key (id)=(1) already exists.\n2026-10-04 12:56:58.355 PDT [1488] STATEMENT:  INSERT INTO accounts(id, email) VALUES (1, 'dup')\n2026-10-04 12:56:58.355 PDT [1489] ERROR:  division by zero\n2026-10-04 12:56:58.355 PDT [1489] STATEMENT:  SELECT 1/0\n2026-10-04 12:56:58.356 PDT [1490] ERROR:  relation \"no_such_table\" does not exist at character 15\n2026-10-04 12:56:58.356 PDT [1490] STATEMENT:  SELECT * FROM no_such_table\n2026-10-04 12:56:58.357 PDT [1491] ERROR:  invalid input syntax for type integer: \"x\" at character 8\n2026-10-04 12:56:58.357 PDT [1491] STATEMENT:  SELECT 'x'::int\n2026-10-04 12:56:58.358 PDT [1492] ERROR:  duplicate key value violates unique constraint \"accounts_pkey\"\n2026-10-04 12:56:58.358 PDT [1492] DETAIL:  Key (id)=(1) already exists.\n2026-10-04 12:56:58.358 PDT [1492] STATEMENT:  INSERT INTO accounts(id, email) VALUES (1, 'dup')\n2026-10-04 12:56:58.359 PDT [1493] ERROR:  division by zero\n2026-10-04 12:56:58.359 PDT [1493] STATEMENT:  SELECT 1/0\n2026-10-04 12:56:58.360 PDT [1494] ERROR:  relation \"no_such_table\" does not exist at character 15\n2026-10-04 12:56:58.360 PDT [1494] STATEMENT:  SELECT * FROM no_such_table\n2026-10-04 12:56:58.361 PDT [1495] ERROR:  invalid input syntax for type integer: \"x\" at character 8\n2026-10-04 12:56:58.361 PDT [1495] STATEMENT:  SELECT 'x'::int\n2026-10-04 12:56:58.362 PDT [1496] ERROR:  duplicate key value violates unique constraint \"accounts_pkey\"\n2026-10-04 12:56:58.362 PDT [1496] DETAIL:  Key (id)=(1) already exists.\n2026-10-04 12:56:58.362 PDT [1496] STATEMENT:  INSERT INTO accounts(id, email) VALUES (1, 'dup')\n2026-10-04 12:57:06.233 PDT [1520] ERROR:  canceling statement due to user request\n2026-10-04 12:57:06.233 PDT [1520] STATEMENT:  SELECT count(*) FROM (SELECT g, md5(g::text) m FROM generate_series(1, 4000000) g ORDER BY 2) s\n2026-10-04 12:57:11.667 PDT [1545] FATAL:  terminating connection due to administrator command\n2026-10-04 12:57:11.667 PDT [1545] STATEMENT:  SELECT count(*) FROM (SELECT g, md5(g::text) m FROM generate_series(1, 4000000) g ORDER BY 2) s\n"
+    },
+    "default-settings": {
+      "git_commit": "bd666920c8d468b39a7807e5a680d991d0a294a2",
+      "conf": null,
+      "settings": [
+        "pgrust.ephemeral_db_prefix=tdb_",
+        "pgrust.ephemeral_db_mint_roles=postgres",
+        "pgrust.ephemeral_db_grace=3600",
+        "pgrust.memory_watchdog_limit=1024",
+        "file_copy_method=clone"
+      ],
+      "b_query": "SELECT count(*) FROM t1 WHERE account_id < 50",
+      "scenarios": {
+        "baseline": {
+          "a": {
+            "statements": [],
+            "total_s": 10.01
+          },
+          "b_select1_ms": {
+            "n": 3859,
+            "min": 0.04,
+            "p50": 0.07,
+            "p95": 0.28,
+            "p99": 0.79,
+            "max": 7.45,
+            "mean": 0.11
+          },
+          "b_query_ms": {
+            "n": 3859,
+            "min": 0.06,
+            "p50": 0.09,
+            "p95": 0.4,
+            "p99": 0.61,
+            "max": 5.71,
+            "mean": 0.14
+          },
+          "b_errors": 0,
+          "b_error_examples": [],
+          "b_new_connection_ms": {
+            "n": 47,
+            "min": 1.19,
+            "p50": 1.61,
+            "p95": 5.78,
+            "p99": 6.51,
+            "max": 6.72,
+            "mean": 2.28
+          },
+          "b_new_connection_errors": [],
+          "b_longest_gap_ms": 7.4,
+          "server_alive": true,
+          "peak_footprint_bytes": 160978368,
+          "peak_threads": 40
+        },
+        "sort": {
+          "a": {
+            "statements": [
+              {
+                "sql": "SET statement_timeout = 15000",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "SELECT count(*) FROM (SELECT g, md5(g::text) m FROM generate_series(1, 4000000) g ORDER BY",
+                "ok": true,
+                "s": 3.64,
+                "result": "[['4000000']]"
+              },
+              {
+                "sql": "SELECT sum(length(m)) FROM (SELECT md5(g::text) m FROM generate_series(1, 4000000) g GROUP",
+                "ok": true,
+                "s": 4.59,
+                "result": "[['128000000']]"
+              }
+            ],
+            "total_s": 8.23
+          },
+          "b_select1_ms": {
+            "n": 3383,
+            "min": 0.04,
+            "p50": 0.06,
+            "p95": 0.14,
+            "p99": 0.35,
+            "max": 5.4,
+            "mean": 0.08
+          },
+          "b_query_ms": {
+            "n": 3383,
+            "min": 0.06,
+            "p50": 0.09,
+            "p95": 0.19,
+            "p99": 0.41,
+            "max": 2.79,
+            "mean": 0.11
+          },
+          "b_errors": 0,
+          "b_error_examples": [],
+          "b_new_connection_ms": {
+            "n": 40,
+            "min": 1.24,
+            "p50": 1.4,
+            "p95": 1.86,
+            "p99": 4.3,
+            "max": 5.81,
+            "mean": 1.56
+          },
+          "b_new_connection_errors": [],
+          "b_longest_gap_ms": 5.4,
+          "server_alive": true,
+          "peak_footprint_bytes": 175003136,
+          "peak_threads": 41
+        },
+        "long_txn": {
+          "a": {
+            "statements": [
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "INSERT INTO t0(account_id, name, payload) SELECT 1, md5(g::text), jsonb_build_object('n', ",
+                "ok": true,
+                "s": 6.28,
+                "result": "[]"
+              },
+              {
+                "sql": "LOCK TABLE t2 IN ACCESS EXCLUSIVE MODE",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              }
+            ],
+            "total_s": 14.3
+          },
+          "b_select1_ms": {
+            "n": 5237,
+            "min": 0.04,
+            "p50": 0.06,
+            "p95": 0.28,
+            "p99": 0.57,
+            "max": 18.8,
+            "mean": 0.11
+          },
+          "b_query_ms": {
+            "n": 5237,
+            "min": 0.06,
+            "p50": 0.09,
+            "p95": 0.4,
+            "p99": 0.61,
+            "max": 2.96,
+            "mean": 0.14
+          },
+          "b_errors": 0,
+          "b_error_examples": [],
+          "b_new_connection_ms": {
+            "n": 64,
+            "min": 1.15,
+            "p50": 1.49,
+            "p95": 5.86,
+            "p99": 15.57,
+            "max": 28.57,
+            "mean": 2.53
+          },
+          "b_new_connection_errors": [],
+          "b_longest_gap_ms": 18.8,
+          "server_alive": true,
+          "peak_footprint_bytes": 465197248,
+          "peak_threads": 40
+        },
+        "memory": {
+          "a": {
+            "statements": [
+              {
+                "sql": "SET statement_timeout = 15000",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "SET work_mem = '8GB'",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "SELECT count(*) FROM (SELECT array_agg(md5(g::text) || md5((g+1)::text)) FROM generate_ser",
+                "ok": true,
+                "s": 1.75,
+                "result": "[['1']]"
+              }
+            ],
+            "total_s": 1.76
+          },
+          "b_select1_ms": {
+            "n": 1225,
+            "min": 0.04,
+            "p50": 0.07,
+            "p95": 0.2,
+            "p99": 0.52,
+            "max": 8.23,
+            "mean": 0.1
+          },
+          "b_query_ms": {
+            "n": 1225,
+            "min": 0.06,
+            "p50": 0.09,
+            "p95": 0.27,
+            "p99": 0.57,
+            "max": 1.33,
+            "mean": 0.12
+          },
+          "b_errors": 0,
+          "b_error_examples": [],
+          "b_new_connection_ms": {
+            "n": 15,
+            "min": 1.27,
+            "p50": 1.79,
+            "p95": 8.6,
+            "p99": 9.11,
+            "max": 9.24,
+            "mean": 2.84
+          },
+          "b_new_connection_errors": [],
+          "b_longest_gap_ms": 8.2,
+          "server_alive": true,
+          "peak_footprint_bytes": 1494393472,
+          "peak_threads": 40
+        },
+        "temp_spill": {
+          "a": {
+            "statements": [
+              {
+                "sql": "SET statement_timeout = 15000",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "SET work_mem = '64kB'",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "SELECT count(*) FROM (SELECT g, md5(g::text) m FROM generate_series(1, 4000000) g ORDER BY",
+                "ok": true,
+                "s": 5.45,
+                "result": "[['4000000']]"
+              }
+            ],
+            "total_s": 5.45
+          },
+          "b_select1_ms": {
+            "n": 2444,
+            "min": 0.04,
+            "p50": 0.06,
+            "p95": 0.17,
+            "p99": 0.46,
+            "max": 4.24,
+            "mean": 0.09
+          },
+          "b_query_ms": {
+            "n": 2444,
+            "min": 0.06,
+            "p50": 0.09,
+            "p95": 0.23,
+            "p99": 0.51,
+            "max": 4.71,
+            "mean": 0.12
+          },
+          "b_errors": 0,
+          "b_error_examples": [],
+          "b_new_connection_ms": {
+            "n": 29,
+            "min": 1.19,
+            "p50": 1.46,
+            "p95": 7.12,
+            "p99": 8.48,
+            "max": 8.66,
+            "mean": 2.15
+          },
+          "b_new_connection_errors": [],
+          "b_longest_gap_ms": 4.7,
+          "server_alive": true,
+          "peak_footprint_bytes": 271868544,
+          "peak_threads": 40
+        },
+        "pathological": {
+          "a": {
+            "statements": [
+              {
+                "sql": "SET statement_timeout = 15000",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "SELECT count(*) FROM generate_series(1, 100000) a, generate_series(1, 100000) b WHERE a + ",
+                "ok": false,
+                "s": 15.01,
+                "error": "SERROR VERROR C57014 Mcanceling statement due to statement timeout Fpostgres.c L3445 RProcessInterrupts  "
+              }
+            ],
+            "total_s": 15.02
+          },
+          "b_select1_ms": {
+            "n": 5616,
+            "min": 0.04,
+            "p50": 0.06,
+            "p95": 0.15,
+            "p99": 0.34,
+            "max": 4.42,
+            "mean": 0.08
+          },
+          "b_query_ms": {
+            "n": 5616,
+            "min": 0.06,
+            "p50": 0.09,
+            "p95": 0.2,
+            "p99": 0.37,
+            "max": 20.61,
+            "mean": 0.11
+          },
+          "b_errors": 0,
+          "b_error_examples": [],
+          "b_new_connection_ms": {
+            "n": 66,
+            "min": 1.14,
+            "p50": 1.47,
+            "p95": 3.51,
+            "p99": 3.88,
+            "max": 4.17,
+            "mean": 1.67
+          },
+          "b_new_connection_errors": [],
+          "b_longest_gap_ms": 20.6,
+          "server_alive": true,
+          "peak_footprint_bytes": 275292864,
+          "peak_threads": 40
+        },
+        "error": {
+          "a": {
+            "statements": [
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              },
+              {
+                "sql": "SELECT 1/0",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22012 Mdivision by zero Fint.c L872 Rint4div  "
+              },
+              {
+                "sql": "SELECT * FROM no_such_table",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C42P01 Mrelation \"no_such_table\" does not exist P15 Fparse_relation.c L1501 RparserOpenTable  "
+              },
+              {
+                "sql": "SELECT 'x'::int",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C22P02 Minvalid input syntax for type integer: \"x\" P8 Fnumutils.c L618 Rpg_strtoint32_safe  "
+              },
+              {
+                "sql": "INSERT INTO accounts(id, email) VALUES (1, 'dup')",
+                "ok": false,
+                "s": 0.0,
+                "error": "SERROR VERROR C23505 Mduplicate key value violates unique constraint \"accounts_pkey\" DKey (id)=(1) already exists. spublic taccounts naccounts_pkey Fnbtinsert.c L673 R_bt_check_unique  "
+              }
+            ],
+            "total_s": 0.22
+          },
+          "b_select1_ms": {
+            "n": 701,
+            "min": 0.04,
+            "p50": 0.08,
+            "p95": 0.34,
+            "p99": 0.57,
+            "max": 2.55,
+            "mean": 0.12
+          },
+          "b_query_ms": {
+            "n": 701,
+            "min": 0.06,
+            "p50": 0.11,
+            "p95": 0.49,
+            "p99": 0.69,
+            "max": 4.09,
+            "mean": 0.17
+          },
+          "b_errors": 0,
+          "b_error_examples": [],
+          "b_new_connection_ms": {
+            "n": 9,
+            "min": 1.32,
+            "p50": 2.02,
+            "p95": 4.21,
+            "p99": 4.49,
+            "max": 4.56,
+            "mean": 2.57
+          },
+          "b_new_connection_errors": [],
+          "b_longest_gap_ms": 4.1,
+          "server_alive": true,
+          "peak_footprint_bytes": 269214400,
+          "peak_threads": 41
+        },
+        "abort": {
+          "a": {
+            "statements": [
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.01,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.01,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.01,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.01,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.01,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.01,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.01,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.01,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.01,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.01,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.01,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "BEGIN",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              },
+              {
+                "sql": "UPDATE t3 SET name = name || 'x'",
+                "ok": true,
+                "s": 0.02,
+                "result": "[]"
+              },
+              {
+                "sql": "ROLLBACK",
+                "ok": true,
+                "s": 0.0,
+                "result": "[]"
+              }
+            ],
+            "total_s": 0.52
+          },
+          "b_select1_ms": {
+            "n": 796,
+            "min": 0.04,
+            "p50": 0.07,
+            "p95": 0.3,
+            "p99": 0.55,
+            "max": 3.13,
+            "mean": 0.13
+          },
+          "b_query_ms": {
+            "n": 796,
+            "min": 0.06,
+            "p50": 0.1,
+            "p95": 0.41,
+            "p99": 0.53,
+            "max": 0.99,
+            "mean": 0.16
+          },
+          "b_errors": 0,
+          "b_error_examples": [],
+          "b_new_connection_ms": {
+            "n": 10,
+            "min": 1.22,
+            "p50": 2.33,
+            "p95": 8.59,
+            "p99": 11.59,
+            "max": 12.34,
+            "mean": 3.36
+          },
+          "b_new_connection_errors": [],
+          "b_longest_gap_ms": 3.1,
+          "server_alive": true,
+          "peak_footprint_bytes": 273867392,
+          "peak_threads": 40
+        },
+        "cancel": {
+          "a": {
+            "statements": [
+              {
+                "sql": "SELECT count(*) FROM (SELECT g, md5(g::text) m FROM generate_series(1, 4000000) g ORDER BY",
+                "ok": false,
+                "s": 3.24,
+                "error": "SERROR VERROR C57014 Mcanceling statement due to user request Fpostgres.c L3465 RProcessInterrupts  "
+              }
+            ],
+            "total_s": 3.25
+          },
+          "b_select1_ms": {
+            "n": 1696,
+            "min": 0.04,
+            "p50": 0.07,
+            "p95": 0.21,
+            "p99": 0.52,
+            "max": 2.35,
+            "mean": 0.1
+          },
+          "b_query_ms": {
+            "n": 1696,
+            "min": 0.06,
+            "p50": 0.1,
+            "p95": 0.33,
+            "p99": 0.58,
+            "max": 6.85,
+            "mean": 0.14
+          },
+          "b_errors": 0,
+          "b_error_examples": [],
+          "b_new_connection_ms": {
+            "n": 21,
+            "min": 1.24,
+            "p50": 1.53,
+            "p95": 5.55,
+            "p99": 7.5,
+            "max": 7.99,
+            "mean": 2.22
+          },
+          "b_new_connection_errors": [],
+          "b_longest_gap_ms": 6.8,
+          "server_alive": true,
+          "peak_footprint_bytes": 285827712,
+          "peak_threads": 40
+        },
+        "terminate": {
+          "a": {
+            "statements": [
+              {
+                "sql": "SELECT count(*) FROM (SELECT g, md5(g::text) m FROM generate_series(1, 4000000) g ORDER BY",
+                "ok": false,
+                "s": 3.08,
+                "error": "SFATAL VFATAL C57P01 Mterminating connection due to administrator command Fpostgres.c L3355 RProcessInterrupts  "
+              }
+            ],
+            "total_s": 3.08
+          },
+          "b_select1_ms": {
+            "n": 1673,
+            "min": 0.04,
+            "p50": 0.06,
+            "p95": 0.19,
+            "p99": 0.4,
+            "max": 1.81,
+            "mean": 0.09
+          },
+          "b_query_ms": {
+            "n": 1673,
+            "min": 0.06,
+            "p50": 0.09,
+            "p95": 0.24,
+            "p99": 0.53,
+            "max": 2.65,
+            "mean": 0.12
+          },
+          "b_errors": 0,
+          "b_error_examples": [],
+          "b_new_connection_ms": {
+            "n": 20,
+            "min": 1.24,
+            "p50": 1.49,
+            "p95": 2.08,
+            "p99": 5.24,
+            "max": 6.03,
+            "mean": 1.71
+          },
+          "b_new_connection_errors": [],
+          "b_longest_gap_ms": 2.7,
+          "server_alive": true,
+          "peak_footprint_bytes": 284058240,
+          "peak_threads": 40
+        }
+      },
+      "server_log_tail": " DETAIL:  Key (id)=(1) already exists.\n2026-10-04 12:58:25.217 PDT [1514] STATEMENT:  INSERT INTO accounts(id, email) VALUES (1, 'dup')\n2026-10-04 12:58:25.218 PDT [1515] ERROR:  division by zero\n2026-10-04 12:58:25.218 PDT [1515] STATEMENT:  SELECT 1/0\n2026-10-04 12:58:25.219 PDT [1516] ERROR:  relation \"no_such_table\" does not exist at character 15\n2026-10-04 12:58:25.219 PDT [1516] STATEMENT:  SELECT * FROM no_such_table\n2026-10-04 12:58:25.220 PDT [1517] ERROR:  invalid input syntax for type integer: \"x\" at character 8\n2026-10-04 12:58:25.220 PDT [1517] STATEMENT:  SELECT 'x'::int\n2026-10-04 12:58:25.221 PDT [1518] ERROR:  duplicate key value violates unique constraint \"accounts_pkey\"\n2026-10-04 12:58:25.221 PDT [1518] DETAIL:  Key (id)=(1) already exists.\n2026-10-04 12:58:25.221 PDT [1518] STATEMENT:  INSERT INTO accounts(id, email) VALUES (1, 'dup')\n2026-10-04 12:58:25.222 PDT [1519] ERROR:  division by zero\n2026-10-04 12:58:25.222 PDT [1519] STATEMENT:  SELECT 1/0\n2026-10-04 12:58:25.222 PDT [1520] ERROR:  relation \"no_such_table\" does not exist at character 15\n2026-10-04 12:58:25.222 PDT [1520] STATEMENT:  SELECT * FROM no_such_table\n2026-10-04 12:58:25.223 PDT [1521] ERROR:  invalid input syntax for type integer: \"x\" at character 8\n2026-10-04 12:58:25.223 PDT [1521] STATEMENT:  SELECT 'x'::int\n2026-10-04 12:58:25.224 PDT [1522] ERROR:  duplicate key value violates unique constraint \"accounts_pkey\"\n2026-10-04 12:58:25.224 PDT [1522] DETAIL:  Key (id)=(1) already exists.\n2026-10-04 12:58:25.224 PDT [1522] STATEMENT:  INSERT INTO accounts(id, email) VALUES (1, 'dup')\n2026-10-04 12:58:25.225 PDT [1523] ERROR:  division by zero\n2026-10-04 12:58:25.225 PDT [1523] STATEMENT:  SELECT 1/0\n2026-10-04 12:58:25.226 PDT [1524] ERROR:  relation \"no_such_table\" does not exist at character 15\n2026-10-04 12:58:25.226 PDT [1524] STATEMENT:  SELECT * FROM no_such_table\n2026-10-04 12:58:25.226 PDT [1525] ERROR:  invalid input syntax for type integer: \"x\" at character 8\n2026-10-04 12:58:25.226 PDT [1525] STATEMENT:  SELECT 'x'::int\n2026-10-04 12:58:25.227 PDT [1526] ERROR:  duplicate key value violates unique constraint \"accounts_pkey\"\n2026-10-04 12:58:25.227 PDT [1526] DETAIL:  Key (id)=(1) already exists.\n2026-10-04 12:58:25.227 PDT [1526] STATEMENT:  INSERT INTO accounts(id, email) VALUES (1, 'dup')\n2026-10-04 12:58:33.203 PDT [1550] ERROR:  canceling statement due to user request\n2026-10-04 12:58:33.203 PDT [1550] STATEMENT:  SELECT count(*) FROM (SELECT g, md5(g::text) m FROM generate_series(1, 4000000) g ORDER BY 2) s\n2026-10-04 12:58:38.406 PDT [1587] FATAL:  terminating autovacuum process due to administrator command\n2026-10-04 12:58:38.406 PDT [1587] CONTEXT:  while vacuuming index \"t0_pkey\" of relation \"public.t0\"\n2026-10-04 12:58:38.469 PDT [1575] FATAL:  terminating connection due to administrator command\n2026-10-04 12:58:38.469 PDT [1575] STATEMENT:  SELECT count(*) FROM (SELECT g, md5(g::text) m FROM generate_series(1, 4000000) g ORDER BY 2) s\n"
+    }
+  }
+}

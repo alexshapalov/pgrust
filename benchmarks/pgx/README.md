@@ -85,6 +85,15 @@ under writes, and drop. `churn.py --out <dir>` repeats create / use / drop
 cycles on one server and records memory, threads, file descriptors and disk
 after each cycle.
 
+## Noisy neighbour, scale, warm pool
+
+`noisy-neighbor.py --out <dir>` measures a quiet database's latency while
+another database in the same server misbehaves in ten ways. `scale.py --out
+<dir>` takes one server to 1,000 databases and records memory, threads, file
+descriptors, an idle-CPU time series and which threads are on-CPU, then
+latency with 20 and 100 active databases. `warm-pool.py --out <dir>` fires
+bursts of simultaneous mint requests against several pool sizes.
+
 ## Hang reproducer
 
 `repro-vacuum-hang.py --out <dir>` loops a template build plus

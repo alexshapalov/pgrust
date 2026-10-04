@@ -1,0 +1,242 @@
+{
+  "benchmark": "scale",
+  "git_commit": "bd666920c8d468b39a7807e5a680d991d0a294a2",
+  "conf": "/Users/alex/GPT/postgresrun/pgrust-pgx/configs/pgx-ephemeral.conf",
+  "settings": [
+    "pgrust.ephemeral_db_prefix=tdb_",
+    "pgrust.ephemeral_db_mint_roles=postgres",
+    "pgrust.ephemeral_db_grace=86400",
+    "max_connections=130",
+    "file_copy_method=clone"
+  ],
+  "template": {
+    "tables": 50,
+    "rows_per_table": 200
+  },
+  "idle": [
+    {
+      "databases": 0,
+      "mint_ms": null,
+      "footprint_bytes": 60050304,
+      "rss_bytes": 26329088,
+      "threads": 8,
+      "fds": 162,
+      "datadir_apparent_bytes": 73007104,
+      "idle_window_s": 60,
+      "idle_cpu_percent_per_10s": [
+        0.0458,
+        0.0601,
+        0.0345,
+        0.0448,
+        0.1362,
+        0.0411
+      ],
+      "idle_cpu_percent_mean": 0.0604,
+      "idle_cpu_percent_last_minute": 0.0604,
+      "idle_disk_written_bytes": 98304,
+      "idle_wakeups": 11,
+      "on_cpu": {
+        "samples_per_thread": 7760,
+        "busy_share_by_thread": {
+          "pg:autovacuum worker": 0.0023,
+          "pg:bgworker": 0.0006,
+          "pg:checkpointer": 0.0003,
+          "pg:wal_writer": 0.0003,
+          "DispatchQueue_1: com.apple.main-thread  (serial)": 0.0001,
+          "pg:memwatchdog": 0.0001,
+          "pg-timeout-timer": 0.0001
+        }
+      }
+    },
+    {
+      "databases": 100,
+      "mint_ms": {
+        "n": 100000.0,
+        "min": 78.1,
+        "p50": 88.8,
+        "p95": 128.7,
+        "p99": 191.9,
+        "max": 233.4,
+        "mean": 95.8
+      },
+      "footprint_bytes": 128306304,
+      "rss_bytes": 45547520,
+      "threads": 8,
+      "fds": 113,
+      "datadir_apparent_bytes": 1614749696,
+      "idle_window_s": 60,
+      "idle_cpu_percent_per_10s": [
+        0.1714,
+        0.8441,
+        0.5209,
+        0.7874,
+        0.7098,
+        0.6619
+      ],
+      "idle_cpu_percent_mean": 0.6159,
+      "idle_cpu_percent_last_minute": 0.6159,
+      "idle_disk_written_bytes": 294912,
+      "idle_wakeups": 17,
+      "on_cpu": {
+        "samples_per_thread": 7854,
+        "busy_share_by_thread": {
+          "pg:autovacuum worker": 0.0101,
+          "pg:bgwriter": 0.0018,
+          "main": 0.0009,
+          "DispatchQueue_1: com.apple.main-thread  (serial)": 0.0005,
+          "pg:autovacuum launcher": 0.0005,
+          "pg:bgworker": 0.0005,
+          "pg:memwatchdog": 0.0003
+        }
+      }
+    },
+    {
+      "databases": 300,
+      "mint_ms": {
+        "n": 200000.0,
+        "min": 75.5,
+        "p50": 84.7,
+        "p95": 116.1,
+        "p99": 127.8,
+        "max": 131.9,
+        "mean": 89.8
+      },
+      "footprint_bytes": 245173632,
+      "rss_bytes": 74448896,
+      "threads": 8,
+      "fds": 109,
+      "datadir_apparent_bytes": 4698521600,
+      "idle_window_s": 60,
+      "idle_cpu_percent_per_10s": [
+        2.1574,
+        2.21,
+        2.1669,
+        2.1448,
+        2.5227,
+        1.6062
+      ],
+      "idle_cpu_percent_mean": 2.1347,
+      "idle_cpu_percent_last_minute": 2.1347,
+      "idle_disk_written_bytes": 196608,
+      "idle_wakeups": 36,
+      "on_cpu": {
+        "samples_per_thread": 7771,
+        "busy_share_by_thread": {
+          "pg:autovacuum worker": 0.0174,
+          "pg:autovacuum launcher": 0.0028,
+          "DispatchQueue_1: com.apple.main-thread  (serial)": 0.0008,
+          "pg:bgworker": 0.0005,
+          "main": 0.0005,
+          "pg:bgwriter": 0.0004
+        }
+      }
+    },
+    {
+      "databases": 1000,
+      "mint_ms": {
+        "n": 700000.0,
+        "min": 75.8,
+        "p50": 92.6,
+        "p95": 128.2,
+        "p99": 144.6,
+        "max": 234.9,
+        "mean": 96.2
+      },
+      "footprint_bytes": 690639104,
+      "rss_bytes": 81657856,
+      "threads": 9,
+      "fds": 106,
+      "datadir_apparent_bytes": 15490916352,
+      "idle_window_s": 300,
+      "idle_cpu_percent_per_10s": [
+        3.6338,
+        4.5172,
+        5.1771,
+        3.9077,
+        4.4618,
+        5.0362,
+        4.3206,
+        4.1441,
+        4.5183,
+        4.1978,
+        3.8807,
+        4.0958,
+        4.527,
+        3.5479,
+        4.448,
+        4.1212,
+        3.0986,
+        4.0953,
+        4.3402,
+        3.4355,
+        3.9385,
+        3.6582,
+        3.8372,
+        3.7432,
+        4.1491,
+        4.1496,
+        3.4974,
+        3.6317,
+        4.9007,
+        3.0552
+      ],
+      "idle_cpu_percent_mean": 4.0689,
+      "idle_cpu_percent_last_minute": 3.8973,
+      "idle_disk_written_bytes": 315392,
+      "idle_wakeups": 171,
+      "on_cpu": {
+        "samples_per_thread": 7737,
+        "busy_share_by_thread": {
+          "pg:autovacuum worker": 0.0313,
+          "pg:autovacuum launcher": 0.014,
+          "DispatchQueue_1: com.apple.main-thread  (serial)": 0.0012,
+          "pg:bgworker": 0.0012,
+          "pg:bgwriter": 0.0006,
+          "pg:memwatchdog": 0.0003,
+          "main": 0.0003,
+          "pg:checkpointer": 0.0001
+        }
+      }
+    }
+  ],
+  "active": [
+    {
+      "databases": 1000,
+      "active": 20,
+      "queries": 29258,
+      "errors": 0,
+      "error_examples": [],
+      "latency_ms": {
+        "n": 29258000.0,
+        "min": 0.09,
+        "p50": 0.26,
+        "p95": 2.07,
+        "p99": 3.85,
+        "max": 58.93,
+        "mean": 0.6
+      },
+      "footprint_bytes": 733910912,
+      "threads": 28,
+      "cpu_percent_of_one_core": 24.3
+    },
+    {
+      "databases": 1000,
+      "active": 100,
+      "queries": 100064,
+      "errors": 0,
+      "error_examples": [],
+      "latency_ms": {
+        "n": 100064000.0,
+        "min": 0.1,
+        "p50": 6.11,
+        "p95": 13.69,
+        "p99": 18.45,
+        "max": 223.65,
+        "mean": 6.58
+      },
+      "footprint_bytes": 912634240,
+      "threads": 108,
+      "cpu_percent_of_one_core": 61.3
+    }
+  ]
+}
