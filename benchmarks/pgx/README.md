@@ -69,6 +69,14 @@ upstream pgrust's own gate, whose driver script is not part of this fork.
 regression suite, one result directory per group. Pass specific `.conf`
 files to run only those.
 
+## Ephemeral databases
+
+`ephemeral.py --out <dir>` benchmarks PgRust's built-in mint-on-connect
+databases: creation latency (cold and from the warm pool), memory and disk
+per database up to 300, idle cost, reaping, isolation, and plain
+`CREATE DATABASE` as a reference (`createdb --engine postgres` for stock
+PostgreSQL). `--conf` and `--guc` select the server configuration.
+
 ## Results
 
 `results/<label>/` holds `env.json`, `startup.json`, `idle.json`,

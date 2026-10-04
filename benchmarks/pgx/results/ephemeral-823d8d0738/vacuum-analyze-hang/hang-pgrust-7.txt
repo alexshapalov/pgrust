@@ -1,0 +1,766 @@
+Analysis of sampling postgres (pid 73956) every 1 millisecond
+Process:         postgres [73956]
+Path:            /Users/USER/*/postgres
+Load Address:    0x100af0000
+Identifier:      postgres
+Version:         0
+Code Type:       ARM64
+Platform:        macOS
+Parent Process:  Python [71826]
+
+Date/Time:       2026-10-04 10:09:56.279 -0700
+Launch Time:     2026-10-04 10:09:25.738 -0700
+OS Version:      macOS 14.4 (23E214)
+Report Version:  7
+Analysis Tool:   /usr/bin/sample
+
+Physical footprint:         116.1M
+Physical footprint (peak):  116.1M
+Idle exit:                  untracked
+----
+
+Call graph:
+    749 Thread_104260703   DispatchQueue_1: com.apple.main-thread  (serial)
+    + 749 start  (in dyld) + 2360  [0x1998f20e0]
+    +   749 ???  (in postgres)  load address 0x100af0000 + 0x162fb74  [0x10211fb74]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cbc408  [0x1027ac408]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0x162ee28  [0x10211ee28]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0x162ee40  [0x10211ee40]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0x162f4a0  [0x10211f4a0]
+    +             749 ???  (in postgres)  load address 0x100af0000 + 0xcf44e8  [0x1017e44e8]
+    +               749 ???  (in postgres)  load address 0x100af0000 + 0x1691910  [0x102181910]
+    +                 749 ???  (in postgres)  load address 0x100af0000 + 0x16945e8  [0x1021845e8]
+    +                   749 ???  (in postgres)  load address 0x100af0000 + 0x1fedd34  [0x102addd34]
+    +                     749 kevent  (in libsystem_kernel.dylib) + 8  [0x199c40340]
+    749 Thread_104260704: pg:checkpointer:1000
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc3956c  [0x10172956c]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc326bc  [0x1017226bc]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc299b4  [0x1017199b4]
+    +             749 ???  (in postgres)  load address 0x100af0000 + 0x49d7c8  [0x100f8d7c8]
+    +               749 ???  (in postgres)  load address 0x100af0000 + 0xc270c4  [0x1017170c4]
+    +                 749 ???  (in postgres)  load address 0x100af0000 + 0x1fe728c  [0x102ad728c]
+    +                   749 ???  (in postgres)  load address 0x100af0000 + 0x1fe8380  [0x102ad8380]
+    +                     749 ???  (in postgres)  load address 0x100af0000 + 0x1cac3a4  [0x10279c3a4]
+    +                       749 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1272  [0x199c7b588]
+    +                         749 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x199c3d9ec]
+    749 Thread_104260705: pg:bgwriter:1001
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc3956c  [0x10172956c]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc326bc  [0x1017226bc]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc299b4  [0x1017199b4]
+    +             749 ???  (in postgres)  load address 0x100af0000 + 0x3560b4  [0x100e460b4]
+    +               749 ???  (in postgres)  load address 0x100af0000 + 0xc270c4  [0x1017170c4]
+    +                 749 ???  (in postgres)  load address 0x100af0000 + 0x1fe728c  [0x102ad728c]
+    +                   749 ???  (in postgres)  load address 0x100af0000 + 0x1fe8380  [0x102ad8380]
+    +                     749 ???  (in postgres)  load address 0x100af0000 + 0x1cac3a4  [0x10279c3a4]
+    +                       749 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1272  [0x199c7b588]
+    +                         749 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x199c3d9ec]
+    749 Thread_104260707: pg:rtworker0:1003
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc39738  [0x101729738]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc32c04  [0x101722c04]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc39038  [0x101729038]
+    +             749 ???  (in postgres)  load address 0x100af0000 + 0x1860d50  [0x102350d50]
+    +               749 ???  (in postgres)  load address 0x100af0000 + 0x1378e48  [0x101e68e48]
+    +                 749 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1228  [0x199c7b55c]
+    +                   749 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x199c3d9ec]
+    749 Thread_104260708: pg:rtworker1:1004
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc39738  [0x101729738]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc32c04  [0x101722c04]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc39038  [0x101729038]
+    +             749 ???  (in postgres)  load address 0x100af0000 + 0x1860dd8  [0x102350dd8]
+    +               749 ???  (in postgres)  load address 0x100af0000 + 0x1868678  [0x102358678]
+    +                 749 ???  (in postgres)  load address 0x100af0000 + 0xfbd940  [0x101aad940]
+    +                   749 ???  (in postgres)  load address 0x100af0000 + 0xfbebc0  [0x101aaebc0]
+    +                     749 ???  (in postgres)  load address 0x100af0000 + 0x34f9b4  [0x100e3f9b4]
+    +                       749 ???  (in postgres)  load address 0x100af0000 + 0x24a66d4  [0x102f966d4]
+    +                         749 ???  (in postgres)  load address 0x100af0000 + 0x176aab4  [0x10225aab4]
+    +                           749 ???  (in postgres)  load address 0x100af0000 + 0x17691bc  [0x1022591bc]
+    +                             749 ???  (in postgres)  load address 0x100af0000 + 0xcedb5c  [0x1017ddb5c]
+    +                               749 ???  (in postgres)  load address 0x100af0000 + 0x24321d4  [0x102f221d4]
+    +                                 749 ???  (in postgres)  load address 0x100af0000 + 0x11903bc  [0x101c803bc]
+    +                                   749 ???  (in postgres)  load address 0x100af0000 + 0x1fe728c  [0x102ad728c]
+    +                                     749 ???  (in postgres)  load address 0x100af0000 + 0x1fe8380  [0x102ad8380]
+    +                                       749 ???  (in postgres)  load address 0x100af0000 + 0x1cac3a4  [0x10279c3a4]
+    +                                         749 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1272  [0x199c7b588]
+    +                                           749 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x199c3d9ec]
+    749 Thread_104260709: pg:rtworker2:1005
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc39738  [0x101729738]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc32c04  [0x101722c04]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc39038  [0x101729038]
+    +             749 ???  (in postgres)  load address 0x100af0000 + 0x1860d50  [0x102350d50]
+    +               749 ???  (in postgres)  load address 0x100af0000 + 0x1378e48  [0x101e68e48]
+    +                 749 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1228  [0x199c7b55c]
+    +                   749 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x199c3d9ec]
+    749 Thread_104260710: pg:rtworker3:1006
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc39738  [0x101729738]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc32c04  [0x101722c04]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc39038  [0x101729038]
+    +             749 ???  (in postgres)  load address 0x100af0000 + 0x1860d50  [0x102350d50]
+    +               749 ???  (in postgres)  load address 0x100af0000 + 0x1378e48  [0x101e68e48]
+    +                 749 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1228  [0x199c7b55c]
+    +                   749 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x199c3d9ec]
+    749 Thread_104260711: pg:rtworker4:1007
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc39738  [0x101729738]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc32c04  [0x101722c04]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc39038  [0x101729038]
+    +             749 ???  (in postgres)  load address 0x100af0000 + 0x1860d50  [0x102350d50]
+    +               749 ???  (in postgres)  load address 0x100af0000 + 0x1378e48  [0x101e68e48]
+    +                 749 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1228  [0x199c7b55c]
+    +                   749 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x199c3d9ec]
+    749 Thread_104260712: pg:rtworker5:1008
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc39738  [0x101729738]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc32c04  [0x101722c04]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc39038  [0x101729038]
+    +             749 ???  (in postgres)  load address 0x100af0000 + 0x1860dd8  [0x102350dd8]
+    +               749 ???  (in postgres)  load address 0x100af0000 + 0x1868678  [0x102358678]
+    +                 749 ???  (in postgres)  load address 0x100af0000 + 0xfbd940  [0x101aad940]
+    +                   749 ???  (in postgres)  load address 0x100af0000 + 0xfbebc0  [0x101aaebc0]
+    +                     749 ???  (in postgres)  load address 0x100af0000 + 0x34f9b4  [0x100e3f9b4]
+    +                       749 ???  (in postgres)  load address 0x100af0000 + 0x24a66d4  [0x102f966d4]
+    +                         749 ???  (in postgres)  load address 0x100af0000 + 0x176aab4  [0x10225aab4]
+    +                           749 ???  (in postgres)  load address 0x100af0000 + 0x17691bc  [0x1022591bc]
+    +                             749 ???  (in postgres)  load address 0x100af0000 + 0xcedb5c  [0x1017ddb5c]
+    +                               749 ???  (in postgres)  load address 0x100af0000 + 0x24321d4  [0x102f221d4]
+    +                                 749 ???  (in postgres)  load address 0x100af0000 + 0x11903bc  [0x101c803bc]
+    +                                   749 ???  (in postgres)  load address 0x100af0000 + 0x1fe728c  [0x102ad728c]
+    +                                     749 ???  (in postgres)  load address 0x100af0000 + 0x1fe8380  [0x102ad8380]
+    +                                       749 ???  (in postgres)  load address 0x100af0000 + 0x1cac3a4  [0x10279c3a4]
+    +                                         749 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1272  [0x199c7b588]
+    +                                           749 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x199c3d9ec]
+    749 Thread_104260713: pg:rtworker6:1009
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc39738  [0x101729738]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc32c04  [0x101722c04]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc39038  [0x101729038]
+    +             749 ???  (in postgres)  load address 0x100af0000 + 0x1860d50  [0x102350d50]
+    +               749 ???  (in postgres)  load address 0x100af0000 + 0x1378e48  [0x101e68e48]
+    +                 749 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1228  [0x199c7b55c]
+    +                   749 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x199c3d9ec]
+    749 Thread_104260714: pg:rtworker7:1010
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc39738  [0x101729738]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc32c04  [0x101722c04]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc39038  [0x101729038]
+    +             749 ???  (in postgres)  load address 0x100af0000 + 0x1860dd8  [0x102350dd8]
+    +               749 ???  (in postgres)  load address 0x100af0000 + 0x1868678  [0x102358678]
+    +                 749 ???  (in postgres)  load address 0x100af0000 + 0xfbd940  [0x101aad940]
+    +                   749 ???  (in postgres)  load address 0x100af0000 + 0xfbebc0  [0x101aaebc0]
+    +                     749 ???  (in postgres)  load address 0x100af0000 + 0x34f9b4  [0x100e3f9b4]
+    +                       749 ???  (in postgres)  load address 0x100af0000 + 0x24a66d4  [0x102f966d4]
+    +                         749 ???  (in postgres)  load address 0x100af0000 + 0x176aab4  [0x10225aab4]
+    +                           749 ???  (in postgres)  load address 0x100af0000 + 0x17691bc  [0x1022591bc]
+    +                             749 ???  (in postgres)  load address 0x100af0000 + 0xcedb5c  [0x1017ddb5c]
+    +                               749 ???  (in postgres)  load address 0x100af0000 + 0x24321d4  [0x102f221d4]
+    +                                 749 ???  (in postgres)  load address 0x100af0000 + 0x11903bc  [0x101c803bc]
+    +                                   749 ???  (in postgres)  load address 0x100af0000 + 0x1fe728c  [0x102ad728c]
+    +                                     749 ???  (in postgres)  load address 0x100af0000 + 0x1fe8380  [0x102ad8380]
+    +                                       749 ???  (in postgres)  load address 0x100af0000 + 0x1cac3a4  [0x10279c3a4]
+    +                                         749 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1272  [0x199c7b588]
+    +                                           749 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x199c3d9ec]
+    749 Thread_104260715: pg:rtworker8:1011
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc39738  [0x101729738]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc32c04  [0x101722c04]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc39038  [0x101729038]
+    +             749 ???  (in postgres)  load address 0x100af0000 + 0x1860d50  [0x102350d50]
+    +               749 ???  (in postgres)  load address 0x100af0000 + 0x1378e48  [0x101e68e48]
+    +                 749 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1228  [0x199c7b55c]
+    +                   749 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x199c3d9ec]
+    749 Thread_104260716: pg:rtworker9:1012
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc39738  [0x101729738]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc32c04  [0x101722c04]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc39038  [0x101729038]
+    +             749 ???  (in postgres)  load address 0x100af0000 + 0x1860d50  [0x102350d50]
+    +               749 ???  (in postgres)  load address 0x100af0000 + 0x1378e48  [0x101e68e48]
+    +                 749 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1228  [0x199c7b55c]
+    +                   749 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x199c3d9ec]
+    749 Thread_104260717: pg:rtworker10:1013
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc39738  [0x101729738]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc32c04  [0x101722c04]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc39038  [0x101729038]
+    +             749 ???  (in postgres)  load address 0x100af0000 + 0x1860d50  [0x102350d50]
+    +               749 ???  (in postgres)  load address 0x100af0000 + 0x1378e48  [0x101e68e48]
+    +                 749 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1228  [0x199c7b55c]
+    +                   749 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x199c3d9ec]
+    749 Thread_104260718: pg:rtworker11:1014
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc39738  [0x101729738]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc32c04  [0x101722c04]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc39038  [0x101729038]
+    +             749 ???  (in postgres)  load address 0x100af0000 + 0x1860dd8  [0x102350dd8]
+    +               749 ???  (in postgres)  load address 0x100af0000 + 0x1868678  [0x102358678]
+    +                 749 ???  (in postgres)  load address 0x100af0000 + 0xfbd940  [0x101aad940]
+    +                   749 ???  (in postgres)  load address 0x100af0000 + 0xfbebc0  [0x101aaebc0]
+    +                     749 ???  (in postgres)  load address 0x100af0000 + 0x34f9b4  [0x100e3f9b4]
+    +                       749 ???  (in postgres)  load address 0x100af0000 + 0x24a66d4  [0x102f966d4]
+    +                         749 ???  (in postgres)  load address 0x100af0000 + 0x176aab4  [0x10225aab4]
+    +                           749 ???  (in postgres)  load address 0x100af0000 + 0x1769240  [0x102259240]
+    +                             749 ???  (in postgres)  load address 0x100af0000 + 0x1769764  [0x102259764]
+    +                               749 ???  (in postgres)  load address 0x100af0000 + 0xbcb480  [0x1016bb480]
+    +                                 749 ???  (in postgres)  load address 0x100af0000 + 0x18ad3bc  [0x10239d3bc]
+    +                                   749 ???  (in postgres)  load address 0x100af0000 + 0xbcb098  [0x1016bb098]
+    +                                     749 ???  (in postgres)  load address 0x100af0000 + 0x1751b7c  [0x102241b7c]
+    +                                       749 ???  (in postgres)  load address 0x100af0000 + 0x174f8a0  [0x10223f8a0]
+    +                                         749 ???  (in postgres)  load address 0x100af0000 + 0x177bbbc  [0x10226bbbc]
+    +                                           749 ???  (in postgres)  load address 0x100af0000 + 0xa11688  [0x101501688]
+    +                                             749 ???  (in postgres)  load address 0x100af0000 + 0xb644ac  [0x1016544ac]
+    +                                               749 ???  (in postgres)  load address 0x100af0000 + 0xb2baa8  [0x10161baa8]
+    +                                                 749 ???  (in postgres)  load address 0x100af0000 + 0x3bd598  [0x100ead598]
+    +                                                   749 ???  (in postgres)  load address 0x100af0000 + 0x24322b0  [0x102f222b0]
+    +                                                     749 ???  (in postgres)  load address 0x100af0000 + 0x11903bc  [0x101c803bc]
+    +                                                       749 ???  (in postgres)  load address 0x100af0000 + 0x1fe728c  [0x102ad728c]
+    +                                                         749 ???  (in postgres)  load address 0x100af0000 + 0x1fe8380  [0x102ad8380]
+    +                                                           749 ???  (in postgres)  load address 0x100af0000 + 0x1cac3a4  [0x10279c3a4]
+    +                                                             749 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1272  [0x199c7b588]
+    +                                                               749 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x199c3d9ec]
+    749 Thread_104260719: pg:memwatchdog
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0x169f540  [0x10218f540]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0x169e6c8  [0x10218e6c8]
+    +           749 nanosleep  (in libsystem_c.dylib) + 220  [0x199b1e274]
+    +             749 __semwait_signal  (in libsystem_kernel.dylib) + 8  [0x199c3d7e8]
+    749 Thread_104260721: pg:standby:1016
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc3913c  [0x10172913c]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc3432c  [0x10172432c]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc378d8  [0x1017278d8]
+    +             749 _dispatch_semaphore_wait_slow  (in libdispatch.dylib) + 132  [0x199acb034]
+    +               749 _dispatch_sema4_wait  (in libdispatch.dylib) + 28  [0x199aca984]
+    +                 749 semaphore_wait_trap  (in libsystem_kernel.dylib) + 8  [0x199c3a170]
+    749 Thread_104260722: pg:standby:1017
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc3913c  [0x10172913c]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc3432c  [0x10172432c]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc378d8  [0x1017278d8]
+    +             749 _dispatch_semaphore_wait_slow  (in libdispatch.dylib) + 132  [0x199acb034]
+    +               749 _dispatch_sema4_wait  (in libdispatch.dylib) + 28  [0x199aca984]
+    +                 749 semaphore_wait_trap  (in libsystem_kernel.dylib) + 8  [0x199c3a170]
+    749 Thread_104260723: pg-timeout-timer
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0x1dc17d8  [0x1028b17d8]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0x1dc0ff8  [0x1028b0ff8]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0x1dc2f7c  [0x1028b2f7c]
+    +             749 ???  (in postgres)  load address 0x100af0000 + 0x1fe728c  [0x102ad728c]
+    +               749 ???  (in postgres)  load address 0x100af0000 + 0x1fe8380  [0x102ad8380]
+    +                 749 ???  (in postgres)  load address 0x100af0000 + 0x1cac3a4  [0x10279c3a4]
+    +                   749 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1272  [0x199c7b588]
+    +                     749 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x199c3d9ec]
+    749 Thread_104260724: pg:standby:1018
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc3913c  [0x10172913c]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc3432c  [0x10172432c]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc378d8  [0x1017278d8]
+    +             749 _dispatch_semaphore_wait_slow  (in libdispatch.dylib) + 132  [0x199acb034]
+    +               749 _dispatch_sema4_wait  (in libdispatch.dylib) + 28  [0x199aca984]
+    +                 749 semaphore_wait_trap  (in libsystem_kernel.dylib) + 8  [0x199c3a170]
+    749 Thread_104260725: pg:standby:1019
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc3913c  [0x10172913c]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc3432c  [0x10172432c]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc378d8  [0x1017278d8]
+    +             749 _dispatch_semaphore_wait_slow  (in libdispatch.dylib) + 132  [0x199acb034]
+    +               749 _dispatch_sema4_wait  (in libdispatch.dylib) + 28  [0x199aca984]
+    +                 749 semaphore_wait_trap  (in libsystem_kernel.dylib) + 8  [0x199c3a170]
+    749 Thread_104260726: pg:standby:1020
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc3913c  [0x10172913c]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc3432c  [0x10172432c]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc378d8  [0x1017278d8]
+    +             749 _dispatch_semaphore_wait_slow  (in libdispatch.dylib) + 132  [0x199acb034]
+    +               749 _dispatch_sema4_wait  (in libdispatch.dylib) + 28  [0x199aca984]
+    +                 749 semaphore_wait_trap  (in libsystem_kernel.dylib) + 8  [0x199c3a170]
+    749 Thread_104260727: pg:standby:1021
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc3913c  [0x10172913c]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc3432c  [0x10172432c]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc378d8  [0x1017278d8]
+    +             749 _dispatch_semaphore_wait_slow  (in libdispatch.dylib) + 132  [0x199acb034]
+    +               749 _dispatch_sema4_wait  (in libdispatch.dylib) + 28  [0x199aca984]
+    +                 749 semaphore_wait_trap  (in libsystem_kernel.dylib) + 8  [0x199c3a170]
+    749 Thread_104260728: pg:standby:1022
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc3913c  [0x10172913c]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc3432c  [0x10172432c]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc378d8  [0x1017278d8]
+    +             749 _dispatch_semaphore_wait_slow  (in libdispatch.dylib) + 132  [0x199acb034]
+    +               749 _dispatch_sema4_wait  (in libdispatch.dylib) + 28  [0x199aca984]
+    +                 749 semaphore_wait_trap  (in libsystem_kernel.dylib) + 8  [0x199c3a170]
+    749 Thread_104260729: pg:standby:1023
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc3913c  [0x10172913c]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc3432c  [0x10172432c]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc378d8  [0x1017278d8]
+    +             749 _dispatch_semaphore_wait_slow  (in libdispatch.dylib) + 132  [0x199acb034]
+    +               749 _dispatch_sema4_wait  (in libdispatch.dylib) + 28  [0x199aca984]
+    +                 749 semaphore_wait_trap  (in libsystem_kernel.dylib) + 8  [0x199c3a170]
+    749 Thread_104260730: pg:standby:1024
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc3913c  [0x10172913c]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc3432c  [0x10172432c]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc378d8  [0x1017278d8]
+    +             749 _dispatch_semaphore_wait_slow  (in libdispatch.dylib) + 132  [0x199acb034]
+    +               749 _dispatch_sema4_wait  (in libdispatch.dylib) + 28  [0x199aca984]
+    +                 749 semaphore_wait_trap  (in libsystem_kernel.dylib) + 8  [0x199c3a170]
+    749 Thread_104260731: pg:standby:1025
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc3913c  [0x10172913c]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc3432c  [0x10172432c]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc378d8  [0x1017278d8]
+    +             749 _dispatch_semaphore_wait_slow  (in libdispatch.dylib) + 132  [0x199acb034]
+    +               749 _dispatch_sema4_wait  (in libdispatch.dylib) + 28  [0x199aca984]
+    +                 749 semaphore_wait_trap  (in libsystem_kernel.dylib) + 8  [0x199c3a170]
+    749 Thread_104260732: pg:standby:1026
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc3913c  [0x10172913c]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc3432c  [0x10172432c]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc378d8  [0x1017278d8]
+    +             749 _dispatch_semaphore_wait_slow  (in libdispatch.dylib) + 132  [0x199acb034]
+    +               749 _dispatch_sema4_wait  (in libdispatch.dylib) + 28  [0x199aca984]
+    +                 749 semaphore_wait_trap  (in libsystem_kernel.dylib) + 8  [0x199c3a170]
+    749 Thread_104260733: pg:standby:1027
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc3913c  [0x10172913c]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc3432c  [0x10172432c]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc378d8  [0x1017278d8]
+    +             749 _dispatch_semaphore_wait_slow  (in libdispatch.dylib) + 132  [0x199acb034]
+    +               749 _dispatch_sema4_wait  (in libdispatch.dylib) + 28  [0x199aca984]
+    +                 749 semaphore_wait_trap  (in libsystem_kernel.dylib) + 8  [0x199c3a170]
+    749 Thread_104260734: pg:standby:1028
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc3913c  [0x10172913c]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc3432c  [0x10172432c]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc378d8  [0x1017278d8]
+    +             749 _dispatch_semaphore_wait_slow  (in libdispatch.dylib) + 132  [0x199acb034]
+    +               749 _dispatch_sema4_wait  (in libdispatch.dylib) + 28  [0x199aca984]
+    +                 749 semaphore_wait_trap  (in libsystem_kernel.dylib) + 8  [0x199c3a170]
+    749 Thread_104260735: pg:standby:1029
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc3913c  [0x10172913c]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc3432c  [0x10172432c]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc378d8  [0x1017278d8]
+    +             749 _dispatch_semaphore_wait_slow  (in libdispatch.dylib) + 132  [0x199acb034]
+    +               749 _dispatch_sema4_wait  (in libdispatch.dylib) + 28  [0x199aca984]
+    +                 749 semaphore_wait_trap  (in libsystem_kernel.dylib) + 8  [0x199c3a170]
+    749 Thread_104260736: pg:standby:1030
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc3913c  [0x10172913c]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc3432c  [0x10172432c]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc378d8  [0x1017278d8]
+    +             749 _dispatch_semaphore_wait_slow  (in libdispatch.dylib) + 132  [0x199acb034]
+    +               749 _dispatch_sema4_wait  (in libdispatch.dylib) + 28  [0x199aca984]
+    +                 749 semaphore_wait_trap  (in libsystem_kernel.dylib) + 8  [0x199c3a170]
+    749 Thread_104260737: pg:standby:1031
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc3913c  [0x10172913c]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc3432c  [0x10172432c]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc378d8  [0x1017278d8]
+    +             749 _dispatch_semaphore_wait_slow  (in libdispatch.dylib) + 132  [0x199acb034]
+    +               749 _dispatch_sema4_wait  (in libdispatch.dylib) + 28  [0x199aca984]
+    +                 749 semaphore_wait_trap  (in libsystem_kernel.dylib) + 8  [0x199c3a170]
+    749 Thread_104260740: pg:wal_writer:1034
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc3956c  [0x10172956c]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc326bc  [0x1017226bc]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc299b4  [0x1017199b4]
+    +             749 ???  (in postgres)  load address 0x100af0000 + 0x20261d8  [0x102b161d8]
+    +               749 ???  (in postgres)  load address 0x100af0000 + 0xc270c4  [0x1017170c4]
+    +                 749 ???  (in postgres)  load address 0x100af0000 + 0x1fe728c  [0x102ad728c]
+    +                   749 ???  (in postgres)  load address 0x100af0000 + 0x1fe8380  [0x102ad8380]
+    +                     749 ???  (in postgres)  load address 0x100af0000 + 0x1cac3a4  [0x10279c3a4]
+    +                       749 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1272  [0x199c7b588]
+    +                         749 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x199c3d9ec]
+    749 Thread_104260741: pg:bgworker:1035
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc3956c  [0x10172956c]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc326bc  [0x1017226bc]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc299b4  [0x1017199b4]
+    +             749 ???  (in postgres)  load address 0x100af0000 + 0x34f594  [0x100e3f594]
+    +               749 ???  (in postgres)  load address 0x100af0000 + 0xc42ac8  [0x101732ac8]
+    +                 749 ???  (in postgres)  load address 0x100af0000 + 0xc270c4  [0x1017170c4]
+    +                   749 ???  (in postgres)  load address 0x100af0000 + 0x1fe728c  [0x102ad728c]
+    +                     749 ???  (in postgres)  load address 0x100af0000 + 0x1fe8380  [0x102ad8380]
+    +                       749 ???  (in postgres)  load address 0x100af0000 + 0x1cac3a4  [0x10279c3a4]
+    +                         749 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1272  [0x199c7b588]
+    +                           749 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x199c3d9ec]
+    749 Thread_104260745: pg:backend:1037
+    + 749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+    +   749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+    +     749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+    +       749 ???  (in postgres)  load address 0x100af0000 + 0xc3956c  [0x10172956c]
+    +         749 ???  (in postgres)  load address 0x100af0000 + 0xc326bc  [0x1017226bc]
+    +           749 ???  (in postgres)  load address 0x100af0000 + 0xc299b4  [0x1017199b4]
+    +             749 ???  (in postgres)  load address 0x100af0000 + 0x302880  [0x100df2880]
+    +               749 ???  (in postgres)  load address 0x100af0000 + 0x162513c  [0x10211513c]
+    +                 749 ???  (in postgres)  load address 0x100af0000 + 0x162aef4  [0x10211aef4]
+    +                   749 ???  (in postgres)  load address 0x100af0000 + 0x16a4588  [0x102194588]
+    +                     749 ???  (in postgres)  load address 0x100af0000 + 0x335e48  [0x100e25e48]
+    +                       749 ???  (in postgres)  load address 0x100af0000 + 0x1feeb9c  [0x102adeb9c]
+    +                         749 ???  (in postgres)  load address 0x100af0000 + 0x1fedd34  [0x102addd34]
+    +                           749 kevent  (in libsystem_kernel.dylib) + 8  [0x199c40340]
+    749 Thread_104260746: pg:backend:1038
+      749 thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+        749 _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+          749 ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+            749 ???  (in postgres)  load address 0x100af0000 + 0xc3956c  [0x10172956c]
+              749 ???  (in postgres)  load address 0x100af0000 + 0xc326bc  [0x1017226bc]
+                749 ???  (in postgres)  load address 0x100af0000 + 0xc299b4  [0x1017199b4]
+                  749 ???  (in postgres)  load address 0x100af0000 + 0x302880  [0x100df2880]
+                    749 ???  (in postgres)  load address 0x100af0000 + 0x162513c  [0x10211513c]
+                      749 ???  (in postgres)  load address 0x100af0000 + 0x162c590  [0x10211c590]
+                        749 ???  (in postgres)  load address 0x100af0000 + 0x161a710  [0x10210a710]
+                          749 ???  (in postgres)  load address 0x100af0000 + 0x16b5d90  [0x1021a5d90]
+                            749 ???  (in postgres)  load address 0x100af0000 + 0x16b22b8  [0x1021a22b8]
+                              749 ???  (in postgres)  load address 0x100af0000 + 0x16b3268  [0x1021a3268]
+                                749 ???  (in postgres)  load address 0x100af0000 + 0x2509a38  [0x102ff9a38]
+                                  749 ???  (in postgres)  load address 0x100af0000 + 0x250b2fc  [0x102ffb2fc]
+                                    749 ???  (in postgres)  load address 0x100af0000 + 0x2509dfc  [0x102ff9dfc]
+                                      749 ???  (in postgres)  load address 0x100af0000 + 0x58044c  [0x10107044c]
+                                        749 ???  (in postgres)  load address 0x100af0000 + 0x587bec  [0x101077bec]
+                                          749 ???  (in postgres)  load address 0x100af0000 + 0x581530  [0x101071530]
+                                            749 ???  (in postgres)  load address 0x100af0000 + 0x581894  [0x101071894]
+                                              749 ???  (in postgres)  load address 0x100af0000 + 0x1f91e5c  [0x102a81e5c]
+                                                749 ???  (in postgres)  load address 0x100af0000 + 0x1f94118  [0x102a84118]
+                                                  749 ???  (in postgres)  load address 0x100af0000 + 0x585168  [0x101075168]
+                                                    749 ???  (in postgres)  load address 0x100af0000 + 0xa14920  [0x101504920]
+                                                      749 ???  (in postgres)  load address 0x100af0000 + 0xb29974  [0x101619974]
+                                                        749 ???  (in postgres)  load address 0x100af0000 + 0x176aee0  [0x10225aee0]
+                                                          749 ???  (in postgres)  load address 0x100af0000 + 0x24321d4  [0x102f221d4]
+                                                            749 ???  (in postgres)  load address 0x100af0000 + 0x11903bc  [0x101c803bc]
+                                                              749 ???  (in postgres)  load address 0x100af0000 + 0x1fe728c  [0x102ad728c]
+                                                                749 ???  (in postgres)  load address 0x100af0000 + 0x1fe8380  [0x102ad8380]
+                                                                  749 ???  (in postgres)  load address 0x100af0000 + 0x1cac3a4  [0x10279c3a4]
+                                                                    749 _pthread_cond_wait  (in libsystem_pthread.dylib) + 1272  [0x199c7b588]
+                                                                      749 __psynch_cvwait  (in libsystem_kernel.dylib) + 8  [0x199c3d9ec]
+
+Total number in stack (recursive counted multiple, when >=5):
+        36       ???  (in postgres)  load address 0x100af0000 + 0x1cc3f1c  [0x1027b3f1c]
+        36       _pthread_start  (in libsystem_pthread.dylib) + 136  [0x199c7af94]
+        36       thread_start  (in libsystem_pthread.dylib) + 8  [0x199c75d34]
+        18       __psynch_cvwait  (in libsystem_kernel.dylib) + 0  [0x199c3d9e4]
+        16       ???  (in postgres)  load address 0x100af0000 + 0xc3432c  [0x10172432c]
+        16       ???  (in postgres)  load address 0x100af0000 + 0xc378d8  [0x1017278d8]
+        16       ???  (in postgres)  load address 0x100af0000 + 0xc3913c  [0x10172913c]
+        16       _dispatch_sema4_wait  (in libdispatch.dylib) + 28  [0x199aca984]
+        16       _dispatch_semaphore_wait_slow  (in libdispatch.dylib) + 132  [0x199acb034]
+        16       semaphore_wait_trap  (in libsystem_kernel.dylib) + 0  [0x199c3a168]
+        12       ???  (in postgres)  load address 0x100af0000 + 0xc32c04  [0x101722c04]
+        12       ???  (in postgres)  load address 0x100af0000 + 0xc39038  [0x101729038]
+        12       ???  (in postgres)  load address 0x100af0000 + 0xc39738  [0x101729738]
+        10       ???  (in postgres)  load address 0x100af0000 + 0x1cac3a4  [0x10279c3a4]
+        10       ???  (in postgres)  load address 0x100af0000 + 0x1fe728c  [0x102ad728c]
+        10       ???  (in postgres)  load address 0x100af0000 + 0x1fe8380  [0x102ad8380]
+        10       _pthread_cond_wait  (in libsystem_pthread.dylib) + 1272  [0x199c7b588]
+        8       ???  (in postgres)  load address 0x100af0000 + 0x1378e48  [0x101e68e48]
+        8       ???  (in postgres)  load address 0x100af0000 + 0x1860d50  [0x102350d50]
+        8       _pthread_cond_wait  (in libsystem_pthread.dylib) + 1228  [0x199c7b55c]
+        6       ???  (in postgres)  load address 0x100af0000 + 0xc299b4  [0x1017199b4]
+        6       ???  (in postgres)  load address 0x100af0000 + 0xc326bc  [0x1017226bc]
+        6       ???  (in postgres)  load address 0x100af0000 + 0xc3956c  [0x10172956c]
+        5       ???  (in postgres)  load address 0x100af0000 + 0x11903bc  [0x101c803bc]
+
+Sort by top of stack, same collapsed (when >= 5):
+        __psynch_cvwait  (in libsystem_kernel.dylib)        13482
+        semaphore_wait_trap  (in libsystem_kernel.dylib)        11984
+        kevent  (in libsystem_kernel.dylib)        1498
+        __semwait_signal  (in libsystem_kernel.dylib)        749
+
+Binary Images:
+       0x100af0000 -        0x103ba7e9f +postgres (0) <0A704EE4-4B6D-38F7-AE11-A4E5BF6A7554> /Users/*/postgres
+       0x104500000 -        0x104503fff +libabsl_leak_check.2608.0.0.dylib (0) <88E2E3B4-17D9-3031-8127-94EC04E06B01> /opt/homebrew/*/libabsl_leak_check.2608.0.0.dylib
+       0x104508000 -        0x10450bfff +libabsl_log_internal_nullguard.2608.0.0.dylib (0) <B0489B23-6D3C-399B-88D8-0D1048E0F673> /opt/homebrew/*/libabsl_log_internal_nullguard.2608.0.0.dylib
+       0x104510000 -        0x10451ffff +libabsl_log_internal_check_op.2608.0.0.dylib (0) <AA1FEAA2-67B4-3407-BA1B-97B2816011A9> /opt/homebrew/*/libabsl_log_internal_check_op.2608.0.0.dylib
+       0x104528000 -        0x10452bfff +libabsl_city.2608.0.0.dylib (0) <BE5FC977-96BE-34C7-AAFE-4E6D975BC07B> /opt/homebrew/*/libabsl_city.2608.0.0.dylib
+       0x104534000 -        0x104537fff +libabsl_log_internal_conditions.2608.0.0.dylib (0) <DB39E26E-C7B6-3BCC-8F26-3DE0E2E527B8> /opt/homebrew/*/libabsl_log_internal_conditions.2608.0.0.dylib
+       0x104540000 -        0x104543fff +libabsl_strerror.2608.0.0.dylib (0) <3EB34839-C381-34F7-8148-E626104565BB> /opt/homebrew/*/libabsl_strerror.2608.0.0.dylib
+       0x104550000 -        0x104557fff +libabsl_examine_stack.2608.0.0.dylib (0) <17D13B0D-0130-380F-A98B-563789CF7B2B> /opt/homebrew/*/libabsl_examine_stack.2608.0.0.dylib
+       0x104564000 -        0x104577fff +libabsl_log_internal_message.2608.0.0.dylib (0) <BECD8A3C-F4CF-3592-AE5C-44356E7A6B30> /opt/homebrew/*/libabsl_log_internal_message.2608.0.0.dylib
+       0x10458c000 -        0x104593fff +libabsl_log_internal_format.2608.0.0.dylib (0) <4D13D3E9-03D2-3B97-86D4-36B5DD967997> /opt/homebrew/*/libabsl_log_internal_format.2608.0.0.dylib
+       0x10459c000 -        0x1045a3fff +libabsl_log_internal_structured_proto.2608.0.0.dylib (0) <A7AA2803-168C-3138-9A6B-409F10F89EBC> /opt/homebrew/*/libabsl_log_internal_structured_proto.2608.0.0.dylib
+       0x1045ac000 -        0x1045b3fff +libabsl_log_sink.2608.0.0.dylib (0) <08787AA1-B055-3F62-B82E-8518B9ABACA5> /opt/homebrew/*/libabsl_log_sink.2608.0.0.dylib
+       0x1045bc000 -        0x1045bffff +libabsl_debugging_internal.2608.0.0.dylib (0) <3210ACB7-5293-3296-8756-3E393A2FCAEA> /opt/homebrew/*/libabsl_debugging_internal.2608.0.0.dylib
+       0x1045c4000 -        0x1045cffff +libabsl_log_internal_log_sink_set.2608.0.0.dylib (0) <A9362626-3F2D-302B-98C3-B245930179B8> /opt/homebrew/*/libabsl_log_internal_log_sink_set.2608.0.0.dylib
+       0x1045dc000 -        0x1045e3fff +libabsl_log_internal_globals.2608.0.0.dylib (0) <13DC3905-F3DB-36FD-B563-61E1475A970B> /opt/homebrew/*/libabsl_log_internal_globals.2608.0.0.dylib
+       0x1045f0000 -        0x1045fbfff +libabsl_log_globals.2608.0.0.dylib (0) <067CE2BF-60DC-39D2-862B-536CF036124C> /opt/homebrew/*/libabsl_log_globals.2608.0.0.dylib
+       0x104608000 -        0x10460ffff +libabsl_log_entry.2608.0.0.dylib (0) <C13FBB98-7914-31C1-8C10-0ABB48AF5B57> /opt/homebrew/*/libabsl_log_entry.2608.0.0.dylib
+       0x104618000 -        0x10461ffff +libabsl_log_internal_proto.2608.0.0.dylib (0) <409EBB34-3F00-3E86-A3FE-22907351DD6A> /opt/homebrew/*/libabsl_log_internal_proto.2608.0.0.dylib
+       0x104628000 -        0x10462ffff +libabsl_flags_private_handle_accessor.2608.0.0.dylib (0) <0FB0BA11-D543-3A8A-9E65-4A828F43C0F5> /opt/homebrew/*/libabsl_flags_private_handle_accessor.2608.0.0.dylib
+       0x10463c000 -        0x104647fff +libabsl_vlog_config_internal.2608.0.0.dylib (0) <A488C529-006C-3A16-AA86-0C442459A624> /opt/homebrew/*/libabsl_vlog_config_internal.2608.0.0.dylib
+       0x104654000 -        0x10465bfff +libabsl_log_internal_fnmatch.2608.0.0.dylib (0) <97014293-5F17-3A7F-A1B4-CD8EB31101B6> /opt/homebrew/*/libabsl_log_internal_fnmatch.2608.0.0.dylib
+       0x104664000 -        0x10466bfff +libabsl_flags_marshalling.2608.0.0.dylib (0) <BD16783B-6790-3962-97A6-CEF994729804> /opt/homebrew/*/libabsl_flags_marshalling.2608.0.0.dylib
+       0x104678000 -        0x10467bfff +libabsl_utf8_for_code_point.2608.0.0.dylib (0) <7C44096A-6198-3F59-83D7-E6D50EC63894> /opt/homebrew/*/libabsl_utf8_for_code_point.2608.0.0.dylib
+       0x104680000 -        0x10468ffff +libabsl_flags_internal.2608.0.0.dylib (0) <79C6B5CB-3E9D-3148-9358-FB5135B6081A> /opt/homebrew/*/libabsl_flags_internal.2608.0.0.dylib
+       0x1046a0000 -        0x1046a3fff +libabsl_flags_commandlineflag_internal.2608.0.0.dylib (0) <AB44CF3C-D87D-30DD-92BD-8377B71B004A> /opt/homebrew/*/libabsl_flags_commandlineflag_internal.2608.0.0.dylib
+       0x1046b0000 -        0x1046b7fff +libabsl_flags_commandlineflag.2608.0.0.dylib (0) <F3BC28AA-3196-3A64-852A-C529B9BA7F07> /opt/homebrew/*/libabsl_flags_commandlineflag.2608.0.0.dylib
+       0x1046c0000 -        0x1046d3fff +libabsl_flags_reflection.2608.0.0.dylib (0) <CBD29B3B-9EB7-33E2-95A2-C61A0FCA8C08> /opt/homebrew/*/libabsl_flags_reflection.2608.0.0.dylib
+       0x1046e4000 -        0x1046e7fff +libabsl_cordz_functions.2608.0.0.dylib (0) <5E9F0412-6DE9-338C-B33F-D420B7182110> /opt/homebrew/*/libabsl_cordz_functions.2608.0.0.dylib
+       0x1046f0000 -        0x1046f3fff +libabsl_hardening.2608.0.0.dylib (0) <1F59F087-9C84-3664-9D70-72D9B1427EBA> /opt/homebrew/*/libabsl_hardening.2608.0.0.dylib
+       0x1046fc000 -        0x104707fff +libabsl_flags_config.2608.0.0.dylib (0) <DED05DE5-F74B-3CBF-A230-05B04CDE15CA> /opt/homebrew/*/libabsl_flags_config.2608.0.0.dylib
+       0x104718000 -        0x104723fff +libabsl_flags_program_name.2608.0.0.dylib (0) <F9A7C940-0D02-362E-A6CE-C9A1DB58C79B> /opt/homebrew/*/libabsl_flags_program_name.2608.0.0.dylib
+       0x104730000 -        0x10473ffff +libabsl_cordz_info.2608.0.0.dylib (0) <F4C60010-B340-32A2-85C2-95CAF00B1172> /opt/homebrew/*/libabsl_cordz_info.2608.0.0.dylib
+       0x104750000 -        0x10475ffff +libabsl_raw_hash_set.2608.0.0.dylib (0) <2150B1DF-B167-381E-8A15-34DED864D09E> /opt/homebrew/*/libabsl_raw_hash_set.2608.0.0.dylib
+       0x104770000 -        0x104773fff +libabsl_base_cpu_detect.2608.0.0.dylib (0) <E105DABD-3E60-36D5-AD7B-13B997295C44> /opt/homebrew/*/libabsl_base_cpu_detect.2608.0.0.dylib
+       0x104780000 -        0x104787fff +libabsl_crc_cord_state.2608.0.0.dylib (0) <9F0C391D-6C0E-3883-A2F9-F5B5ACEEF5FE> /opt/homebrew/*/libabsl_crc_cord_state.2608.0.0.dylib
+       0x104794000 -        0x1047abfff +libabsl_cord.2608.0.0.dylib (0) <841A5CBD-5E5B-3036-AD1E-B0B851B75B5D> /opt/homebrew/*/libabsl_cord.2608.0.0.dylib
+       0x1047b8000 -        0x1047c7fff +libabsl_cord_internal.2608.0.0.dylib (0) <367A5A42-FF10-3284-B95C-6D4743EA7176> /opt/homebrew/*/libabsl_cord_internal.2608.0.0.dylib
+       0x1047d8000 -        0x1047e3fff +libabsl_cordz_handle.2608.0.0.dylib (0) <C15810BA-CF5D-382A-A503-D9A6ADF64EA0> /opt/homebrew/*/libabsl_cordz_handle.2608.0.0.dylib
+       0x1047f0000 -        0x1047f7ff7 +libabsl_crc_internal.2608.0.0.dylib (0) <94B5F2B9-A449-349B-834E-25B94B7F8892> /opt/homebrew/*/libabsl_crc_internal.2608.0.0.dylib
+       0x104804000 -        0x10480bfff +libabsl_crc32c.2608.0.0.dylib (0) <4FAC88D8-9983-397F-9448-85CA01D84F13> /opt/homebrew/*/libabsl_crc32c.2608.0.0.dylib
+       0x104818000 -        0x10481bfff +libabsl_exponential_biased.2608.0.0.dylib (0) <C33774DB-C4A2-3001-A934-02AE2AB31E96> /opt/homebrew/*/libabsl_exponential_biased.2608.0.0.dylib
+       0x104828000 -        0x10482bfff +libabsl_source_location.2608.0.0.dylib (0) <BF1DAC3E-B0C7-3895-AC1C-13F37F5BCCDF> /opt/homebrew/*/libabsl_source_location.2608.0.0.dylib
+       0x104830000 -        0x10483bfff +libabsl_hashtablez_sampler.2608.0.0.dylib (0) <095316D6-407F-3992-A8CF-13251CE33E8B> /opt/homebrew/*/libabsl_hashtablez_sampler.2608.0.0.dylib
+       0x104848000 -        0x10484bfff +libabsl_decode_rust_punycode.2608.0.0.dylib (0) <292D3777-AF6C-355C-A86F-98FC290B51B9> /opt/homebrew/*/libabsl_decode_rust_punycode.2608.0.0.dylib
+       0x104858000 -        0x10485ffd7 +libabsl_hash.2608.0.0.dylib (0) <49D1CE26-FEDD-38B1-98B3-C15D5A5FBC75> /opt/homebrew/*/libabsl_hash.2608.0.0.dylib
+       0x104868000 -        0x10486ffff +libabsl_graphcycles_internal.2608.0.0.dylib (0) <3A83D83C-7176-3AB1-94A0-B6F39E3A51F2> /opt/homebrew/*/libabsl_graphcycles_internal.2608.0.0.dylib
+       0x10487c000 -        0x10487ffff +libabsl_civil_time.2608.0.0.dylib (0) <B3689A27-9AF7-3395-BF95-303EEE13D434> /opt/homebrew/*/libabsl_civil_time.2608.0.0.dylib
+       0x104888000 -        0x104897fff +libabsl_str_format_internal.2608.0.0.dylib (0) <446F8858-A7CA-3FA5-80B3-8CA3913A1F0B> /opt/homebrew/*/libabsl_str_format_internal.2608.0.0.dylib
+       0x1048a8000 -        0x1048b7ffb +libabsl_synchronization.2608.0.0.dylib (0) <03E6525E-92CB-3B9D-AB72-1E44A4AC3FF4> /opt/homebrew/*/libabsl_synchronization.2608.0.0.dylib
+       0x1048c8000 -        0x1048cffff +libabsl_kernel_timeout_internal.2608.0.0.dylib (0) <39CA7402-9CC0-3D22-A080-9696907DD3C8> /opt/homebrew/*/libabsl_kernel_timeout_internal.2608.0.0.dylib
+       0x1048d8000 -        0x1048dbfff +libabsl_stacktrace.2608.0.0.dylib (0) <0CCF0C94-CC68-3214-8281-CAECBFE1ACD6> /opt/homebrew/*/libabsl_stacktrace.2608.0.0.dylib
+       0x1048e8000 -        0x1048effff +libabsl_symbolize.2608.0.0.dylib (0) <60298662-B17F-3078-9673-63130C1333DF> /opt/homebrew/*/libabsl_symbolize.2608.0.0.dylib
+       0x1048f8000 -        0x1048fffff +libabsl_demangle_rust.2608.0.0.dylib (0) <1523A671-805E-3D37-A660-F3E0433F79AD> /opt/homebrew/*/libabsl_demangle_rust.2608.0.0.dylib
+       0x10490c000 -        0x104917fff +libabsl_demangle_internal.2608.0.0.dylib (0) <604C3EDF-552C-317F-B26D-A16CFF35D3CE> /opt/homebrew/*/libabsl_demangle_internal.2608.0.0.dylib
+       0x104920000 -        0x104923fff +libabsl_strings_internal.2608.0.0.dylib (0) <0BDD7746-FD50-3190-9EAC-87DB7E0951A8> /opt/homebrew/*/libabsl_strings_internal.2608.0.0.dylib
+       0x104930000 -        0x104937fff +libabsl_malloc_internal.2608.0.0.dylib (0) <6B30E7CB-675A-3758-949B-A825D0B74ACE> /opt/homebrew/*/libabsl_malloc_internal.2608.0.0.dylib
+       0x104944000 -        0x104947fff +libabsl_tracing_internal.2608.0.0.dylib (0) <C2D3EE32-6AAC-3F99-99F5-231275B1B4C0> /opt/homebrew/*/libabsl_tracing_internal.2608.0.0.dylib
+       0x104950000 -        0x104953fff +libabsl_int128.2608.0.0.dylib (0) <A6CB9D5A-9562-3375-810C-D310E5094BD9> /opt/homebrew/*/libabsl_int128.2608.0.0.dylib
+       0x10495c000 -        0x104967ffb +libabsl_time.2608.0.0.dylib (0) <1DC46D2B-3D91-3440-B034-86FB38D866BE> /opt/homebrew/*/libabsl_time.2608.0.0.dylib
+       0x104974000 -        0x104977fff +libabsl_throw_delegate.2608.0.0.dylib (0) <1D094962-D5AE-36A0-8AC0-F4AE9E0E9EAA> /opt/homebrew/*/libabsl_throw_delegate.2608.0.0.dylib
+       0x10498c000 -        0x10498ffff +libabsl_log_severity.2608.0.0.dylib (0) <B6918ED2-C463-3D9A-89C3-84C940B75520> /opt/homebrew/*/libabsl_log_severity.2608.0.0.dylib
+       0x10499c000 -        0x1049b3ffb +libabsl_strings.2608.0.0.dylib (0) <2981C3B3-B067-3567-A4D3-C58271066F5E> /opt/homebrew/*/libabsl_strings.2608.0.0.dylib
+       0x1049c4000 -        0x1049c7fff +libabsl_base.2608.0.0.dylib (0) <053B6E45-AE55-3669-A3CB-53D8C6FF766A> /opt/homebrew/*/libabsl_base.2608.0.0.dylib
+       0x1049d4000 -        0x1049d7fff +libabsl_raw_logging_internal.2608.0.0.dylib (0) <A1AC54F5-7DDF-333A-8CA3-20C4C6BD161F> /opt/homebrew/*/libabsl_raw_logging_internal.2608.0.0.dylib
+       0x1049ec000 -        0x1049fbff7 +libabsl_time_zone.2608.0.0.dylib (0) <960A5BDE-8E3F-3F3F-92D7-EDB47ED04121> /opt/homebrew/*/libabsl_time_zone.2608.0.0.dylib
+       0x104a14000 -        0x104a17fff +libabsl_spinlock_wait.2608.0.0.dylib (0) <50C4ACE1-9B88-3FBC-BA4A-16A7A8B4BF4F> /opt/homebrew/*/libabsl_spinlock_wait.2608.0.0.dylib
+       0x19989c000 -        0x1998ebd83  libobjc.A.dylib (912.3) <76C8305C-4066-390C-8F3E-F0858D756AD8> /usr/lib/libobjc.A.dylib
+       0x1998ec000 -        0x1999749db  dyld (1.0.0 - 1160.6) <8E1E5EE2-F89A-33A7-BB0A-74BDC06B7828> /usr/lib/dyld
+       0x199975000 -        0x199979ff8  libsystem_blocks.dylib (90) <E9F1A3B9-AE38-3F4C-BF14-8A6E012AD36C> /usr/lib/system/libsystem_blocks.dylib
+       0x19997a000 -        0x1999c4fff  libxpc.dylib (2748.101.4) <C43D5322-9B69-37EE-B51E-45FDE5D81B5B> /usr/lib/system/libxpc.dylib
+       0x1999c5000 -        0x1999dffff  libsystem_trace.dylib (1510.100.36) <681EBF40-B321-364A-88EA-04AB45E3DA66> /usr/lib/system/libsystem_trace.dylib
+       0x1999e0000 -        0x199a88fd7  libcorecrypto.dylib (1638.100.62) <95C1D199-1B36-32B2-9BE7-5723A58D0D96> /usr/lib/system/libcorecrypto.dylib
+       0x199a89000 -        0x199ac5ff7  libsystem_malloc.dylib (521.100.59) <B36EAAD5-558D-39E8-AB0D-FD87F2EF154B> /usr/lib/system/libsystem_malloc.dylib
+       0x199ac6000 -        0x199b0dfff  libdispatch.dylib (1477.100.9) <7F973554-8168-35BF-AE86-2E9123E81BF7> /usr/lib/system/libdispatch.dylib
+       0x199b0e000 -        0x199b10fff  libsystem_featureflags.dylib (86) <D8AF5585-B9E4-38C0-B48B-CFD5C13DEB82> /usr/lib/system/libsystem_featureflags.dylib
+       0x199b11000 -        0x199b8fff3  libsystem_c.dylib (1592.100.35) <49477E07-E77B-332F-B98D-79CA210A866D> /usr/lib/system/libsystem_c.dylib
+       0x199b90000 -        0x199c1cff7  libc++.1.dylib (1700.255) <08C4329E-407F-310B-B037-75A8020B2963> /usr/lib/libc++.1.dylib
+       0x199c1d000 -        0x199c38ffb  libc++abi.dylib (1700.255) <4FED965B-18AD-3A4F-8928-1F0A3C35345F> /usr/lib/libc++abi.dylib
+       0x199c39000 -        0x199c73ffb  libsystem_kernel.dylib (10063.101.15) <1889CE0A-52E7-3122-8907-81AF920AC472> /usr/lib/system/libsystem_kernel.dylib
+       0x199c74000 -        0x199c80fff  libsystem_pthread.dylib (519.101.1) <45239F06-CC53-36D0-9933-7776AC7EA2FA> /usr/lib/system/libsystem_pthread.dylib
+       0x199c81000 -        0x199ca6ff7  libdyld.dylib (1160.6) <72199A80-9C55-376D-8ECF-EE68AFA57B7A> /usr/lib/system/libdyld.dylib
+       0x199ca7000 -        0x199caefe7  libsystem_platform.dylib (316.100.10) <031F3E8C-5227-3138-A444-68174C1C28CF> /usr/lib/system/libsystem_platform.dylib
+       0x199caf000 -        0x199cdbffb  libsystem_info.dylib (583.0.1) <615EAFA2-4446-3994-89E9-858A0552F1B8> /usr/lib/system/libsystem_info.dylib
+       0x199cdc000 -        0x19a1b4fff  com.apple.CoreFoundation (6.9 - 2420) <33908A83-098F-3437-973E-FB848C4F39DF> /System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation
+       0x19a1b5000 -        0x19a46efff  com.apple.LaunchServices (1141.1 - 1141.1) <1323AB9B-A0CD-38EB-87EC-91E87903E147> /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/LaunchServices
+       0x19a5bb000 -        0x19a956fef  libBLAS.dylib (1447.100.11) <4D6ED213-D805-3C75-A3EF-B0F659CF8132> /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
+       0x19a957000 -        0x19aa48ff7  com.apple.Lexicon-framework (1.0 - 134.9) <8DD8828B-6E72-32BE-A064-67FE2E312A39> /System/Library/PrivateFrameworks/Lexicon.framework/Versions/A/Lexicon
+       0x19aa49000 -        0x19aaaffff  libSparse.dylib (125) <3B1EB1F6-1BE1-3F02-97F8-D6E6BB45D4DF> /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libSparse.dylib
+       0x19aab0000 -        0x19ab43fff  com.apple.SystemConfiguration (1.21 - 1.21) <7E12A3B1-3C5B-3E1E-A2C7-D0436242A012> /System/Library/Frameworks/SystemConfiguration.framework/Versions/A/SystemConfiguration
+       0x19ab44000 -        0x19ab78ff3  libCRFSuite.dylib (52) <2B56C52C-832D-3E69-B3B8-A9606DF0F0B5> /usr/lib/libCRFSuite.dylib
+       0x19ae30000 -        0x19ba8dfff  com.apple.Foundation (6.9 - 2420) <1B93A4D2-DB73-3F3B-A726-C8EACC5128E0> /System/Library/Frameworks/Foundation.framework/Versions/C/Foundation
+       0x19ba8e000 -        0x19bc73fff  com.apple.LanguageModeling (1.0 - 366.9) <B6856E4D-DFB5-30CF-B9BF-779C4D0FED6E> /System/Library/PrivateFrameworks/LanguageModeling.framework/Versions/A/LanguageModeling
+       0x19c9fd000 -        0x19cdcffff  com.apple.security (7.0 - 61123.100.169) <E3032FF9-E461-36A1-90F1-C7EE260C0118> /System/Library/Frameworks/Security.framework/Versions/A/Security
+       0x19cdd0000 -        0x19d096fff  libicucore.A.dylib (74000.303) <50DE7E22-A040-3E0F-836E-BEF36B36EC01> /usr/lib/libicucore.A.dylib
+       0x19d097000 -        0x19d0a1ff3  libsystem_darwin.dylib (1592.100.35) <8DB1E11F-85AB-3699-AD96-228BE7D8C715> /usr/lib/system/libsystem_darwin.dylib
+       0x19d0a2000 -        0x19d3a7fff  com.apple.CoreServices.CarbonCore (1333 - 1333) <A8E6D1C2-3232-3EE7-AC52-C70C8D24CFE8> /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/CarbonCore.framework/Versions/A/CarbonCore
+       0x19d3a8000 -        0x19d3e8ff7  com.apple.CoreServicesInternal (505 - 505) <F81CEFD5-5C8F-30DA-AF7B-3D3C219ABA9E> /System/Library/PrivateFrameworks/CoreServicesInternal.framework/Versions/A/CoreServicesInternal
+       0x19d3e9000 -        0x19d429fff  com.apple.CSStore (1141.1 - 1141.1) <EF032633-55D2-370B-8738-2ABF5FD79875> /System/Library/PrivateFrameworks/CoreServicesStore.framework/Versions/A/CoreServicesStore
+       0x19d42a000 -        0x19d50cfff  com.apple.framework.IOKit (2.0.2 - 100076.101.1) <1832B4AB-F904-37C3-8809-4E251EB3E184> /System/Library/Frameworks/IOKit.framework/Versions/A/IOKit
+       0x19d50d000 -        0x19d51dfff  libsystem_notify.dylib (317.100.2) <EDCEB984-2FC8-3EB5-9016-3453A3DDEE8F> /usr/lib/system/libsystem_notify.dylib
+       0x19ef90000 -        0x19ef90fff  libnetwork.dylib (3762.101.1) <361592F9-71A5-337E-AF0E-296924118C9B> /usr/lib/libnetwork.dylib
+       0x19ef91000 -        0x19f365fff  com.apple.CFNetwork (1.0 - 1494.0.7) <60C90B3D-7A28-31A4-ACCF-705E5269FE77> /System/Library/Frameworks/CFNetwork.framework/Versions/A/CFNetwork
+       0x19f366000 -        0x19f37fffb  libsystem_networkextension.dylib (1838.101.1) <EBACF63D-8B18-37FF-8952-85FD99605BD7> /usr/lib/system/libsystem_networkextension.dylib
+       0x19f380000 -        0x19f381fff  libenergytrace.dylib (23) <5FDB6DBB-B0DF-3D80-89CB-0F00B03C5DCE> /usr/lib/libenergytrace.dylib
+       0x19f382000 -        0x19f3f7fdf  libMobileGestalt.dylib (1332.100.10) <64498125-B4F9-3115-B1B2-926E1C740647> /usr/lib/libMobileGestalt.dylib
+       0x19f3f8000 -        0x19f40ffff  libsystem_asl.dylib (398) <B8B21C7C-4530-3EA2-AB35-BA98B82F33D0> /usr/lib/system/libsystem_asl.dylib
+       0x19f410000 -        0x19f430ff0  com.apple.TCC (1.0 - 1) <F40DBA8E-C2BB-39BC-B732-0D5AA729999E> /System/Library/PrivateFrameworks/TCC.framework/Versions/A/TCC
+       0x1a09c1000 -        0x1a09dafff  com.apple.ProtocolBuffer (1 - 300.24.10.5.2) <1145F0EE-B89D-3AA1-892D-F7135CDE5137> /System/Library/PrivateFrameworks/ProtocolBuffer.framework/Versions/A/ProtocolBuffer
+       0x1a09db000 -        0x1a0b8dfff  libsqlite3.dylib (351) <877868A7-B883-3A57-8F35-4DBEF7386DC1> /usr/lib/libsqlite3.dylib
+       0x1a0d67000 -        0x1a0ddaff7  com.apple.AE (944 - 944) <1885B57C-7EF6-3921-BA18-0DE48C174133> /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/AE.framework/Versions/A/AE
+       0x1a0ddb000 -        0x1a0de5fff  libdns_services.dylib (2200.100.94.0.2) <6326929E-6A18-358A-801A-E2A8BD6D20A6> /usr/lib/libdns_services.dylib
+       0x1a0de6000 -        0x1a0deeff3  libsystem_symptoms.dylib (1871.100.22) <372ACDF1-29E7-34DA-B035-BD7671EB5A8B> /usr/lib/system/libsystem_symptoms.dylib
+       0x1a0def000 -        0x1a1a3dfff  com.apple.Network (1.0 - 1) <D7D230C1-AD42-3A19-9090-0953FE6B787C> /System/Library/Frameworks/Network.framework/Versions/A/Network
+       0x1a1a3e000 -        0x1a1a6cfff  com.apple.analyticsd (1.0 - 1) <F045814E-1A3D-344A-8C78-B3A510FE2BB2> /System/Library/PrivateFrameworks/CoreAnalytics.framework/Versions/A/CoreAnalytics
+       0x1a1a6d000 -        0x1a1a6efff  libDiagnosticMessagesClient.dylib (113) <3FD99EC3-B540-369A-A989-A44B40770968> /usr/lib/libDiagnosticMessagesClient.dylib
+       0x1a1a6f000 -        0x1a1ab5fff  com.apple.spotlight.metadata.utilities (1.0 - 2274.23) <05E9916C-60D2-35AB-BB45-51C9EA9AFB18> /System/Library/PrivateFrameworks/MetadataUtilities.framework/Versions/A/MetadataUtilities
+       0x1a1ab6000 -        0x1a1b50fff  com.apple.Metadata (14.4 - 2274.23) <A109A8B3-FE9F-3147-8FAE-B3F236FB0162> /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Metadata
+       0x1a1b51000 -        0x1a1b59ffb  com.apple.DiskArbitration (2.7 - 2.7) <FB7E6533-8177-3C9D-841C-6E784899ABE3> /System/Library/Frameworks/DiskArbitration.framework/Versions/A/DiskArbitration
+       0x1a1b5a000 -        0x1a1f43fdf  com.apple.vImage (8.1 - 587.100.1) <5905E516-D7AC-358C-AF65-AF145940909A> /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vImage.framework/Versions/A/vImage
+       0x1a25ae000 -        0x1a25bdfff  com.apple.OpenDirectory (14.4 - 642) <4F0DD0B8-40A9-390F-824D-32284D211063> /System/Library/Frameworks/OpenDirectory.framework/Versions/A/OpenDirectory
+       0x1a25be000 -        0x1a25ddffb  com.apple.CFOpenDirectory (14.4 - 642) <05E096FC-C25F-3024-89DD-D8AFEBA60EE6> /System/Library/Frameworks/OpenDirectory.framework/Versions/A/Frameworks/CFOpenDirectory.framework/Versions/A/CFOpenDirectory
+       0x1a25de000 -        0x1a25eaff7  com.apple.CoreServices.FSEvents (1376.100.3 - 1376.100.3) <9854F074-AA6A-3384-AC3D-7CBFA4A3B6E6> /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/FSEvents.framework/Versions/A/FSEvents
+       0x1a25eb000 -        0x1a2615fff  com.apple.coreservices.SharedFileList (225 - 225) <DE02FEC9-622D-36FC-9496-6E28466F8BFF> /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/SharedFileList.framework/Versions/A/SharedFileList
+       0x1a2616000 -        0x1a261cfff  libapp_launch_measurement.dylib (17) <E9794766-3765-3112-B9F6-AE7E3E4FC37E> /usr/lib/libapp_launch_measurement.dylib
+       0x1a261d000 -        0x1a2666fff  com.apple.CoreAutoLayout (1.0 - 32) <AE7454CD-FDF4-3151-A0F8-67A64A331064> /System/Library/PrivateFrameworks/CoreAutoLayout.framework/Versions/A/CoreAutoLayout
+       0x1a2667000 -        0x1a2750ff3  libxml2.2.dylib (37.15) <6D8E1641-C5BF-31E1-8D8A-443AAEB7C01F> /usr/lib/libxml2.2.dylib
+       0x1a3f70000 -        0x1a3f9aff3  libsystem_containermanager.dylib (582.100.15) <C9DB5B40-6F90-348A-A518-3ACFB49B39FE> /usr/lib/system/libsystem_containermanager.dylib
+       0x1a3f9b000 -        0x1a3fb2fff  com.apple.IOSurface (352.41.7 - 352.41.7) <7EE8E9F4-ECEF-3633-A084-9C2D8E2AEC34> /System/Library/Frameworks/IOSurface.framework/Versions/A/IOSurface
+       0x1a4f32000 -        0x1a4f36fff  libsystem_configuration.dylib (1300.100.9) <D57D8736-2800-3066-82D4-C433A2DC10C4> /usr/lib/system/libsystem_configuration.dylib
+       0x1a4f37000 -        0x1a4f3cff3  libsystem_sandbox.dylib (2190.101.1) <2F95044C-6CEF-3731-B1B9-F7D6A51B3A3F> /usr/lib/system/libsystem_sandbox.dylib
+       0x1a4f3f000 -        0x1a4f42ffb  com.apple.AppleSystemInfo (3.1.5 - 3.1.5) <90AFB068-BC56-3ABB-93D1-C9D2AE2D5C56> /System/Library/PrivateFrameworks/AppleSystemInfo.framework/Versions/A/AppleSystemInfo
+       0x1a4f43000 -        0x1a4f44fff  liblangid.dylib (138) <01F8F980-177E-3142-9A7E-F40272283389> /usr/lib/liblangid.dylib
+       0x1a4f45000 -        0x1a5067fff  com.apple.CoreNLP (1.0 - 313) <89E09C0E-0349-3495-8646-A3F84B1304F3> /System/Library/PrivateFrameworks/CoreNLP.framework/Versions/A/CoreNLP
+       0x1a5068000 -        0x1a506dfff  com.apple.LinguisticData (1.0 - 483.10) <E54F8409-DB75-3540-9884-AA72814A4F63> /System/Library/PrivateFrameworks/LinguisticData.framework/Versions/A/LinguisticData
+       0x1a506e000 -        0x1a5941fe7  libBNNS.dylib (830.101.1) <34827228-2E67-3A03-816D-BA464EC38C43> /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBNNS.dylib
+       0x1a5942000 -        0x1a5a32f87  libvDSP.dylib (1043.100.6) <6C6D994F-02CC-322D-AB27-D140292BAB6E> /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libvDSP.dylib
+       0x1a5a33000 -        0x1a5a66fff  com.apple.CoreEmoji (1.0 - 200.311) <937A5C1C-C6B3-3A11-B340-97BF725FD2CF> /System/Library/PrivateFrameworks/CoreEmoji.framework/Versions/A/CoreEmoji
+       0x1a5a67000 -        0x1a5a76ffb  com.apple.IOMobileFramebuffer (343.0.0 - 343.0.0) <BCBC0330-AE6C-3888-972F-BF9FA9508E34> /System/Library/PrivateFrameworks/IOMobileFramebuffer.framework/Versions/A/IOMobileFramebuffer
+       0x1a5c98000 -        0x1a5d25fff  com.apple.securityfoundation (6.0 - 55283) <C26C56E1-3806-30EF-A0C9-3C144C1B0490> /System/Library/Frameworks/SecurityFoundation.framework/Versions/A/SecurityFoundation
+       0x1a5d26000 -        0x1a5d4cfff  com.apple.coreservices.BackgroundTaskManagement (1.0 - 104) <D8198EBD-3472-3656-BF3D-D4DED8F5449E> /System/Library/PrivateFrameworks/BackgroundTaskManagement.framework/Versions/A/BackgroundTaskManagement
+       0x1a5d58000 -        0x1a5d5afff  libquarantine.dylib (172.100.3) <158A39C2-F9C6-32CA-845B-F1DFB711718A> /usr/lib/system/libquarantine.dylib
+       0x1a5d5b000 -        0x1a5d66fff  libCheckFix.dylib (32) <A7DAEDE9-A4AC-330D-8790-23C64CB24D3E> /usr/lib/libCheckFix.dylib
+       0x1a5d67000 -        0x1a5d7efff  libcoretls.dylib (186) <E8F5AFCB-3397-3F90-B7EF-6E654C653F4D> /usr/lib/libcoretls.dylib
+       0x1a5d7f000 -        0x1a5d90ffb  libbsm.0.dylib (89) <C20BA6D7-6BD8-3F50-93DF-22AB57DC1168> /usr/lib/libbsm.0.dylib
+       0x1a5d91000 -        0x1a5decfff  libmecab.dylib (1062.307) <5349B279-7E48-3AD6-B924-0CA008BB5F84> /usr/lib/libmecab.dylib
+       0x1a5ded000 -        0x1a5defffb  libgermantok.dylib (29) <658F83D0-8935-35E4-931A-2714E7DC3955> /usr/lib/libgermantok.dylib
+       0x1a5df0000 -        0x1a5e04fff  libLinearAlgebra.dylib (1447.100.11) <B328B92C-1E68-3AD3-BA9A-347FA62FC29D> /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libLinearAlgebra.dylib
+       0x1a643d000 -        0x1a6500fc7  com.apple.AppleFSCompression (163 - 1.0) <D9D85513-5CFF-39A4-9517-12582A8AD422> /System/Library/PrivateFrameworks/AppleFSCompression.framework/Versions/A/AppleFSCompression
+       0x1a6501000 -        0x1a650dffb  libbz2.1.0.dylib (45) <92297FDA-90D5-3274-8425-D00F9A0CD2D0> /usr/lib/libbz2.1.0.dylib
+       0x1a650e000 -        0x1a6513fff  libsystem_coreservices.dylib (152.5.1) <324A6A0A-BBDE-3257-9A75-6A74C85E3430> /usr/lib/system/libsystem_coreservices.dylib
+       0x1a6514000 -        0x1a6545fff  com.apple.CoreServices.OSServices (1141.1 - 1141.1) <2BFE09A3-3B7A-3DD8-B1A9-19054A14C7BE> /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/OSServices.framework/Versions/A/OSServices
+       0x1a682d000 -        0x1a683bfff  libz.1.dylib (91.40.4) <6C4F90C2-6EFC-3551-8150-285D3D954E15> /usr/lib/libz.1.dylib
+       0x1a683c000 -        0x1a6872ff3  libsystem_m.dylib (3252.100.9) <9735ABAE-2939-30EB-90D4-C6F23F795B2F> /usr/lib/system/libsystem_m.dylib
+       0x1a6873000 -        0x1a6876fff  libcharset.1.dylib (99) <9187B6AE-DEA8-3FC2-B810-C2E49C8048D1> /usr/lib/libcharset.1.dylib
+       0x1a6877000 -        0x1a687effb  libmacho.dylib (1010.6) <DD2A9F47-7F80-344C-B6FE-82682F8AAB4A> /usr/lib/system/libmacho.dylib
+       0x1a687f000 -        0x1a689efff  libkxld.dylib (10063.101.15) <27D9C9AE-CDB5-3221-A163-61EA34189F23> /usr/lib/system/libkxld.dylib
+       0x1a689f000 -        0x1a68acff7  libcommonCrypto.dylib (600028.100.1) <0BA453ED-E5A2-3C2F-86F4-CFCFFA6C1879> /usr/lib/system/libcommonCrypto.dylib
+       0x1a68ad000 -        0x1a68b8fff  libunwind.dylib (1700.242) <31BBAE83-7FFD-30A6-8BFC-6D5D17A6CC82> /usr/lib/system/libunwind.dylib
+       0x1a68b9000 -        0x1a68c0fff  liboah.dylib (318.5) <3FE71C4F-17CC-3B93-AE29-05CE7D116F1B> /usr/lib/liboah.dylib
+       0x1a68c1000 -        0x1a68cafff  libcopyfile.dylib (196.100.4) <3DF60503-459B-3DA5-BD91-E72518FA9370> /usr/lib/system/libcopyfile.dylib
+       0x1a68cb000 -        0x1a68cefff  libcompiler_rt.dylib (103.2) <DE476BC5-36E2-3F7A-87C8-1EF2BE6ADFDA> /usr/lib/system/libcompiler_rt.dylib
+       0x1a68cf000 -        0x1a68d3ffb  libsystem_collections.dylib (1592.100.35) <2EA02C23-E13C-39AE-B850-82CEABACE7A6> /usr/lib/system/libsystem_collections.dylib
+       0x1a68d4000 -        0x1a68d6ffb  libsystem_secinit.dylib (147.100.1) <11D0DCC2-FC9F-3E2C-B2CF-0662E64DC96D> /usr/lib/system/libsystem_secinit.dylib
+       0x1a68d7000 -        0x1a68d9ffb  libremovefile.dylib (70.100.4) <92A7E10F-1F6C-30D5-9C44-D42352D3A674> /usr/lib/system/libremovefile.dylib
+       0x1a68da000 -        0x1a68daffb  libkeymgr.dylib (31) <291CFCDE-CF87-3F39-A3E3-36C4303BEC16> /usr/lib/system/libkeymgr.dylib
+       0x1a68db000 -        0x1a68e3ff7  libsystem_dnssd.dylib (2200.100.94.0.2) <4D030E4B-27FC-3C22-8467-A8CAFECA7761> /usr/lib/system/libsystem_dnssd.dylib
+       0x1a68e4000 -        0x1a68e9fff  libcache.dylib (93) <C0BCBAE5-4913-3D80-8E3A-9D4DEC1EA827> /usr/lib/system/libcache.dylib
+       0x1a68ea000 -        0x1a68ebfff  libSystem.B.dylib (1345.100.2) <CC304138-4DB2-35CE-B55F-044E187F356E> /usr/lib/libSystem.B.dylib
+       0x1a68ec000 -        0x1a68effff  libfakelink.dylib (5) <8D9D7804-A8F3-3CF3-9F99-67463051A4D1> /usr/lib/libfakelink.dylib
+       0x1a68f0000 -        0x1a68f0ffb  com.apple.SoftLinking (1.0 - 47) <A25FC67A-C812-328E-8545-1BF6BEEF65C0> /System/Library/PrivateFrameworks/SoftLinking.framework/Versions/A/SoftLinking
+       0x1a68f1000 -        0x1a6926ff3  libpcap.A.dylib (131) <DD40870A-D755-3E6F-81FB-1949CAB321FD> /usr/lib/libpcap.A.dylib
+       0x1a6927000 -        0x1a692dff7  libiconv.2.dylib (99) <EBF0B2BA-6A01-3BE8-874E-772A01059C9C> /usr/lib/libiconv.2.dylib
+       0x1a692e000 -        0x1a693ffff  libcmph.dylib (8) <8E49A694-0D21-34F2-919E-C73818A176A7> /usr/lib/libcmph.dylib
+       0x1a6940000 -        0x1a69c8fff  libarchive.2.dylib (131) <D2C4E20C-0B7E-3A93-A849-384EBB909B89> /usr/lib/libarchive.2.dylib
+       0x1a69c9000 -        0x1a6a3fff3  com.apple.SearchKit (1.4.1 - 1.4.1) <D89B72E5-2620-32EC-A029-A2ED399447F2> /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/SearchKit.framework/Versions/A/SearchKit
+       0x1a6a40000 -        0x1a6a41ff7  libThaiTokenizer.dylib (15) <05F7FC32-BAA9-34C5-A783-24289456A459> /usr/lib/libThaiTokenizer.dylib
+       0x1a6a42000 -        0x1a6a68ff7  com.apple.applesauce (1.0 - 16.60.1) <91969C80-75D6-360C-AEA4-E3015BBAAE30> /System/Library/PrivateFrameworks/AppleSauce.framework/Versions/A/AppleSauce
+       0x1a6a69000 -        0x1a6a83ffb  libapple_nghttp2.dylib (20) <211C76CA-1DA2-334A-9430-31814E3D4440> /usr/lib/libapple_nghttp2.dylib
+       0x1a6a84000 -        0x1a6a96ff3  libSparseBLAS.dylib (1447.100.11) <94B2ABC5-6A47-379B-BC97-0ED54AC65E1A> /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libSparseBLAS.dylib
+       0x1a6a99000 -        0x1a6a9efff  libpam.2.dylib (33) <8ED1307E-63AF-3C1F-B1B6-C155515F92B3> /usr/lib/libpam.2.dylib
+       0x1a6a9f000 -        0x1a6b6eff7  libcompression.dylib (169.100.2) <20933059-9E27-3834-B420-6A9C4FACB565> /usr/lib/libcompression.dylib
+       0x1a6b6f000 -        0x1a6b73ffb  libQuadrature.dylib (7) <6269A517-248D-312D-AD14-C8628A297786> /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libQuadrature.dylib
+       0x1a6b74000 -        0x1a7ceefcf  libLAPACK.dylib (1447.100.11) <1AE3697E-810A-3259-8B55-894B8777CF5C> /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libLAPACK.dylib
+       0x1a7cef000 -        0x1a7d45fff  com.apple.DictionaryServices (1.2 - 355) <92CC115F-D8B9-3D20-B6E4-CEEFCBABBB7D> /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/DictionaryServices.framework/Versions/A/DictionaryServices
+       0x1a7d46000 -        0x1a7d64ff7  liblzma.5.dylib (20) <2AF65A72-B0C5-369C-84E3-27AD61D5AD5D> /usr/lib/liblzma.5.dylib
+       0x1a7d65000 -        0x1a7d66ffb  libcoretls_cfhelpers.dylib (186) <CF31DA72-FD76-30CD-AFF8-CEDA8AC3C526> /usr/lib/libcoretls_cfhelpers.dylib
+       0x1a7d67000 -        0x1a7dd6ff7  com.apple.APFS (2236.101.1 - 2236.101.1) <2B21E745-F8AB-3ABE-87C6-A0715494C289> /System/Library/PrivateFrameworks/APFS.framework/Versions/A/APFS
+       0x1a7dd7000 -        0x1a7de5ffb  libxar.1.dylib (498) <63123423-7E28-38F2-A10F-F449F31CA8FD> /usr/lib/libxar.1.dylib
+       0x1a7de6000 -        0x1a7de9ff7  libutil.dylib (72) <78B61AF1-44AA-3363-B30A-E51CBD4479C0> /usr/lib/libutil.dylib
+       0x1a7dea000 -        0x1a7e15ff3  libxslt.1.dylib (20.3) <3812D0DF-CD14-392B-AA83-515492972C27> /usr/lib/libxslt.1.dylib
+       0x1a7e1e000 -        0x1a7e99fff  libvMisc.dylib (1043.100.6) <D1B359CA-6BD5-3F1B-988E-2157F767F7A3> /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libvMisc.dylib
+       0x1a81c5000 -        0x1a81cffff  libheimdal-asn1.dylib (689) <F0E176F3-C662-3325-A4A4-9E55468F1B4A> /usr/lib/libheimdal-asn1.dylib
+       0x1a9933000 -        0x1a9e90fff  libswiftCore.dylib (5.10 - 5.10.0.12.5) <05650D36-BBC5-3760-AEC7-4D2751B5D729> /usr/lib/swift/libswiftCore.dylib
+       0x1abe62000 -        0x1abf9ffff  com.apple.combine (1.0 - 311) <471FD19F-E3B4-3FCE-8CDE-6329067DD0CC> /System/Library/Frameworks/Combine.framework/Versions/A/Combine
+       0x1adf37000 -        0x1adf37fff  com.apple.Accelerate.vecLib (3.11 - vecLib 3.11) <87C48560-FD22-310A-9A39-972083577952> /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/vecLib
+       0x1adf60000 -        0x1adf60fff  com.apple.CoreServices (1226 - 1226) <12D0527E-1521-3A45-B16C-CB1B3AF39604> /System/Library/Frameworks/CoreServices.framework/Versions/A/CoreServices
+       0x1ae21f000 -        0x1ae21ffff  com.apple.Accelerate (1.11 - Accelerate 1.11) <894C0646-5CF2-3103-B4D0-CD8F1D19CC3E> /System/Library/Frameworks/Accelerate.framework/Versions/A/Accelerate
+       0x1af5c5000 -        0x1af5dcff7  libswiftDispatch.dylib (41) <DAE7C867-9EF9-3D00-8CE0-44B15D6ABE76> /usr/lib/swift/libswiftDispatch.dylib
+       0x1b1e34000 -        0x1b1e37ff5  libswiftObjectiveC.dylib (8) <5090AB15-A2C1-3DAB-8C95-0B5EFAC3F99F> /usr/lib/swift/libswiftObjectiveC.dylib
+       0x1b1e38000 -        0x1b1e52fff  libswiftos.dylib (1049.100.4) <BC6FAA6B-C783-349E-9439-3A3E54F2C623> /usr/lib/swift/libswiftos.dylib
+       0x1bd0c5000 -        0x1bd0ceff3  libswiftDarwin.dylib (5.10 - 5.10.0.12.5) <BF10D745-A09D-30F6-B1FD-61E32108E378> /usr/lib/swift/libswiftDarwin.dylib
+       0x1bf585000 -        0x1bf5a9fff  libmis.dylib (386.100.27) <7BAA4FC0-C4DD-39DE-A26D-34AF23C960D0> /usr/lib/libmis.dylib
+       0x1bf5b7000 -        0x1bf5bdfff  libswiftCoreFoundation.dylib (2401) <86C3F3D1-8C85-315F-8C1C-8D12DA54E0EF> /usr/lib/swift/libswiftCoreFoundation.dylib
+       0x1bf5c9000 -        0x1bf600ff2  libswiftXPC.dylib (36.100.7.0.1) <BFEE4FBF-0ECF-37C0-BD7F-502FE5F358D1> /usr/lib/swift/libswiftXPC.dylib
+       0x1bf602000 -        0x1bf602fff  libswiftIOKit.dylib (1) <EAF2C3B2-10AD-36CD-A920-A45DFE81E6FF> /usr/lib/swift/libswiftIOKit.dylib
+       0x1cfc0d000 -        0x1cfc14fff  com.apple.MobileSystemServices (1.0 - 1) <AC486041-576F-3A3E-86CD-CFD4E42D7F0E> /System/Library/PrivateFrameworks/MobileSystemServices.framework/Versions/A/MobileSystemServices
+       0x1ed686000 -        0x1ed689fff  com.apple.ConfigProfileHelper (16.4 - 1652) <621FBF28-1E2B-3659-9D84-A9D3B4DA88E3> /System/Library/PrivateFrameworks/ConfigProfileHelper.framework/Versions/A/ConfigProfileHelper
+       0x231ceb000 -        0x231cfefff  com.apple.private.AppleMobileFileIntegrity-fmk (1.0 - 1) <5B6928E2-3EE3-321C-8CE7-F3C5C1679893> /System/Library/PrivateFrameworks/AppleMobileFileIntegrity.framework/Versions/A/AppleMobileFileIntegrity
+       0x234526000 -        0x234685fff  com.apple.CollectionsInternal (1.1.0 - 22) <7DC7FE56-7C52-373F-BF56-5AC17E19F784> /System/Library/PrivateFrameworks/CollectionsInternal.framework/Versions/A/CollectionsInternal
+       0x241dbd000 -        0x241e9cfff  com.apple.InstalledContentLibrary (1.0 - 1.0) <26922896-2AFC-384E-8D22-C95E6334DA62> /System/Library/PrivateFrameworks/InstalledContentLibrary.framework/Versions/A/InstalledContentLibrary
+       0x243c38000 -        0x2441d0fff  com.apple.MIL (3304.6 - 3304.6.1) <1776A9FD-0D44-34A1-B53D-55518418469F> /System/Library/PrivateFrameworks/MIL.framework/Versions/A/MIL
+       0x2454e9000 -        0x245534fff  com.apple.MessageSecurity (1.0 - 101.100.4) <A64CA60D-6DC2-3CC1-82DC-98C86D3779BF> /System/Library/PrivateFrameworks/MessageSecurity.framework/Versions/A/MessageSecurity
+       0x24a5b7000 -        0x24a5bfff7  com.apple.ReflectionInternal (1.0.0 - 22) <EABFD56A-54C6-3455-A976-D053BEB1C1F3> /System/Library/PrivateFrameworks/ReflectionInternal.framework/Versions/A/ReflectionInternal
+       0x24ab3d000 -        0x24ab54fff  com.apple.RuntimeInternal (1.0.0 - 22) <050F1161-476D-3D52-8B97-65FA89346889> /System/Library/PrivateFrameworks/RuntimeInternal.framework/Versions/A/RuntimeInternal
+       0x25ed26000 -        0x25ed31fff  libCoreEntitlements.dylib (53.100.3.0.1) <976BAB8A-2F18-3CFD-973F-645335DD6C56> /usr/lib/libCoreEntitlements.dylib
+       0x25ef14000 -        0x25ef1ffff  libTLE.dylib (53.100.3.0.1) <05A71C26-388C-329A-9D8A-D601BBB1C37B> /usr/lib/libTLE.dylib
+       0x260319000 -        0x260384ff7  libswift_Concurrency.dylib (5.10 - 5.10.0.12.5) <D6C9A750-A3E9-3AA3-9D68-E0D6B1469648> /usr/lib/swift/libswift_Concurrency.dylib
+       0x2603c4000 -        0x26046cff7  libswift_RegexParser.dylib (5.10 - 5.10.0.12.5) <F9659498-9A32-3EAE-A550-C85533C08F05> /usr/lib/swift/libswift_RegexParser.dylib
+       0x26046d000 -        0x26050fff7  libswift_StringProcessing.dylib (5.10 - 5.10.0.12.5) <5329D85F-7446-3295-8064-C8288457FB38> /usr/lib/swift/libswift_StringProcessing.dylib
+       0x260666000 -        0x260669fff  libsystem_darwindirectory.dylib (86.0.2) <0395D567-DBD9-3F03-A9E0-A0969963A834> /usr/lib/system/libsystem_darwindirectory.dylib
+       0x26066a000 -        0x26066dfff  libsystem_eligibility.dylib (47.101.3) <6C663441-D4D5-361C-ABE7-B68D7B6E5B9B> /usr/lib/system/libsystem_eligibility.dylib
+       0x26066e000 -        0x260671ffb  libsystem_sanitizers.dylib (8) <EEA82D78-5036-3A22-8DC6-4E131A57941B> /usr/lib/system/libsystem_sanitizers.dylib
