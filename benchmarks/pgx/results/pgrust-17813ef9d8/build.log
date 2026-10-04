@@ -1,0 +1,1803 @@
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded openssl-macros v0.1.1
+  Downloaded blowfish v0.9.1
+  Downloaded foreign-types-shared v0.1.1
+  Downloaded cty v0.2.2
+  Downloaded num-integer v0.1.46
+  Downloaded foreign-types v0.3.2
+  Downloaded ecb v0.1.2
+  Downloaded mimalloc v0.1.52
+  Downloaded find-msvc-tools v0.1.9
+  Downloaded zstd v0.13.3
+  Downloaded zstd-safe v7.2.4
+  Downloaded twox-hash v2.1.3
+  Downloaded cast5 v0.11.1
+  Downloaded pkg-config v0.3.33
+  Downloaded cfb-mode v0.8.2
+  Downloaded snap v1.1.2
+  Downloaded lz4_flex v0.11.6
+  Downloaded des v0.8.1
+  Downloaded openssl-sys v0.9.117
+  Downloaded cc v1.4.0
+  Downloaded vcpkg v0.2.15
+  Downloaded zstd-sys v2.0.16+zstd.1.5.7
+  Downloaded zerocopy v0.8.55
+  Downloaded openssl v0.10.81
+  Downloaded libmimalloc-sys v0.1.49
+  Downloaded openssl-src v300.6.1+3.6.3
+   Compiling types_error v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/types_error)
+   Compiling seam_core v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/seam_core)
+   Compiling types_core v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/types_core)
+   Compiling version_check v0.9.5
+   Compiling cfg-if v1.0.4
+   Compiling zerocopy v0.8.55
+   Compiling once_cell v1.21.4
+   Compiling allocator-api2 v0.2.21
+   Compiling rustc-hash v2.1.3
+   Compiling libc v0.2.189
+   Compiling types_guc v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/types_guc)
+   Compiling init_small_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/init/init_small_seams)
+   Compiling types_dest v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/types_dest)
+   Compiling stack_depth_core v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/stack_depth_core)
+   Compiling elog_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/error/elog_seams)
+   Compiling guc_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/guc_seams)
+   Compiling acl_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/acl_seams)
+   Compiling pgtz_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/timezone/pgtz_seams)
+   Compiling localtime v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/timezone/localtime)
+   Compiling pgstat_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/activity/pgstat_seams)
+   Compiling guc_tables v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/guc_tables)
+   Compiling error_small_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/error/error_small_seams)
+   Compiling xact_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/xact_seams)
+   Compiling ahash v0.8.12
+   Compiling postgres_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/tcop/postgres_seams)
+   Compiling waitevent_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/activity/waitevent_seams)
+   Compiling hashfn v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/hashfn)
+   Compiling file_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/file/file_seams)
+   Compiling pg_prng_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/port/pg_prng_seams)
+   Compiling string_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/string_seams)
+   Compiling pg_prng v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/pg_prng)
+   Compiling startup_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/startup_seams)
+   Compiling strftime v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/timezone/strftime)
+   Compiling pg_string v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/string)
+   Compiling aio_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/aio/aio_seams)
+   Compiling rel_vocab v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/rel_vocab)
+   Compiling s_lock_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/lmgr/s_lock_seams)
+   Compiling wchar v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/wchar)
+   Compiling shmem_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/shmem_seams)
+   Compiling timeout_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/timeout_seams)
+   Compiling ipc_portal_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/ipc_portal_seams)
+   Compiling pg_sema_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/port/pg_sema_seams)
+   Compiling pmsignal_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/pmsignal_seams)
+   Compiling syncrep_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/syncrep_seams)
+   Compiling autovacuum_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/autovacuum_seams)
+   Compiling condition_variable_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/lmgr/condition_variable_seams)
+   Compiling xlogutils_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/xlogutils_seams)
+   Compiling xloginsert_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/xloginsert_seams)
+   Compiling types_array v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/array)
+   Compiling twox-hash v2.1.3
+   Compiling pg_class_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_class_seams)
+   Compiling inval_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/inval_seams)
+   Compiling keywords v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/keywords)
+   Compiling parallel_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/parallel_seams)
+   Compiling numutils v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/numutils)
+   Compiling lz4_flex v0.11.6
+   Compiling pglz v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/pglz)
+   Compiling postmaster_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/postmaster_seams)
+   Compiling twophase_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/twophase_seams)
+   Compiling varsup_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/varsup_seams)
+   Compiling transam_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/transam_seams)
+   Compiling ryu v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/ryu)
+   Compiling lsyscache_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/lsyscache_seams)
+   Compiling l2cache v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/l2cache)
+   Compiling relmapper_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/relmapper_seams)
+   Compiling hyperloglog v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/lib/hyperloglog)
+   Compiling arrayutils v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/arrayutils)
+   Compiling find-msvc-tools v0.1.9
+   Compiling shlex v2.0.1
+   Compiling pg_clock v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/port/pg_clock)
+   Compiling pg_strong_random v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/port/pg_strong_random)
+   Compiling ip v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/ip)
+   Compiling pgsync v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/pgsync)
+   Compiling vfs v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/file/vfs)
+   Compiling pkg-config v0.3.33
+   Compiling types_startup v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/types_startup)
+   Compiling wait_error v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/wait_error)
+   Compiling secure_zero v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/secure_zero)
+   Compiling syslogger_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/syslogger_seams)
+   Compiling unicode_category v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/unicode_category)
+   Compiling pg_bitutils v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/port/pg_bitutils)
+   Compiling jobserver v0.1.35
+   Compiling pg_path v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/port/pg_path)
+   Compiling memchr v2.8.3
+   Compiling waiter v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/waiter)
+   Compiling pgstrcasecmp v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/port/pgstrcasecmp)
+   Compiling timestamp_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/timestamp_seams)
+   Compiling libpq_pqsignal v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/libpq/libpq_pqsignal)
+warning: function `allocate_slot` is never used
+   --> crates/backend/storage/ipc/waiter/src/lib.rs:435:8
+    |
+435 |     fn allocate_slot() -> usize {
+    |        ^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling conffiles_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/conffiles_seams)
+   Compiling guc_file_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/guc_file_seams)
+   Compiling cc v1.4.0
+   Compiling scalar_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/scalar_seams)
+   Compiling superuser_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/superuser_seams)
+   Compiling mcxt_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/mmgr/mcxt_seams)
+   Compiling ps_status_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/ps_status_seams)
+   Compiling backend_status_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/activity/backend_status_seams)
+   Compiling slot_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/slot_seams)
+   Compiling subtrans_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/subtrans_seams)
+   Compiling xlogrecovery_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/xlogrecovery_seams)
+   Compiling crc32c v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/port/crc32c)
+   Compiling backend_progress_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/activity/backend_progress_seams)
+   Compiling bgworker_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/bgworker_seams)
+warning: `waiter` (lib) generated 1 warning
+   Compiling logical_worker_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/logical_worker_seams)
+   Compiling async_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/async_seams)
+   Compiling slotsync_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/slotsync_seams)
+   Compiling commit_ts_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/commit_ts_seams)
+   Compiling xact_portal_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/xact_portal_seams)
+   Compiling logical_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/logical_seams)
+   Compiling launcher_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/launcher_seams)
+   Compiling trigger_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/trigger_seams)
+   Compiling be_fsstubs_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/libpq/be_fsstubs_seams)
+   Compiling snapbuild_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/snapbuild_seams)
+   Compiling unicode_case v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/unicode_case)
+   Compiling xlogarchive_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/xlogarchive_seams)
+   Compiling walreceiverfuncs_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/walreceiverfuncs_seams)
+   Compiling walsummarizer_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/walsummarizer_seams)
+   Compiling rewriteheap_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/heap/rewriteheap_seams)
+   Compiling reorderbuffer_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/logical/reorderbuffer_seams)
+   Compiling be_secure_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/libpq/be_secure_seams)
+   Compiling pg_qsort v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/pg_qsort)
+   Compiling vcpkg v0.2.15
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.24
+   Compiling quote v1.0.47
+   Compiling openssl v0.10.81
+   Compiling foreign-types-shared v0.1.1
+   Compiling bitflags v2.13.1
+   Compiling foreign-types v0.3.2
+   Compiling pg_sha2 v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/sha2)
+   Compiling walsender_config v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/walsender_config)
+   Compiling objectaccess v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/objectaccess)
+   Compiling pg_md5 v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/md5)
+   Compiling ifaddr v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/libpq/ifaddr)
+   Compiling hba_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/libpq/hba_seams)
+   Compiling auth_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/libpq/auth_seams)
+   Compiling relfilenumbermap_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/relfilenumbermap_seams)
+   Compiling xlogprefetcher_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/xlogprefetcher_seams)
+   Compiling zstd-safe v7.2.4
+   Compiling pgrc2_format v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/pgrcolumnar2/pgrc2_format)
+   Compiling order_key v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/order_key)
+   Compiling alp v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/alp)
+   Compiling simdutf8 v0.1.5
+   Compiling pgrc2_claim v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/pgrcolumnar2/pgrc2_claim)
+   Compiling pg_inherits_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_inherits_seams)
+   Compiling gin_hstore_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/gin/gin_hstore_seams)
+   Compiling gin_int4_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/gin/gin_int4_seams)
+   Compiling pairingheap v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/lib/pairingheap)
+   Compiling rls_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/rls_seams)
+warning: function `decode_vector32` is never used
+   --> crates/_support/alp/src/classic32.rs:293:15
+    |
+293 | pub(crate) fn decode_vector32(v: &AlpF32Vector, out: &mut Vec<f32>) {
+    |               ^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling lanereg v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/lanereg)
+   Compiling pg_rusage v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/pg_rusage)
+   Compiling scan_fgram v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/parser/scan_fgram)
+   Compiling gram_core v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/parser/gram_core)
+   Compiling session_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/session_seams)
+   Compiling janitor_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/janitor_seams)
+   Compiling pmchild_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/pmchild_seams)
+   Compiling ipci_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/ipci_seams)
+   Compiling stringhash v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/stringhash)
+   Compiling openssl-src v300.6.1+3.6.3
+   Compiling pg_class v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_class)
+   Compiling pg_hmac v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/hmac)
+   Compiling pg_b64 v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/base64)
+   Compiling timingsafe_bcmp v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/port/timingsafe_bcmp)
+   Compiling hashbrown v0.14.5
+   Compiling twophase_config v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/twophase_config)
+   Compiling syn v2.0.119
+   Compiling pgrc2_meta v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/pgrcolumnar2/pgrc2_meta)
+   Compiling snap v1.1.2
+   Compiling generic-array v0.14.7
+   Compiling typenum v1.20.1
+   Compiling autocfg v1.5.1
+   Compiling adler2 v2.0.1
+   Compiling regexp_alt v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/regexp_alt)
+   Compiling openssl-sys v0.9.117
+   Compiling zstd-sys v2.0.16+zstd.1.5.7
+   Compiling mcx v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/mcx)
+   Compiling num-traits v0.2.19
+   Compiling miniz_oxide v0.8.9
+   Compiling datum v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/datum)
+   Compiling types_storage v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/types_storage)
+warning: `alp` (lib) generated 1 warning
+   Compiling types_tuple v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/types_tuple)
+   Compiling mbutils_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/mb/mbutils_seams)
+   Compiling miscinit_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/init/miscinit_seams)
+   Compiling stringinfo v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/stringinfo)
+   Compiling ipc_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/ipc_seams)
+   Compiling detoast_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/common/detoast_seams)
+   Compiling types_fmgr v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/fmgr)
+   Compiling types_hash v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/hash)
+   Compiling types_trigger v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/types_trigger)
+   Compiling types_snapshot v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/snapshot)
+   Compiling init_small v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/init/init_small)
+   Compiling pqcomm_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/libpq/pqcomm_seams)
+warning: unexpected `cfg` condition name: `loom`
+  --> crates/backend/utils/init/init_small/src/globals.rs:62:1
+   |
+62 | / pgsync::process_global! { static BACKEND_CHILDREN: pgsync::Mutex<Vec<(i32, u32)>> =
+63 | |     pgsync::Mutex::new(Vec::new()); }
+   | |_____________________________________^
+   |
+   = help: expected names are: `docsrs`, `feature`, `pgrust_sim`, and `test` and 31 more
+   = note: using a cfg inside a macro will use the cfgs from the destination crate and not the ones from the defining crate
+   = help: try referring to `$crate::__process_global_one` crate for guidance on how handle this unexpected cfg
+   = help: the macro `$crate::__process_global_one` may come from an old version of the `pgsync` crate, try updating your dependency with `cargo update -p pgsync`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: requested on the command line with `-W unexpected-cfgs`
+   = note: this warning originates in the macro `$crate::__process_global_one` which comes from the expansion of the macro `pgsync::process_global` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition name: `loom`
+  --> crates/backend/utils/init/init_small/src/globals.rs:62:1
+   |
+62 | / pgsync::process_global! { static BACKEND_CHILDREN: pgsync::Mutex<Vec<(i32, u32)>> =
+63 | |     pgsync::Mutex::new(Vec::new()); }
+   | |_____________________________________^
+   |
+   = note: using a cfg inside a macro will use the cfgs from the destination crate and not the ones from the defining crate
+   = help: try referring to `$crate::__process_global_one` crate for guidance on how handle this unexpected cfg
+   = help: the macro `$crate::__process_global_one` may come from an old version of the `pgsync` crate, try updating your dependency with `cargo update -p pgsync`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: this warning originates in the macro `$crate::__process_global_one` which comes from the expansion of the macro `pgsync::process_global` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+   Compiling types_resowner v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/types_resowner)
+   Compiling xlogreader_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/xlogreader_seams)
+   Compiling latch_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/latch_seams)
+   Compiling resowner_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/resowner/resowner_seams)
+   Compiling lmgr_proc_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/lmgr/lmgr_proc_seams)
+   Compiling types_scan v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/types_scan)
+   Compiling types_gist v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/gist)
+   Compiling types_bloom v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/types_bloom)
+   Compiling types_nbtree v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/types_nbtree)
+   Compiling elog v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/error/elog)
+   Compiling tablespace_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/tablespace_seams)
+   Compiling types_spgist v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/types_spgist)
+   Compiling jit_deform v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/jit_deform)
+   Compiling fmgr_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/fmgr/fmgr_seams)
+   Compiling waiteventset_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/waiteventset_seams)
+warning: `init_small` (lib) generated 4 warnings (2 duplicates)
+   Compiling lwlock v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/lmgr/lwlock)
+   Compiling types_rel v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/rel)
+   Compiling types_slot v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/types_slot)
+   Compiling transam_xlog_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/transam_xlog_seams)
+   Compiling syscache_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/syscache_seams)
+   Compiling lock_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/lmgr/lock_seams)
+   Compiling deadlock_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/lmgr/deadlock_seams)
+   Compiling snapmgr_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/time/snapmgr_seams)
+   Compiling relpath_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/relpath_seams)
+   Compiling nbt_compare v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/nbtree/compare)
+   Compiling toast_internals_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/common/toast_internals_seams)
+   Compiling namespace_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/namespace_seams)
+   Compiling bufmgr_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/buffer/bufmgr_seams)
+   Compiling procarray_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/procarray_seams)
+   Compiling fd v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/file/fd)
+   Compiling types_nodes v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/nodes)
+   Compiling mbutils v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/mb/mbutils)
+   Compiling syncscan_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/common/syncscan_seams)
+warning: unused import: `set_errno`
+  --> crates/backend/storage/file/fd/src/sync.rs:13:40
+   |
+13 | use crate::vfd::{self, get_errno, loc, set_errno, with_fd, FD_CLOSE_AT_EOXACT, FD_DELETE_AT_CLOSE};
+   |                                        ^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling tableam_vocab v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/table/tableam_vocab)
+   Compiling smgr_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/smgr/smgr_seams)
+   Compiling relation_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/common/relation_seams)
+   Compiling table_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/table/table_seams)
+   Compiling pqformat v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/libpq/pqformat)
+   Compiling detoast v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/common/detoast)
+   Compiling sync_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/sync/sync_seams)
+   Compiling heaptuple v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/common/heaptuple)
+   Compiling slru v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/slru)
+   Compiling table v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/table/table)
+   Compiling format_type v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/format_type)
+   Compiling catalog_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/catalog_seams)
+   Compiling pmsignal v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/pmsignal)
+   Compiling dbcommands_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/dbcommands_seams)
+   Compiling multixact_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/multixact_seams)
+   Compiling exectuples v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/exectuples)
+   Compiling dsm_core v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/dsm_core)
+   Compiling tableam_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/table/tableam_seams)
+   Compiling aclchk_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/aclchk_seams)
+   Compiling typcache_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/typcache_seams)
+   Compiling catcache_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/catcache_seams)
+   Compiling sinval_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/sinval_seams)
+   Compiling tupdesc v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/common/tupdesc)
+   Compiling pg_enum_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_enum_seams)
+   Compiling adt_float v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/float)
+   Compiling types_portal v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/portal)
+   Compiling ipc v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/ipc)
+   Compiling relcache_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/relcache_seams)
+   Compiling types_pathnodes v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/pathnodes)
+   Compiling readfuncs v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/nodes/readfuncs)
+   Compiling inval v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/inval)
+   Compiling lmgr_proc v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/lmgr/lmgr_proc)
+   Compiling pquery_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/tcop/pquery_seams)
+   Compiling printtup v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/common/printtup)
+   Compiling indexcmds_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/indexcmds_seams)
+   Compiling clauses_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/optimizer/util/clauses_seams)
+   Compiling funcapi_srf v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/fmgr/funcapi_srf)
+   Compiling multixact v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/multixact)
+   Compiling outfuncs v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/nodes/outfuncs)
+   Compiling queryenvironment v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/queryenvironment)
+warning: `fd` (lib) generated 1 warning (run `cargo fix --lib -p fd` to apply 1 suggestion)
+   Compiling regex v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/regex)
+   Compiling unicode_norm v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/unicode_norm)
+   Compiling pg_locale_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/pg_locale_seams)
+   Compiling regex_core_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/regex/regex_core_seams)
+   Compiling adt_scalar v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/scalar)
+   Compiling regexp_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/regexp_seams)
+   Compiling procsignal_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/procsignal_seams)
+   Compiling dfmgr v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/fmgr/dfmgr)
+   Compiling pgtz v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/timezone/pgtz)
+   Compiling latch v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/latch)
+   Compiling lsyscache v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/lsyscache)
+   Compiling waiteventset v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/waiteventset)
+   Compiling guc_file v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/guc_file)
+   Compiling predicate_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/lmgr/predicate_seams)
+   Compiling copyfuncs v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/nodes/copyfuncs)
+   Compiling resowner_portal_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/resowner/resowner_portal_seams)
+   Compiling miscinit v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/init/miscinit)
+   Compiling resowner v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/resowner/resowner)
+   Compiling tuplestore_hold_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/sort/tuplestore_hold_seams)
+   Compiling dynahash v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/hash/dynahash)
+   Compiling condition_variable v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/lmgr/condition_variable)
+   Compiling interrupt v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/interrupt)
+   Compiling lmgr_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/lmgr/lmgr_seams)
+   Compiling tuplestore v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/sort/tuplestore)
+   Compiling pgstat v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/activity/pgstat)
+   Compiling standby_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/standby_seams)
+   Compiling timeline_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/timeline_seams)
+   Compiling catalog_storage_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/storage_seams)
+   Compiling xlogutils v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/xlogutils)
+   Compiling checkpointer_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/checkpointer_seams)
+   Compiling shm_mq v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/shm_mq)
+   Compiling tstore_receiver v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/tstore_receiver)
+   Compiling nodes_core v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/nodes/nodes_core)
+   Compiling tqueue v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/tqueue)
+   Compiling cmdtag v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/tcop/cmdtag)
+   Compiling sql_functions_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/sql_functions_seams)
+   Compiling matview_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/matview_seams)
+   Compiling createas_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/createas_seams)
+   Compiling spi_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/spi_seams)
+   Compiling copy_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/copy_seams)
+   Compiling plancache_portal_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/plancache_portal_seams)
+   Compiling portalcmds_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/portalcmds_seams)
+   Compiling snapmgr_portal_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/time/snapmgr_portal_seams)
+   Compiling relmapper v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/relmapper)
+   Compiling timeout v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/timeout)
+   Compiling catalog_index_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/catalog_index_seams)
+   Compiling origin_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/origin_seams)
+   Compiling combocid_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/time/combocid_seams)
+   Compiling tablecmds_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/tablecmds_seams)
+   Compiling adt_datetime v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/adt_datetime)
+   Compiling pg_database_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_database_seams)
+   Compiling xlogbackup v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/xlogbackup)
+   Compiling controldata_utils v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/controldata_utils)
+   Compiling pqcomm v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/libpq/pqcomm)
+   Compiling tidbitmap v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/nodes/tidbitmap)
+   Compiling locale v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/locale)
+   Compiling openssl-macros v0.1.1
+   Compiling typcache v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/typcache)
+   Compiling gin_vocab v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/gin/gin_vocab)
+warning: field `key_ctx` is never read
+   --> crates/backend/access/gin/gin_vocab/src/lib.rs:961:5
+    |
+959 | pub struct GinScanWork {
+    |            ----------- field in this struct
+960 |     state: core::mem::MaybeUninit<GinScanState<'static>>,
+961 |     key_ctx: mcx::PinnedContext,
+    |     ^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling formatting_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/formatting_seams)
+   Compiling be_secure_common v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/libpq/be_secure_common)
+warning: `gin_vocab` (lib) generated 1 warning
+   Compiling adt_network v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/network)
+   Compiling arrayfuncs v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/arrayfuncs)
+   Compiling regproc_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/regproc_seams)
+   Compiling relpath v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/relpath)
+   Compiling tuplesort_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/sort/tuplesort_seams)
+   Compiling adt_domains v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/domains)
+   Compiling adt_mac v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/mac)
+   Compiling conv v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/mb/conv)
+   Compiling mcxt_stats v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/mmgr/mcxt_stats)
+   Compiling types_trigger_call v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/types_trigger_call)
+   Compiling indexam_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/index/indexam_seams)
+   Compiling trigfuncs v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/trigfuncs)
+   Compiling adt_mac8 v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/mac8)
+   Compiling foreigncmds_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/foreigncmds_seams)
+   Compiling adt_windowfuncs v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/windowfuncs)
+   Compiling adt_numeric v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/numeric)
+   Compiling adt_varbit v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/varbit)
+   Compiling array_userfuncs v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/array_userfuncs)
+   Compiling sequence_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/sequence_seams)
+   Compiling extension_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/extension_seams)
+   Compiling bufmask v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/common/bufmask)
+   Compiling types_brin v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/types_brin)
+   Compiling freespace_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/freespace/freespace_seams)
+   Compiling ps_status v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/ps_status)
+   Compiling freespace v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/freespace/freespace)
+   Compiling visibilitymap v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/heap/visibilitymap)
+   Compiling pruneheap_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/heap/pruneheap_seams)
+   Compiling gin_xlog v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/gin/gin_xlog)
+   Compiling generic_xlog v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/generic_xlog)
+   Compiling sequence_xlog v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/sequence_xlog)
+   Compiling heaptoast_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/heap/heaptoast_seams)
+   Compiling pgrc2_batch v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/pgrcolumnar2/pgrc2_batch)
+   Compiling heapam_visibility_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/heap/heapam_visibility_seams)
+   Compiling write_governor v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/file/write_governor)
+   Compiling types_hnsw v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/types/types_hnsw)
+   Compiling define v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/define)
+   Compiling genam_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/index/genam_seams)
+   Compiling pgrc2_read v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/pgrcolumnar2/pgrc2_read)
+   Compiling vacuum_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/vacuum_seams)
+   Compiling gin_trgm_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/gin/gin_trgm_seams)
+   Compiling gin_btree_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/gin/gin_btree_seams)
+   Compiling toastdesc v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/common/toastdesc)
+   Compiling hstore_subs_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/hstore_subs_seams)
+   Compiling expandedrecord_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/expandedrecord_seams)
+   Compiling relcache_build_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/relcache_build_seams)
+   Compiling sort_storage v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/sort/sort_storage)
+   Compiling var_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/optimizer/util/var_seams)
+   Compiling planner_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/optimizer/plan/planner_seams)
+   Compiling objectaddress_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/objectaddress_seams)
+   Compiling policy_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/policy_seams)
+   Compiling relation v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/common/relation)
+   Compiling parser_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/parser/parser_seams)
+   Compiling pg_db_role_setting_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_db_role_setting_seams)
+   Compiling tsm_system_rows v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/tsm_system_rows)
+   Compiling tsm_system_time v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/tsm_system_time)
+   Compiling opclasscmds_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/opclasscmds_seams)
+   Compiling parser_small1 v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/parser/parser_small1)
+   Compiling adt_pg_lsn v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/pg_lsn)
+   Compiling rewrite_handler_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/rewrite/rewrite_handler_seams)
+   Compiling pqcomm_simnet v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/libpq/pqcomm_simnet)
+   Compiling ruleutils_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/ruleutils_seams)
+   Compiling sharedtuplestore v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/sort/sharedtuplestore)
+   Compiling pg_barrier v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/pg_barrier)
+   Compiling varlena v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/varlena)
+   Compiling guc v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/guc)
+   Compiling repl_scanner v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/repl_scanner)
+   Compiling repl_gram v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/repl_gram)
+   Compiling parse_utilcmd_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/parser/parse_utilcmd_seams)
+   Compiling parse_relation_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/parser/parse_relation_seams)
+   Compiling parse_func_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/parser/parse_func_seams)
+   Compiling walsender_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/walsender_seams)
+   Compiling parse_clause_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/parser/parse_clause_seams)
+   Compiling hba v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/libpq/hba)
+   Compiling parse_collate_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/parser/parse_collate_seams)
+   Compiling analyze_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/parser/analyze_seams)
+   Compiling ri_triggers_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/ri_triggers_seams)
+   Compiling allpaths v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/optimizer/path/allpaths)
+   Compiling execreplication_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/execreplication_seams)
+   Compiling rewrite_define_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/rewrite/rewrite_define_seams)
+   Compiling saslprep v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/saslprep)
+   Compiling funcapi v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/fmgr/funcapi)
+   Compiling pg_locale v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/pg_locale)
+   Compiling shmem v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/shmem)
+   Compiling aio_core v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/aio/aio_core)
+   Compiling lock v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/lmgr/lock)
+   Compiling waitevent v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/activity/waitevent)
+   Compiling procsignal v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/procsignal)
+   Compiling md v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/smgr/md)
+   Compiling lmgr v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/lmgr/lmgr)
+   Compiling clog v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/clog)
+   Compiling sinval v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/sinval)
+   Compiling stack_depth v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/stack_depth)
+   Compiling bufmgr v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/buffer/bufmgr)
+   Compiling smgr v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/smgr/smgr)
+   Compiling varsup v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/varsup)
+warning: unused import: `std::sync::atomic::Ordering`
+ --> crates/backend/storage/buffer/bufmgr/src/aio_read.rs:6:5
+  |
+6 | use std::sync::atomic::Ordering;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `SeqCst`
+ --> crates/backend/access/transam/varsup/src/lib.rs:4:53
+  |
+4 | use std::sync::atomic::Ordering::{Relaxed, Release, SeqCst};
+  |                                                     ^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `TransactionIdPrecedesOrEquals`
+  --> crates/backend/access/transam/varsup/src/lib.rs:17:28
+   |
+17 |     TransactionIdPrecedes, TransactionIdPrecedesOrEquals,
+   |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `varsup` (lib) generated 2 warnings (run `cargo fix --lib -p varsup` to apply 2 suggestions)
+   Compiling adt_oracle_compat v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/oracle_compat)
+   Compiling injection_point v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/injection_point)
+   Compiling regex_core v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/regex/regex_core)
+   Compiling adt_int8 v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/int8)
+warning: function `ReadBuffer_batched` is never used
+    --> crates/backend/storage/buffer/bufmgr/src/read.rs:1072:15
+     |
+1072 | pub(crate) fn ReadBuffer_batched(
+     |               ^^^^^^^^^^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling adt_cash v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/cash)
+   Compiling ts_locale v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/tsearch/ts_locale)
+   Compiling adt_bool v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/bool)
+   Compiling adt_tsvector_core v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/tsvector_core)
+   Compiling instrument v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/instrument)
+   Compiling explain_dr v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/explain_dr)
+   Compiling adt_regproc v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/regproc)
+   Compiling tcop_dest v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/tcop/dest)
+   Compiling adt_enum v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/adt_enum)
+   Compiling execmain_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/execmain_seams)
+   Compiling ts_cache v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/ts_cache)
+   Compiling portalmem v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/mmgr/portalmem)
+   Compiling ts_parse v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/tsearch/ts_parse)
+   Compiling xact v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/xact)
+   Compiling adt_varchar v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/varchar)
+   Compiling adt_regexp v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/regexp)
+warning: field `cre_context` is never read
+  --> crates/backend/utils/adt/regexp/src/lib.rs:32:5
+   |
+27 | struct CachedRe {
+   |        -------- field in this struct
+...
+32 |     cre_context: mcx::PinnedContext,
+   |     ^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling adt_tsquery_core v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/tsquery_core)
+   Compiling adt_int v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/int)
+   Compiling name v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/name)
+   Compiling adt_timestamp v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/adt_timestamp)
+   Compiling procarray v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/procarray)
+   Compiling wparser_def v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/tsearch/wparser_def)
+warning: `bufmgr` (lib) generated 2 warnings (run `cargo fix --lib -p bufmgr` to apply 1 suggestion)
+   Compiling tsearch_dict v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/tsearch/dict)
+   Compiling tsearch_spell v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/tsearch/spell)
+warning: `adt_regexp` (lib) generated 1 warning
+   Compiling adt_tsrank v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/tsrank)
+   Compiling adt_date v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/adt_date)
+   Compiling transam_xlog v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/transam_xlog)
+   Compiling adt_uuid v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/uuid)
+   Compiling snapmgr v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/time/snapmgr)
+   Compiling subtrans v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/subtrans)
+   Compiling pseudorandomfuncs v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/pseudorandomfuncs)
+warning: unused import: `Cell`
+ --> crates/backend/utils/time/snapmgr/src/lib.rs:4:17
+  |
+4 | use std::cell::{Cell, UnsafeCell};
+  |                 ^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling adt_json v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/json)
+   Compiling adt_formatting v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/formatting)
+   Compiling transam v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/transam)
+   Compiling predicate v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/lmgr/predicate)
+   Compiling adt_rangetypes v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/rangetypes)
+   Compiling xid8funcs v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/xid8funcs)
+warning: `snapmgr` (lib) generated 1 warning (run `cargo fix --lib -p snapmgr` to apply 1 suggestion)
+   Compiling slot v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/slot)
+   Compiling adt_multirangetypes v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/multirangetypes)
+   Compiling adt_jsonpath v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/jsonpath)
+   Compiling lockfuncs v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/lockfuncs)
+   Compiling waitfuncs v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/waitfuncs)
+   Compiling commands_async v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/commands_async)
+   Compiling adt_mcxtfuncs v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/mcxtfuncs)
+   Compiling adt_jsonb v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/jsonb)
+   Compiling dict_snowball v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/snowball/dict_snowball)
+   Compiling adt_like v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/like)
+   Compiling hbafuncs v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/hbafuncs)
+   Compiling adt_ascii v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/adt_ascii)
+   Compiling adt_pseudotypes v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/pseudotypes)
+   Compiling adt_quote v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/quote)
+   Compiling cryptohashfuncs v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/cryptohashfuncs)
+   Compiling adt_encode v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/encode)
+   Compiling adt_xml v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/xml)
+   Compiling dbsize v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/dbsize)
+   Compiling adt_char v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/char)
+   Compiling adt_amutils v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/adt_amutils)
+   Compiling xloginsert v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/xloginsert)
+   Compiling storage_xlog v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/storage_xlog)
+warning: variable does not need to be mutable
+    --> crates/backend/utils/adt/xml/src/lib.rs:1239:9
+     |
+1239 |     let mut expand = |buf: &mut Vec<u8>, s: &[u8]| {
+     |         ----^^^^^^
+     |         |
+     |         help: remove this `mut`
+     |
+     = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling brin_pageops v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/brin/brin_pageops)
+   Compiling reloptions v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/common/reloptions)
+   Compiling standby v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/standby)
+   Compiling brin_xlog v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/brin/brin_xlog)
+   Compiling logical_message v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/logical/logical_message)
+   Compiling bulkwrite v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/smgr/bulkwrite)
+   Compiling skipsupport v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/skipsupport)
+   Compiling to_tsany v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/tsearch/to_tsany)
+   Compiling adt_jsonpath_exec v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/jsonpath_exec)
+   Compiling heapam_xlog v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/heap/heapam_xlog)
+   Compiling nbtree_xlog v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/nbtree/nbtree_xlog)
+warning: `adt_xml` (lib) generated 1 warning (run `cargo fix --lib -p adt_xml` to apply 1 suggestion)
+   Compiling hash_xlog v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/hash/hash_xlog)
+   Compiling spgist_xlog v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/spgist/spgist_xlog)
+   Compiling gist_xlog v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/gist/gist_xlog)
+   Compiling adt_jsonb_shred v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/jsonb_shred)
+   Compiling catalog_storage v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/catalog_storage)
+   Compiling adt_tsginidx v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/tsginidx)
+   Compiling pgvector v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/pgvector)
+   Compiling commands_define v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/commands_define)
+   Compiling queryjumble v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/nodes/queryjumble)
+   Compiling utility_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/tcop/utility_seams)
+   Compiling nodes_params v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/nodes/params)
+   Compiling memwatchdog v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/memwatchdog)
+   Compiling spccache v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/spccache)
+   Compiling exectuples_output v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/exectuples_output)
+   Compiling commands_analyze_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/commands_analyze_seams)
+   Compiling cluster_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/cluster_seams)
+   Compiling scram_common v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/scram_common)
+   Compiling publicationcmds_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/publicationcmds_seams)
+   Compiling percentrepl v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/percentrepl)
+   Compiling timeline v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/timeline)
+   Compiling shell_archive v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/archive/shell_archive)
+   Compiling archive v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/archive)
+   Compiling auth_sasl v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/libpq/auth_sasl)
+   Compiling pgclient v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/interfaces/pgclient)
+   Compiling auth_scram v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/libpq/auth_scram)
+   Compiling attoptcache v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/attoptcache)
+warning: function `InvalidateAttoptCacheCallback` should have a snake case name
+  --> crates/backend/utils/cache/attoptcache/src/lib.rs:31:8
+   |
+31 | pub fn InvalidateAttoptCacheCallback(_arg: Datum, _cacheid: i32, _hashvalue: u32) {
+   |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: convert the identifier to snake case: `invalidate_attopt_cache_callback`
+   |
+   = note: `#[warn(non_snake_case)]` (part of `#[warn(nonstandard_style)]`) on by default
+
+   Compiling crypt v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/libpq/crypt)
+warning: `attoptcache` (lib) generated 1 warning
+   Compiling twophase_rmgr v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/twophase_rmgr)
+   Compiling blkreftable v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/blkreftable)
+   Compiling block-padding v0.3.3
+   Compiling crypto-common v0.1.7
+   Compiling manifest v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/backup/manifest)
+   Compiling inout v0.1.4
+   Compiling adt_geo v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/geo)
+   Compiling cipher v0.4.4
+   Compiling parse_manifest v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/parse_manifest)
+   Compiling sink v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/backup/sink)
+   Compiling dsm_registry v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/dsm_registry)
+   Compiling logicalproto v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/logical/proto)
+   Compiling sysv_shmem v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/port/sysv_shmem)
+   Compiling syncscan v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/common/syncscan)
+   Compiling libmimalloc-sys v0.1.49
+   Compiling pg_sema v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/port/pg_sema)
+   Compiling adt_misc v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/adt_misc)
+   Compiling auth_oauth v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/libpq/auth_oauth)
+   Compiling spgist_proc v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/spgist/spgist_proc)
+   Compiling num-integer v0.1.46
+   Compiling radixtree v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/lib/radixtree)
+   Compiling cpufeatures v0.2.17
+   Compiling backup_copy_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/backup/backup_copy_seams)
+   Compiling byteorder v1.5.0
+   Compiling tidstore v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/common/tidstore)
+   Compiling blowfish v0.9.1
+   Compiling backup_copy v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/backup/backup_copy)
+   Compiling num-bigint v0.4.8
+   Compiling aes v0.8.4
+   Compiling des v0.8.1
+   Compiling cast5 v0.11.1
+   Compiling cbc v0.1.2
+   Compiling ecb v0.1.2
+   Compiling cfb-mode v0.8.2
+   Compiling basebackup_target v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/backup/basebackup_target)
+   Compiling throttle v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/backup/throttle)
+   Compiling rangetypes_gist v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/rangetypes_gist)
+   Compiling tzparser v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/tzparser)
+   Compiling xlogstats v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/xlogstats)
+   Compiling bloomfilter v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/lib/bloomfilter)
+   Compiling fdnb v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/libpq/fdnb)
+   Compiling cty v0.2.2
+   Compiling pg_sha1 v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/sha1)
+   Compiling pqcomm_stdio v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/libpq/pqcomm_stdio)
+   Compiling uuid_ossp v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/uuid_ossp)
+   Compiling rangetypes_spgist v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/rangetypes_spgist)
+   Compiling spgist_kdtree v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/spgist/spgist_kdtree)
+   Compiling spgist_box v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/spgist/spgist_box)
+   Compiling spgist_quadtree v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/spgist/spgist_quadtree)
+   Compiling hstore v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/hstore)
+   Compiling intarray v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/intarray)
+   Compiling ltree v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/ltree)
+   Compiling adt_tsgistidx v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/tsgistidx)
+   Compiling parser_driver v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/parser/parser_driver)
+   Compiling pg_trgm v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/pg_trgm)
+   Compiling pg_controldata v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/pg_controldata)
+   Compiling btree_gin v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/btree_gin)
+   Compiling btree_gist v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/btree_gist)
+   Compiling zstd v0.13.3
+   Compiling unaccent v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/unaccent)
+   Compiling aio_uring v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/aio/aio_uring)
+   Compiling test_oat_hooks v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/test_oat_hooks)
+   Compiling injection_points v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/injection_points)
+warning: unexpected `cfg` condition name: `loom`
+  --> crates/contrib/test_oat_hooks/src/lib.rs:85:1
+   |
+85 | / pgsync::process_global! {
+86 | |     static NEXT_OBJECT_ACCESS_HOOK: Mutex<Option<ObjectAccessHook>> = Mutex::new(None);
+87 | |     static NEXT_OBJECT_ACCESS_HOOK_STR: Mutex<Option<ObjectAccessHookStr>> = Mutex::new(None);
+88 | | }
+   | |_^
+   |
+   = help: expected names are: `docsrs`, `feature`, and `test` and 31 more
+   = note: using a cfg inside a macro will use the cfgs from the destination crate and not the ones from the defining crate
+   = help: try referring to `$crate::__process_global_one` crate for guidance on how handle this unexpected cfg
+   = help: the macro `$crate::__process_global_one` may come from an old version of the `pgsync` crate, try updating your dependency with `cargo update -p pgsync`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: `#[warn(unexpected_cfgs)]` on by default
+   = note: this warning originates in the macro `$crate::__process_global_one` which comes from the expansion of the macro `pgsync::process_global` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: unexpected `cfg` condition name: `loom`
+  --> crates/contrib/test_oat_hooks/src/lib.rs:85:1
+   |
+85 | / pgsync::process_global! {
+86 | |     static NEXT_OBJECT_ACCESS_HOOK: Mutex<Option<ObjectAccessHook>> = Mutex::new(None);
+87 | |     static NEXT_OBJECT_ACCESS_HOOK_STR: Mutex<Option<ObjectAccessHookStr>> = Mutex::new(None);
+88 | | }
+   | |_^
+   |
+   = note: using a cfg inside a macro will use the cfgs from the destination crate and not the ones from the defining crate
+   = help: try referring to `$crate::__process_global_one` crate for guidance on how handle this unexpected cfg
+   = help: the macro `$crate::__process_global_one` may come from an old version of the `pgsync` crate, try updating your dependency with `cargo update -p pgsync`
+   = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+   = note: this warning originates in the macro `$crate::__process_global_one` which comes from the expansion of the macro `pgsync::process_global` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+   Compiling pgrc2_codec v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/pgrcolumnar2/pgrc2_codec)
+warning: `test_oat_hooks` (lib) generated 8 warnings (6 duplicates)
+   Compiling pgrcolumnar v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/pgrcolumnar)
+   Compiling parquet_read v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/parquet_read)
+   Compiling compression v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/common/compression)
+   Compiling basebackup_compress v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/backup/compress)
+   Compiling adt_rowtypes v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/rowtypes)
+   Compiling aio_funcs v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/aio/aio_funcs)
+   Compiling fuzzystrmatch v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/fuzzystrmatch)
+warning: fields `starts` and `sym_bytes` are never read
+   --> crates/backend/access/pgrcolumnar2/pgrc2_codec/src/fsst.rs:729:5
+    |
+724 | pub struct FsstMocProgram {
+    |            -------------- fields in this struct
+...
+729 |     starts: [u16; FSST_MAX_SYMBOLS + 1],
+    |     ^^^^^^
+730 |     sym_bytes: Vec<u8>,
+    |     ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling pgrc2_scan v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/pgrcolumnar2/pgrc2_scan)
+   Compiling pgrc2_write v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/pgrcolumnar2/pgrc2_write)
+   Compiling sqe v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/sqe)
+   Compiling spgist_text v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/spgist/spgist_text)
+   Compiling isn v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/isn)
+   Compiling pg_config v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/pg_config)
+   Compiling contrib_cube v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/cube)
+   Compiling citext v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/citext)
+   Compiling pg_freespacemap v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/pg_freespacemap)
+   Compiling network_spgist v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/network_spgist)
+   Compiling network_gist v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/network_gist)
+   Compiling contrib_earthdistance v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/earthdistance)
+   Compiling contrib_seg v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/seg)
+   Compiling conffiles v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/conffiles)
+   Compiling pgrc2_am v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/pgrcolumnar2/pgrc2_am)
+   Compiling s_lock v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/lmgr/s_lock)
+   Compiling main_main v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/main/main_main)
+   Compiling mimalloc v0.1.52
+warning: `pgrc2_codec` (lib) generated 1 warning
+warning: variable does not need to be mutable
+    --> crates/backend/executor/sqe/src/joins/hash_join.rs:4617:13
+     |
+4617 |         let mut drain = |tbl: &mut Vec<u128>, len: &mut usize, rw: &mut Option<BW>,
+     |             ----^^^^^
+     |             |
+     |             help: remove this `mut`
+     |
+     = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+    --> crates/backend/executor/sqe/src/joins/hash_join.rs:4632:13
+     |
+4632 |         let mut insert = |mtag: u64, word: u64, tbl: &mut Vec<u128>, len: &mut usize,
+     |             ----^^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> crates/backend/executor/sqe/src/joins/hash_join.rs:4689:13
+     |
+4689 |         let mut count = |e: u128, dcounts: &mut Vec<i64>| {
+     |             ----^^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> crates/backend/executor/sqe/src/stencils/distinct.rs:331:17
+    |
+331 |             let mut drain = |tbl: &mut Vec<u64>, len: &mut usize, rw: &mut Option<BW>,
+    |                 ----^^^^^
+    |                 |
+    |                 help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> crates/backend/executor/sqe/src/stencils/distinct.rs:353:17
+    |
+353 |             let mut insert = |k: u64, tbl: &mut Vec<u64>, len: &mut usize,
+    |                 ----^^^^^^
+    |                 |
+    |                 help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> crates/backend/executor/sqe/src/stencils/distinct.rs:634:17
+    |
+634 |             let mut drain = |seen: &mut Cnt128, rw: &mut Option<BW>,
+    |                 ----^^^^^
+    |                 |
+    |                 help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> crates/backend/executor/sqe/src/stencils/distinct.rs:920:17
+    |
+920 |             let mut drain = |tbl: &mut Vec<u128>, bits: &mut Vec<u64>, len: &mut usize,
+    |                 ----^^^^^
+    |                 |
+    |                 help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> crates/backend/executor/sqe/src/stencils/distinct.rs:941:17
+    |
+941 |             let mut insert = |k: u64, v: u64, tbl: &mut Vec<u128>, bits: &mut Vec<u64>,
+    |                 ----^^^^^^
+    |                 |
+    |                 help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> crates/backend/executor/sqe/src/stencils/distinct.rs:988:17
+    |
+988 |             let mut emit = |key: u64, cnt: u64, keep: &mut BinaryHeap<Reverse<Rank>>| {
+    |                 ----^^^^
+    |                 |
+    |                 help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> crates/backend/executor/sqe/src/stencils/face_fold.rs:1166:13
+     |
+1166 |         let mut take = |v: GroupAcc, acc: &mut Option<GroupAcc>| match acc {
+     |             ----^^^^
+     |             |
+     |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+    --> crates/backend/executor/sqe/src/stencils/face_fold.rs:1235:17
+     |
+1235 |             let mut take = |v: GroupAcc, acc: &mut Option<GroupAcc>| match acc {
+     |                 ----^^^^
+     |                 |
+     |                 help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> crates/backend/executor/sqe/src/stencils/hash_group.rs:767:21
+    |
+767 |                 let mut drain = |seen: &mut Cnt128,
+    |                     ----^^^^^
+    |                     |
+    |                     help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> crates/backend/executor/sqe/src/stencils/scan_serve.rs:199:9
+    |
+199 |     let mut push = |dset: &mut Vec<(u32, Face)>, a: u32| {
+    |         ----^^^^
+    |         |
+    |         help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> crates/backend/executor/sqe/src/stencils/sort_grouped.rs:289:9
+    |
+289 |     let mut stage = |dset: &mut Vec<(u32, Face)>, a: u32| -> usize {
+    |         ----^^^^^
+    |         |
+    |         help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> crates/backend/executor/sqe/src/stencils/sort_grouped.rs:313:9
+    |
+313 |     let mut pstage = |pset: &mut Vec<(u32, Face)>, a: u32| -> usize {
+    |         ----^^^^^^
+    |         |
+    |         help: remove this `mut`
+
+warning: field `node` is never read
+    --> crates/backend/executor/sqe/src/joins/hash_join.rs:1550:5
+     |
+1549 | struct AggFold<'a> {
+     |        ------- field in this struct
+1550 |     node: &'a JoinAggNode,
+     |     ^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `neg1` is never read
+   --> crates/backend/executor/sqe/src/stencils/distinct.rs:515:9
+    |
+508 |     struct S {
+    |            - field in this struct
+...
+515 |         neg1: bool,
+    |         ^^^^
+
+warning: field `neg1` is never read
+   --> crates/backend/executor/sqe/src/stencils/distinct.rs:832:9
+    |
+825 |     struct S1 {
+    |            -- field in this struct
+...
+832 |         neg1: bool,
+    |         ^^^^
+
+   Compiling pgcrypto v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/pgcrypto)
+   Compiling be_secure_openssl v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/libpq/be_secure_openssl)
+   Compiling oauth_validators v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/libpq/oauth_validators)
+   Compiling backend_status v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/activity/backend_status)
+   Compiling be_secure v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/libpq/be_secure)
+   Compiling sslinfo v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/sslinfo)
+   Compiling backend_startup v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/tcop/backend_startup)
+   Compiling backend_progress v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/activity/backend_progress)
+   Compiling signalfuncs v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/signalfuncs)
+   Compiling deadlock v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/lmgr/deadlock)
+   Compiling pgstatfuncs v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/pgstatfuncs)
+   Compiling sink_support v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/backup/sink_support)
+   Compiling auth v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/libpq/auth)
+   Compiling fmgr_core v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/fmgr/fmgr_core)
+warning: function `deferred_arm` is never used
+   --> crates/backend/libpq/auth/src/lib.rs:316:4
+    |
+316 | fn deferred_arm(method: &str, what: &str) -> i32 {
+    |    ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `auth` (lib) generated 1 warning
+   Compiling commit_ts v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/commit_ts)
+   Compiling coerce v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/parser/coerce)
+   Compiling brin_minmax_multi v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/brin/brin_minmax_multi)
+   Compiling brin_inclusion v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/brin/brin_inclusion)
+   Compiling brin_bloom v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/brin/brin_bloom)
+   Compiling multixactfuncs v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/multixactfuncs)
+   Compiling rmgrdesc v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/rmgrdesc)
+   Compiling sync v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/sync/sync)
+   Compiling brin_tuple v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/brin/brin_tuple)
+   Compiling index_amvalidate v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/index/index_amvalidate)
+   Compiling clauses v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/optimizer/util/clauses)
+   Compiling brin_minmax v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/brin/brin_minmax)
+   Compiling gin_validate v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/gin/gin_validate)
+   Compiling brin_validate v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/brin/brin_validate)
+   Compiling gist_validate v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/gist/gist_validate)
+   Compiling rmgr v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/rmgr)
+   Compiling heapam v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/heap/heapam)
+   Compiling xlogreader v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/xlogreader)
+   Compiling tablesample v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/tablesample/tablesample)
+   Compiling xlogprefetcher v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/xlogprefetcher)
+   Compiling twophase v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/twophase)
+   Compiling heapam_handler v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/heap/heapam_handler)
+   Compiling combocid v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/time/combocid)
+   Compiling tableam v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/table/tableam)
+   Compiling types_relscan v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/index/relscan)
+   Compiling nbtree v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/nbtree/nbtree)
+   Compiling brin v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/brin/brin)
+   Compiling relcache v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/relcache)
+   Compiling hash_validate v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/hash/hash_validate)
+   Compiling nbt_validate v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/nbtree/nbt_validate)
+   Compiling spgist_validate v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/spgist/spgist_validate)
+   Compiling gist v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/gist/gist)
+   Compiling hash v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/hash/hash)
+   Compiling pgvector_hnsw v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/pgvector_hnsw)
+   Compiling gin v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/gin/gin)
+   Compiling bloom v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/bloom)
+   Compiling spgist v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/spgist/spgist)
+   Compiling tuplesort v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/sort/tuplesort)
+   Compiling gistproc v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/gist/gistproc)
+   Compiling indexam v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/index/indexam)
+   Compiling genam v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/index/genam)
+   Compiling heaptoast v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/heap/heaptoast)
+   Compiling catalog v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/catalog)
+   Compiling execexpr v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/execexpr)
+   Compiling catcache v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/catcache)
+   Compiling reorderbuffer v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/logical/reorderbuffer)
+   Compiling relfilenumbermap v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/relfilenumbermap)
+warning: method `probe_keys` is never used
+  --> crates/backend/utils/cache/catcache/src/l2.rs:98:19
+   |
+91 | impl CatL2Entry {
+   | --------------- method in this implementation
+...
+98 |     pub(crate) fn probe_keys(&self, kinds: &[CCFastKind; 4], nkeys: i32) -> [CatCKey<'_>; 4] {
+   |                   ^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling cache_syscache v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/cache_syscache)
+   Compiling heapam_visibility v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/heap/heapam_visibility)
+   Compiling amapi v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/index/amapi)
+   Compiling pruneheap v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/heap/pruneheap)
+   Compiling superuser v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/superuser)
+   Compiling partcache v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/partcache)
+warning: `catcache` (lib) generated 1 warning
+   Compiling postinit v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/init/postinit)
+warning: field `mcx` is never read
+  --> crates/backend/utils/cache/partcache/src/lib.rs:92:5
+   |
+90 | struct PartCacheState {
+   |        -------------- field in this struct
+91 |     root: &'static MemoryContext,
+92 |     mcx: Mcx<'static>,
+   |     ^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling pg_database v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_database)
+   Compiling auxprocess v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/auxprocess)
+   Compiling checkpointer v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/checkpointer)
+warning: `partcache` (lib) generated 1 warning
+   Compiling pgarch v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/pgarch)
+   Compiling postmaster_startup v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/startup)
+   Compiling executils v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/executils)
+   Compiling laneexec v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/laneexec)
+   Compiling cache_evtcache v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/cache_evtcache)
+   Compiling rewriteheap v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/heap/rewriteheap)
+   Compiling execindexing v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/execindexing)
+   Compiling execscan v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/execscan)
+   Compiling execgrouping v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/execgrouping)
+   Compiling nodeindexscan v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodeindexscan)
+warning: function `unported` is never used
+  --> crates/backend/executor/execindexing/src/lib.rs:35:15
+   |
+35 | pub(crate) fn unported(what: &str) -> Box<PgError> {
+   |               ^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling nodenamedtuplestorescan v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodenamedtuplestorescan)
+   Compiling nodeforeignscan v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodeforeignscan)
+   Compiling catalog_indexing v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/catalog_indexing)
+   Compiling pg_inherits v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_inherits)
+   Compiling pg_shdepend v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_shdepend)
+   Compiling pg_enum v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_enum)
+   Compiling pg_subscription v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_subscription)
+   Compiling pg_depend v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_depend)
+warning: `execindexing` (lib) generated 1 warning
+   Compiling pg_parameter_acl v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_parameter_acl)
+   Compiling pg_largeobject v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_largeobject)
+   Compiling commands_comment v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/comment)
+   Compiling nodeagg v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodeagg)
+warning: unused imports: `heap_compute_data_size` and `heap_fill_tuple`
+  --> crates/backend/executor/nodeagg/src/merge.rs:35:19
+   |
+35 | use ::heaptuple::{heap_compute_data_size, heap_fill_tuple};
+   |                   ^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `BITMAPLEN` and `MAXALIGN`
+  --> crates/backend/executor/nodeagg/src/merge.rs:56:20
+   |
+56 |     TupleDescData, BITMAPLEN, HEAP_HASNULL, MAXALIGN, MINIMAL_TUPLE_OFFSET,
+   |                    ^^^^^^^^^                ^^^^^^^^
+
+   Compiling pg_conversion v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_conversion)
+   Compiling dependency_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/dependency_seams)
+   Compiling pg_namespace v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_namespace)
+   Compiling pg_range v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_range)
+   Compiling pg_constraint v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_constraint)
+   Compiling event_trigger_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/event_trigger_seams)
+   Compiling nodeindexonlyscan v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodeindexonlyscan)
+   Compiling catalog_namespace v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/catalog_namespace)
+   Compiling pg_type v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_type)
+   Compiling nodebitmapindexscan v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodebitmapindexscan)
+   Compiling noderecursiveunion v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/noderecursiveunion)
+warning: unused variable: `estate`
+    --> crates/backend/executor/nodeagg/src/lib.rs:2775:5
+     |
+2775 |     estate: &EStateData<'mcx>,
+     |     ^^^^^^ help: if this is intentional, prefix it with an underscore: `_estate`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `value_count`, `prefetch_i64`, and `unspilled_into` are never used
+   --> crates/backend/executor/nodeagg/src/distinctset.rs:267:19
+    |
+240 | impl<'mcx> DistinctSet<'mcx> {
+    | ---------------------------- methods in this implementation
+...
+267 |     pub(crate) fn value_count(&self) -> usize {
+    |                   ^^^^^^^^^^^
+...
+278 |     pub(crate) fn prefetch_i64(&self, k: i64) {
+    |                   ^^^^^^^^^^^^
+...
+651 |     pub(crate) fn unspilled_into<'b>(self) -> DistinctSet<'b> {
+    |                   ^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling catalog_heap v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/catalog_heap)
+   Compiling adt_acl v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/acl)
+   Compiling session v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/session)
+   Compiling nodesetop v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodesetop)
+   Compiling nodefunctionscan v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodefunctionscan)
+   Compiling nodesamplescan v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodesamplescan)
+   Compiling parse_relation v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/parser/parse_relation)
+   Compiling aclchk v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/aclchk)
+   Compiling rewrite_manip v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/rewrite/rewrite_manip)
+   Compiling orderedsetaggs v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/orderedsetaggs)
+   Compiling nodeworktablescan v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodeworktablescan)
+   Compiling nodetidrangescan v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodetidrangescan)
+   Compiling nodebitmapheapscan v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodebitmapheapscan)
+   Compiling parse_utilcmd v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/parser/parse_utilcmd)
+   Compiling vars v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/optimizer/util/vars)
+   Compiling fastpath v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/tcop/fastpath)
+   Compiling partbounds v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/partitioning/partbounds)
+   Compiling nodectescan v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodectescan)
+   Compiling nodevaluesscan v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodevaluesscan)
+   Compiling parse_agg v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/parser/parse_agg)
+   Compiling nodetidscan v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodetidscan)
+   Compiling nodetablefuncscan v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodetablefuncscan)
+   Compiling partdesc v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/partitioning/partdesc)
+warning: field `mcx` is never read
+  --> crates/backend/partitioning/partdesc/src/lib.rs:44:5
+   |
+42 | struct PartDescState {
+   |        ------------- field in this struct
+43 |     root: &'static MemoryContext,
+44 |     mcx: Mcx<'static>,
+   |     ^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling parse_func v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/parser/parse_func)
+   Compiling parse_oper v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/parser/parse_oper)
+   Compiling partprune v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/partitioning/partprune)
+   Compiling parse_expr v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/parser/parse_expr)
+   Compiling execpartition v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/execpartition)
+   Compiling nodelimit v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodelimit)
+   Compiling nodelockrows v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodelockrows)
+warning: `partdesc` (lib) generated 1 warning
+   Compiling nodewindowagg v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodewindowagg)
+   Compiling execjunk v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/execjunk)
+   Compiling nodenestloop v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodenestloop)
+   Compiling nodeincrementalsort v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodeincrementalsort)
+   Compiling nodesort v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodesort)
+   Compiling nodeappend v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodeappend)
+   Compiling nodemergeappend v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodemergeappend)
+   Compiling nodeunique v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodeunique)
+   Compiling nodemergejoin v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodemergejoin)
+   Compiling nodematerial v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodematerial)
+   Compiling parse_collate v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/parser/parse_collate)
+   Compiling parse_target v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/parser/parse_target)
+   Compiling nodegroup v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodegroup)
+   Compiling statscmds v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/statscmds)
+   Compiling parse_clause v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/parser/parse_clause)
+   Compiling ruleutils v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/ruleutils)
+   Compiling guc_funcs v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/guc_funcs)
+warning: `nodeagg` (lib) generated 4 warnings (run `cargo fix --lib -p nodeagg` to apply 3 suggestions)
+   Compiling brin_build v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/brin/brin_build)
+   Compiling spgist_build v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/spgist/spgist_build)
+   Compiling statistics v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/statistics/statistics)
+   Compiling bloom_build v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/bloom_build)
+   Compiling pg_db_role_setting v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_db_role_setting)
+   Compiling ginbuild v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/gin/ginbuild)
+   Compiling pgvector_hnsw_build v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/pgvector_hnsw_build)
+   Compiling parser_analyze v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/parser/parser_analyze)
+   Compiling trigger v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/trigger)
+   Compiling gistbuild v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/gist/gistbuild)
+   Compiling commands_tablespace v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/tablespace)
+   Compiling alter_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/alter_seams)
+   Compiling proclang v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/proclang)
+   Compiling commands_amcmds v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/amcmds)
+   Compiling pg_attrdef v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_attrdef)
+   Compiling plancache v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/plancache)
+   Compiling nodemodifytable v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodemodifytable)
+   Compiling prepare_seams v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/prepare_seams)
+   Compiling pg_cast v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_cast)
+   Compiling pquery v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/tcop/pquery)
+   Compiling seclabel v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/seclabel)
+   Compiling xlogarchive v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/xlogarchive)
+   Compiling xlogrecovery v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/xlogrecovery)
+   Compiling postgres v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/tcop/postgres)
+   Compiling pg_proc v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_proc)
+   Compiling rewrite_search_cycle v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/rewrite/rewrite_search_cycle)
+   Compiling rowsecurity v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/rewrite/rowsecurity)
+warning: function `restore_point_name` is never used
+   --> crates/backend/access/transam/xlogrecovery/src/targets.rs:289:4
+    |
+289 | fn restore_point_name(data: &[u8]) -> PgResult<String> {
+    |    ^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling pg_publication v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_publication)
+   Compiling rewrite_handler v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/rewrite/rewrite_handler)
+   Compiling bgworker v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/bgworker)
+   Compiling prepare v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/prepare)
+   Compiling walreceiverfuncs v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/walreceiverfuncs)
+   Compiling parallel v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/transam/parallel)
+   Compiling user v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/user)
+   Compiling walreceiver v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/walreceiver)
+warning: unused variable: `first`
+   --> crates/backend/access/transam/parallel/src/query_task_guard.rs:441:39
+    |
+441 |     fn finish_session_into(&mut self, first: &mut Option<Box<PgError>>) {
+    |                                       ^^^^^ help: if this is intentional, prefix it with an underscore: `_first`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling typecmds_seams v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/typecmds_seams)
+   Compiling origin v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/origin)
+warning: `xlogrecovery` (lib) generated 1 warning
+   Compiling launcher v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/launcher)
+   Compiling runtime v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/runtime)
+   Compiling nodehash v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodehash)
+   Compiling rls v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/misc/rls)
+   Compiling snapbuild v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/logical/snapbuild)
+   Compiling pg_collation v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_collation)
+   Compiling pg_aggregate v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_aggregate)
+   Compiling lockcmds v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/lockcmds)
+   Compiling conversioncmds v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/conversioncmds)
+   Compiling walsummarizer v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/walsummarizer)
+   Compiling logical v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/logical/logical)
+   Compiling slotsync v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/slotsync)
+   Compiling io_worker v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/io_worker)
+   Compiling nodememoize v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodememoize)
+   Compiling nodehashjoin v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodehashjoin)
+   Compiling costsize v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/optimizer/path/costsize)
+   Compiling spillset v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/spillset)
+warning: `parallel` (lib) generated 1 warning (run `cargo fix --lib -p parallel` to apply 1 suggestion)
+   Compiling sqe_spill v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/sqe_spill)
+   Compiling nodeseqscan v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/nodeseqscan)
+   Compiling nbtsort v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/nbtree/nbtsort)
+   Compiling logical_decode v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/logical/logical_decode)
+   Compiling bgjobs v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/bgjobs)
+warning: function `hashed_agg_spill_surcharge` is never used
+    --> crates/backend/optimizer/path/costsize/src/lib.rs:1982:4
+     |
+1982 | fn hashed_agg_spill_surcharge(
+     |    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling equivclass v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/optimizer/path/equivclass)
+   Compiling pathnode v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/optimizer/util/pathnode)
+   Compiling execmain v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/execmain)
+   Compiling auxjob v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/auxjob)
+   Compiling basebackup_incremental v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/backup/basebackup_incremental)
+   Compiling indxpath v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/optimizer/path/indxpath)
+warning: unused import: `serial_lease_yield_for_engagement`
+   --> crates/backend/executor/execmain/src/execmain.rs:519:32
+    |
+519 | pub(crate) use crate::slease::{serial_lease_yield_for_engagement, SerialLease};
+    |                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `crate::slease::serial_lease_currently_held`
+   --> crates/backend/executor/execmain/src/execmain.rs:531:16
+    |
+531 | pub(crate) use crate::slease::serial_lease_currently_held;
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `::types_nodes::plannodes::PlannedStmt`
+  --> crates/backend/executor/execmain/src/sqeshell/seam.rs:24:5
+   |
+24 | use ::types_nodes::plannodes::PlannedStmt;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `JoinAggReq`
+  --> crates/backend/executor/execmain/src/sqeshell/seam.rs:40:79
+   |
+40 |     BuildFold, DimKey, DimSrc, DimStage, InSetFilter, JoinAggNode, JoinAggOp, JoinAggReq,
+   |                                                                               ^^^^^^^^^^
+
+warning: unused attribute
+    --> crates/backend/executor/execmain/src/procnode.rs:3160:1
+     |
+3160 | #[cold]
+     | ^^^^^^^ help: remove this attribute
+     |
+note: attribute also specified here
+    --> crates/backend/executor/execmain/src/procnode.rs:3158:1
+     |
+3158 | #[cold]
+     | ^^^^^^^
+     = note: `#[warn(unused_attributes)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused attribute
+    --> crates/backend/executor/execmain/src/procnode.rs:3161:1
+     |
+3161 | #[inline(never)]
+     | ^^^^^^^^^^^^^^^^ help: remove this attribute
+     |
+note: attribute also specified here
+    --> crates/backend/executor/execmain/src/procnode.rs:3159:1
+     |
+3159 | #[inline(never)]
+     | ^^^^^^^^^^^^^^^^
+     = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+
+   Compiling walsender v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/walsender)
+warning: `costsize` (lib) generated 1 warning
+   Compiling bgwriter v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/bgwriter)
+   Compiling walwriter v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/walwriter)
+   Compiling slotfuncs v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/slotfuncs)
+   Compiling vacuum_morsels v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/vacuum_morsels)
+   Compiling logicalrelation v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/logical/relation)
+   Compiling logicalfuncs v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/logical/logicalfuncs)
+   Compiling test_decoding v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/test_decoding)
+   Compiling pg_logicalinspect v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/pg_logicalinspect)
+   Compiling basebackup v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/backup/basebackup)
+   Compiling syncrep v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/syncrep)
+   Compiling passwordcheck v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/passwordcheck)
+   Compiling pg_walinspect v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/pg_walinspect)
+   Compiling pageinspect v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/pageinspect)
+   Compiling gin_funcs v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/gin/gin_funcs)
+   Compiling pg_surgery v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/pg_surgery)
+   Compiling variable v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/variable)
+   Compiling adt_expandedrecord v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/expandedrecord)
+   Compiling partitionfuncs v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/partitionfuncs)
+   Compiling commands_constraint v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/constraint_cmd)
+   Compiling pg_buffercache v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/pg_buffercache)
+   Compiling regress_lib v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/test_regress)
+   Compiling relcache_build v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/cache/relcache_build)
+   Compiling pg_visibility v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/pg_visibility)
+   Compiling genfile v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/genfile)
+warning: `sqe` (lib) generated 18 warnings (run `cargo fix --lib -p sqe` to apply 15 suggestions)
+warning: unused variable: `is`
+    --> crates/backend/executor/execmain/src/procnode.rs:2189:34
+     |
+2189 |         PlanStateNode::IndexScan(is) => {
+     |                                  ^^ help: if this is intentional, prefix it with an underscore: `_is`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `ios`
+    --> crates/backend/executor/execmain/src/procnode.rs:2207:38
+     |
+2207 |         PlanStateNode::IndexOnlyScan(ios) => {
+     |                                      ^^^ help: if this is intentional, prefix it with an underscore: `_ios`
+
+warning: unused variable: `s`
+    --> crates/backend/executor/execmain/src/procnode.rs:2246:29
+     |
+2246 |         PlanStateNode::Sort(s) => {
+     |                             ^ help: if this is intentional, prefix it with an underscore: `_s`
+
+warning: unused variable: `mj`
+    --> crates/backend/executor/execmain/src/procnode.rs:2252:34
+     |
+2252 |         PlanStateNode::MergeJoin(mj) => {
+     |                                  ^^ help: if this is intentional, prefix it with an underscore: `_mj`
+
+warning: unused variable: `hj`
+    --> crates/backend/executor/execmain/src/procnode.rs:2254:33
+     |
+2254 |         PlanStateNode::HashJoin(hj) => {
+     |                                 ^^ help: if this is intentional, prefix it with an underscore: `_hj`
+
+warning: unused variable: `nl`
+    --> crates/backend/executor/execmain/src/procnode.rs:2256:33
+     |
+2256 |         PlanStateNode::NestLoop(nl) => {
+     |                                 ^^ help: if this is intentional, prefix it with an underscore: `_nl`
+
+warning: unused variable: `g`
+    --> crates/backend/executor/execmain/src/procnode.rs:2258:31
+     |
+2258 |         PlanStateNode::Gather(g) => {
+     |                               ^ help: if this is intentional, prefix it with an underscore: `_g`
+
+warning: unused variable: `sqs`
+    --> crates/backend/executor/execmain/src/procnode.rs:2260:37
+     |
+2260 |         PlanStateNode::SubqueryScan(sqs) => {
+     |                                     ^^^ help: if this is intentional, prefix it with an underscore: `_sqs`
+
+warning: unused variable: `apn`
+    --> crates/backend/executor/execmain/src/procnode.rs:2262:31
+     |
+2262 |         PlanStateNode::Append(apn) => {
+     |                               ^^^ help: if this is intentional, prefix it with an underscore: `_apn`
+
+warning: unused variable: `child`
+    --> crates/backend/executor/execmain/src/procnode.rs:2264:28
+     |
+2264 |         PlanStateNode::Agg(child) => {
+     |                            ^^^^^ help: if this is intentional, prefix it with an underscore: `_child`
+
+warning: variable does not need to be mutable
+    --> crates/backend/executor/execmain/src/sqeshell/heap.rs:1628:17
+     |
+1628 |             let mut row = |k: usize,
+     |                 ----^^^
+     |                 |
+     |                 help: remove this `mut`
+     |
+     = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+    --> crates/backend/executor/execmain/src/sqeshell/seam.rs:8986:9
+     |
+8986 |     let mut push = |cols: &mut Vec<u32>, c: u32| {
+     |         ----^^^^
+     |         |
+     |         help: remove this `mut`
+
+warning: unused variable: `aggless_ok`
+    --> crates/backend/executor/execmain/src/sqeshell/seam.rs:7984:5
+     |
+7984 |     aggless_ok: bool,
+     |     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_aggless_ok`
+
+warning: variable does not need to be mutable
+     --> crates/backend/executor/execmain/src/sqeshell/seam.rs:14499:5
+      |
+14499 |     mut corr: Option<&mut CorrCollect>,
+      |     ----^^^^
+      |     |
+      |     help: remove this `mut`
+
+warning: type `ArrayElem` is more private than the item `Render::ArrayOf::0`
+   --> crates/backend/executor/execmain/src/sqeshell/seam.rs:927:13
+    |
+927 |     ArrayOf(ArrayElem),
+    |             ^^^^^^^^^ field `Render::ArrayOf::0` is reachable at visibility `pub(crate)`
+    |
+note: but type `ArrayElem` is only usable at visibility `pub(self)`
+   --> crates/backend/executor/execmain/src/sqeshell/seam.rs:945:1
+    |
+945 | enum ArrayElem {
+    | ^^^^^^^^^^^^^^
+    = note: `#[warn(private_interfaces)]` on by default
+
+warning: function `lane_result_childless_next` is never used
+   --> crates/backend/executor/execmain/src/noderesult.rs:166:15
+    |
+166 | pub(crate) fn lane_result_childless_next<'mcx>(
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `mode` is never used
+   --> crates/backend/executor/execmain/src/procnode.rs:377:19
+    |
+361 | impl<'mcx> ProbeBatch<'mcx> {
+    | --------------------------- method in this implementation
+...
+377 |     pub(crate) fn mode(&self) -> ProbeBatchMode {
+    |                   ^^^^
+
+warning: constant `S_YIELDED` is never used
+   --> crates/backend/executor/execmain/src/slease.rs:188:7
+    |
+188 | const S_YIELDED: u8 = 4;
+    |       ^^^^^^^^^
+
+warning: struct `SerialLeaseYield` is never constructed
+   --> crates/backend/executor/execmain/src/slease.rs:491:19
+    |
+491 | pub(crate) struct SerialLeaseYield {
+    |                   ^^^^^^^^^^^^^^^^
+
+warning: function `serial_lease_yield_for_engagement` is never used
+   --> crates/backend/executor/execmain/src/slease.rs:495:15
+    |
+495 | pub(crate) fn serial_lease_yield_for_engagement() -> SerialLeaseYield {
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `serial_lease_currently_held` is never used
+   --> crates/backend/executor/execmain/src/slease.rs:528:15
+    |
+528 | pub(crate) fn serial_lease_currently_held() -> bool {
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `lawful` is never used
+    --> crates/backend/executor/execmain/src/sqeshell/heap.rs:1366:8
+     |
+1309 | impl<'a, 'mcx> HeapPackSource<'a, 'mcx> {
+     | --------------------------------------- method in this implementation
+...
+1366 |     fn lawful(&self) -> bool {
+     |        ^^^^^^
+
+warning: field `scanrelid` is never read
+   --> crates/backend/executor/execmain/src/sqeshell/heapjoin.rs:120:5
+    |
+119 | struct SideRec {
+    |        ------- field in this struct
+120 |     scanrelid: u32,
+    |     ^^^^^^^^^
+
+warning: function `counters` is never used
+   --> crates/backend/executor/execmain/src/sqeshell/memo.rs:150:15
+    |
+150 | pub(crate) fn counters() -> (u64, u64, u64, u64) {
+    |               ^^^^^^^^
+
+warning: variant `B` is never constructed
+   --> crates/backend/executor/execmain/src/sqeshell/refusal.rs:288:5
+    |
+286 | pub enum Tier {
+    |          ---- variant in this enum
+287 |     A,
+288 |     B,
+    |     ^
+    |
+    = note: `Tier` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: variants `Distinct` and `Sort` are never constructed
+   --> crates/backend/executor/execmain/src/sqeshell/refusal.rs:296:5
+    |
+294 | pub enum FamilyKind {
+    |          ---------- variants in this enum
+295 |     HashGroup,
+296 |     Distinct,
+    |     ^^^^^^^^
+297 |     Join,
+298 |     Sort,
+    |     ^^^^
+    |
+    = note: `FamilyKind` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: field `node_id` is never read
+    --> crates/backend/executor/execmain/src/sqeshell/seam.rs:1565:16
+     |
+1565 |     SetOpCmd { node_id: i32, cmd: u32, keys: Vec<(usize, bool)> },
+     |     --------   ^^^^^^^
+     |     |
+     |     field in this variant
+
+warning: field `node_id` is never read
+    --> crates/backend/executor/execmain/src/sqeshell/seam.rs:1711:5
+     |
+1710 | pub(crate) struct SrfSpec {
+     |                   ------- field in this struct
+1711 |     node_id: i32,
+     |     ^^^^^^^
+
+warning: function `refusal_count` is never used
+   --> crates/backend/executor/execmain/src/sqeshell/stat.rs:118:8
+    |
+118 | pub fn refusal_count(key: &str) -> u64 {
+    |        ^^^^^^^^^^^^^
+
+   Compiling planner v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/optimizer/plan/planner)
+   Compiling portalcmds v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/portalcmds)
+   Compiling exec_hooks v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/exec_hooks)
+warning: function `endpoint_datum_copy` is never used
+   --> crates/backend/optimizer/plan/planner/src/selfuncs.rs:637:15
+    |
+637 | pub(crate) fn endpoint_datum_copy<'mcx>(
+    |               ^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling explain v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/explain)
+   Compiling hashsort v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/hash/hashsort)
+   Compiling pgoutput v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/pgoutput)
+   Compiling catalog_index v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/catalog_index)
+   Compiling catalog_toasting v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/catalog_toasting)
+   Compiling brin_funcs v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/brin/brin_funcs)
+   Compiling amcheck v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/amcheck)
+   Compiling stats_import v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/statistics/stats_import)
+   Compiling pg_prewarm v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/pg_prewarm)
+   Compiling dbcommands v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/dbcommands)
+   Compiling commands_vacuum v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/vacuum)
+warning: constant `Anum_pg_index_indcheckxmin` should have an upper case name
+  --> crates/contrib/amcheck/src/nbtree_check.rs:67:7
+   |
+67 | const Anum_pg_index_indcheckxmin: i32 = 12;
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(non_upper_case_globals)]` (part of `#[warn(nonstandard_style)]`) on by default
+help: convert the identifier to upper case
+   |
+67 - const Anum_pg_index_indcheckxmin: i32 = 12;
+67 + const ANUM_PG_INDEX_INDCHECKXMIN: i32 = 12;
+   |
+
+   Compiling commands_analyze v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/analyze)
+   Compiling autovacuum v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/autovacuum)
+   Compiling schemacmds v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/schemacmds)
+   Compiling extension v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/extension)
+   Compiling subscriptioncmds v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/subscriptioncmds)
+   Compiling launch_backend v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/launch_backend)
+   Compiling copy_cmd v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/copy)
+   Compiling ipci v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/ipc/ipci)
+warning: `amcheck` (lib) generated 1 warning (run `cargo fix --lib -p amcheck` to apply 1 suggestion)
+   Compiling catalog_objectaddress v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/objectaddress)
+   Compiling syslogger v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/syslogger)
+   Compiling functioncmds v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/functioncmds)
+   Compiling event_trigger v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/event_trigger)
+   Compiling collationcmds v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/collationcmds)
+   Compiling catalog_dependency v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/catalog_dependency)
+   Compiling aggregatecmds v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/aggregatecmds)
+   Compiling foreigncmds v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/foreigncmds)
+   Compiling rewrite_define v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/rewrite/rewrite_define)
+   Compiling commands_cluster v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/cluster)
+   Compiling commands_publicationcmds v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/publicationcmds)
+   Compiling opclasscmds v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/opclasscmds)
+warning: unused import: `AMOID`
+ --> crates/backend/commands/opclasscmds/src/lib.rs:5:41
+  |
+5 | use cache_syscache::cacheinfo::{AMNAME, AMOID, AMOPSTRATEGY, AMPROCNUM};
+  |                                         ^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling pg_operator v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/catalog/pg_operator)
+   Compiling tablecmds v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/tablecmds)
+warning: `opclasscmds` (lib) generated 1 warning (run `cargo fix --lib -p opclasscmds` to apply 1 suggestion)
+   Compiling operatorcmds v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/operatorcmds)
+   Compiling commands_dropcmds v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/dropcmds)
+   Compiling commands_policy v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/policy)
+   Compiling tsearchcmds v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/tsearchcmds)
+warning: unused import: `types_core::InvalidOid`
+ --> crates/backend/commands/dropcmds/src/lib.rs:7:5
+  |
+7 | use types_core::InvalidOid;
+  |     ^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `NOTICE`
+ --> crates/backend/commands/dropcmds/src/lib.rs:9:38
+  |
+9 | use types_error::{PgError, PgResult, NOTICE};
+  |                                      ^^^^^^
+
+   Compiling large_object v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/storage/large_object)
+warning: `commands_dropcmds` (lib) generated 2 warnings (run `cargo fix --lib -p commands_dropcmds` to apply 2 suggestions)
+   Compiling execreplication v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/execreplication)
+   Compiling vacuumparallel v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/vacuumparallel)
+   Compiling be_fsstubs v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/libpq/be_fsstubs)
+   Compiling postgres_fdw v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/postgres_fdw)
+   Compiling file_fdw v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/file_fdw)
+   Compiling vacuumlazy v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/access/heap/vacuumlazy)
+   Compiling postmaster v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/postmaster)
+   Compiling pmchild v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/pmchild)
+warning: value assigned to `next_unskippable_allvis` is never read
+    --> crates/backend/access/heap/vacuumlazy/src/lib.rs:1437:39
+     |
+1437 |     let mut next_unskippable_allvis = false;
+     |                                       ^^^^^ this value is reassigned later and never used
+...
+1445 |         next_unskippable_allvis = mapbits & VISIBILITYMAP_ALL_VISIBLE != 0;
+     |         ------------------------------------------------------------------ `next_unskippable_allvis` is overwritten here before the previous value is read
+     |
+     = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling pg_upgrade_support v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/pg_upgrade_support)
+   Compiling test_custom_types v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/test_custom_types)
+warning: variable does not need to be mutable
+   --> crates/backend/postmaster/postmaster/src/main_entry.rs:173:9
+    |
+173 |     let mut fail = |msg: String| -> ! {
+    |         ----^^^^
+    |         |
+    |         help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling janitor v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/postmaster/janitor)
+   Compiling pgstattuple v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/pgstattuple)
+   Compiling auto_explain v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/auto_explain)
+   Compiling pg_overexplain v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/pg_overexplain)
+warning: `postmaster` (lib) generated 1 warning (run `cargo fix --lib -p postmaster` to apply 1 suggestion)
+warning: `vacuumlazy` (lib) generated 1 warning
+   Compiling sequence v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/sequence)
+   Compiling commands_view v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/view)
+   Compiling typecmds v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/typecmds)
+   Compiling indexcmds v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/indexcmds)
+   Compiling commands_createas v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/createas)
+   Compiling discard v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/discard)
+   Compiling commands_alter v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/alter)
+   Compiling logicalworker v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/replication/logical/worker)
+   Compiling utility v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/tcop/utility)
+   Compiling pgrowlocks v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/pgrowlocks)
+warning: function `payload_gap` is never used
+  --> crates/backend/tcop/utility/src/lib.rs:44:15
+   |
+44 | pub(crate) fn payload_gap(func: &str, node: &str) -> ! {
+   |               ^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `NAMESPACE_RELATION_ID` is never used
+    --> crates/backend/tcop/utility/src/dispatch.rs:1911:7
+     |
+1911 | const NAMESPACE_RELATION_ID: types_core::Oid = 2615;
+     |       ^^^^^^^^^^^^^^^^^^^^^
+
+   Compiling spi v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/spi)
+   Compiling pg_stat_statements v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/pg_stat_statements)
+   Compiling sql_functions v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/executor/sql_functions)
+warning: `utility` (lib) generated 2 warnings
+   Compiling adt_tsvector_stat v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/tsvector_stat)
+   Compiling commands_matview v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/commands/matview)
+   Compiling contrib_lo v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/lo)
+   Compiling dblink v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/dblink)
+   Compiling tcn v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/tcn)
+   Compiling adt_tsquery_rewrite v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/tsquery_rewrite)
+   Compiling plpgsql v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/pl/plpgsql)
+   Compiling ri_triggers v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/ri_triggers)
+warning: unused import: `SPI_cursor_open`
+  --> crates/pl/plpgsql/src/exec.rs:31:41
+   |
+31 |     SPI_cursor_close, SPI_cursor_fetch, SPI_cursor_open, SPI_cursor_open_with_paramlist,
+   |                                         ^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling xmlmap v0.1.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/backend/utils/adt/xmlmap)
+   Compiling tablefunc v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/contrib/tablefunc)
+   Compiling seams_init v0.0.0 (/Users/alex/GPT/postgresrun/pgrust-pgx/crates/_support/seams_init)
+warning: `execmain` (lib) generated 35 warnings (run `cargo fix --lib -p execmain` to apply 20 suggestions)
+warning: `plpgsql` (lib) generated 1 warning (run `cargo fix --lib -p plpgsql` to apply 1 suggestion)
+warning: `planner` (lib) generated 1 warning
+    Finished `release` profile [optimized] target(s) in 5m 43s
+      344.36 real      1178.66 user       152.83 sys
+          1056292864  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+            26558554  page reclaims
+              295272  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                  80  messages sent
+                1925  messages received
+                4472  signals received
+               63933  voluntary context switches
+             6561643  involuntary context switches
+         51676950807  instructions retired
+         23978804261  cycles elapsed
+           303958848  peak memory footprint
+exit=0

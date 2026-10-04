@@ -1,0 +1,14 @@
+{
+  "plan_only": [
+    "portals"
+  ],
+  "semantic": [],
+  "tests": {
+    "portals": {
+      "plan_lines": 16,
+      "semantic_lines": 0,
+      "semantic_examples": [],
+      "class": "plan_only"
+    }
+  }
+}
