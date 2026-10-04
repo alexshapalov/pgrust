@@ -77,6 +77,14 @@ per database up to 300, idle cost, reaping, isolation, and plain
 `CREATE DATABASE` as a reference (`createdb --engine postgres` for stock
 PostgreSQL). `--conf` and `--guc` select the server configuration.
 
+## Copy-on-write and churn
+
+`cow.py --out <dir>` compares `file_copy_method = copy` and `clone` for
+templates of several sizes: mint latency, physical space per clone, growth
+under writes, and drop. `churn.py --out <dir>` repeats create / use / drop
+cycles on one server and records memory, threads, file descriptors and disk
+after each cycle.
+
 ## Hang reproducer
 
 `repro-vacuum-hang.py --out <dir>` loops a template build plus
