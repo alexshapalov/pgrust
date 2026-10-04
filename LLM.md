@@ -1,369 +1,546 @@
-# PGX Experimental Plan
+# PGX — LLM Implementation Instructions
 
-## Purpose
+## Mission
 
-This repository is a fork of `pgrust` used to evaluate a new database runtime called **PGX**.
+This repository is a fork of PgRust:
+
+`https://github.com/alexshapalov/pgrust`
+
+We are using it to build and evaluate **PGX**.
+
+PGX is a lightweight, disposable, Postgres-compatible database runtime designed specifically for:
+
+- AI coding agents
+- CI
+- tests
+- preview environments
+- development
+- short-lived isolated databases
 
 PGX is not intended to replace production PostgreSQL.
 
-PGX is intended to be a **small, fast, low-memory, Postgres-compatible database runtime for AI agents, tests, CI, previews, and short-lived development environments**. It will be used underneath **PGRun**, where every agent, test run, or isolated task can receive its own disposable Postgres-compatible database.
+Production remains PostgreSQL.
 
-The core product hypothesis is:
+PGX should provide enough PostgreSQL compatibility that normal applications, ORMs, migrations, test suites, and Postgres clients can use it without needing a separate database implementation.
+
+The main hypothesis is:
 
 > Production PostgreSQL is optimized to live for years.  
 > PGX should be optimized to live for minutes or hours.
 
-A PGX database should be cheap enough that creating one is not an infrastructure decision.
-
 The long-term goal is:
 
-> **Make a Postgres-compatible database almost as cheap to create and throw away as a file.**
+> Make a Postgres-compatible database cheap enough to create and destroy like a temporary file.
 
-This document is the implementation and benchmarking plan. Work must happen in two approaches, in order.
+PGX will eventually run underneath PGRun.
 
-1. **Approach 1 — PGX Ephemeral Profile:** keep the current pgrust architecture, remove/disable production-only work, tune aggressively for short-lived databases, and measure the result.
-2. **Approach 2 — PGX Lightweight Runtime:** only after Approach 1 is measured, investigate architecture changes that make idle databases almost free: shared runtime, lazy state, scale-to-zero, and copy-on-write-aware storage.
+PGRun is the infrastructure/orchestration layer.
 
-Do not jump to Approach 2 before Approach 1 numbers exist.
+PGX is the database engine/runtime.
 
 ---
 
-# 1. Product model
+# 1. Do not redesign everything immediately
 
-PGRun is the infrastructure layer.
+We must work in two phases.
 
-PGX is the database runtime.
+Do not start Phase 2 until Phase 1 is complete and measured.
+
+## Phase 1
+
+Use the existing PgRust architecture.
+
+Remove or disable everything that is unnecessary for short-lived agent/test databases.
+
+Tune startup, memory, background work, and durability.
+
+Measure the result.
+
+Goal:
+
+> Determine how lightweight PgRust can become without fundamentally changing its architecture.
+
+## Phase 2
+
+Only after Phase 1 measurements exist, investigate architectural changes inspired by lightweight database systems:
+
+- one shared runtime
+- many isolated databases
+- lazy loading
+- scale-to-zero
+- database state eviction
+- copy-on-write-aware storage
+- database-as-an-object
+
+Goal:
+
+> Make the cost of an inactive PGX database approach the cost of storing its data rather than the cost of running a database server.
+
+---
+
+# 2. Important rule
+
+Do not optimize for generic database benchmark performance first.
+
+PGX is not trying to win ClickBench.
+
+PGX should optimize for:
+
+1. low idle RAM
+2. low incremental RAM per database
+3. fast startup
+4. fast first connection
+5. fast first query
+6. cheap database creation
+7. cheap branch creation
+8. cheap branch destruction
+9. zero or near-zero idle CPU
+10. very little idle disk IO
+11. very high database density
+12. compatibility with normal Postgres applications
+
+The most important question is:
+
+> How many isolated Postgres-compatible databases can we run on one server?
+
+---
+
+# 3. Product architecture
 
 Conceptually:
 
 ```text
-                    PGRun
-          agent database infrastructure
-                      |
-        +-------------+-------------+
-        |             |             |
-       PGX           PGX           PGX
-    agent #1      agent #2      agent #3
-        |             |             |
-        +------ Postgres-compatible-+
-                      |
-              production Postgres
+                     PGRun
+          infrastructure for agents
+                       |
+          +------------+------------+
+          |            |            |
+         PGX          PGX          PGX
+       agent A      agent B      agent C
+          |            |            |
+          +---- Postgres protocol ---+
 ```
 
-The expected PGRun lifecycle is:
+Expected PGRun workflow:
 
 ```text
-production PostgreSQL
+Production PostgreSQL
         |
         v
-sanitized / masked snapshot
+safe / masked / sanitized copy
         |
         v
-PGRun golden database
+golden database
         |
         v
-cheap isolated PGX branch
+PGX branch
         |
         v
-agent gets postgres://...
+postgres://...
         |
         v
-migrate / read / write / test
+agent runs migrations / writes / tests
         |
         v
-destroy
+branch deleted
 ```
 
-Typical PGX database lifetime:
-
-- a few seconds;
-- a few minutes;
-- one CI run;
-- one agent task;
-- one coding session;
-- occasionally several hours or a few days.
-
-PGX is **not** designed for:
-
-- primary production databases;
-- years of uptime;
-- high-availability clusters;
-- replicas;
-- disaster recovery;
-- PITR;
-- long-term WAL archival;
-- cross-region failover;
-- production backup orchestration.
-
-This difference in lifetime is the source of the optimization opportunity.
-
----
-
-# 2. Compatibility goal
-
-Do not define PGX as “Postgres Lite”.
-
-Define PGX as:
-
-> **Postgres application semantics without production operations.**
-
-The application-facing surface should remain as close to PostgreSQL as practical.
-
-High-priority compatibility includes:
-
-- PostgreSQL wire protocol;
-- SQL syntax;
-- transactions;
-- MVCC behavior;
-- locks;
-- transaction isolation used by normal applications;
-- schemas;
-- tables;
-- views;
-- constraints;
-- foreign keys;
-- indexes;
-- sequences / identity;
-- JSON / JSONB;
-- arrays;
-- timestamps;
-- common data types;
-- CTEs;
-- window functions;
-- subqueries;
-- joins;
-- triggers;
-- PL/pgSQL where available;
-- COPY;
-- prepared statements;
-- common DDL;
-- `EXPLAIN`;
-- connection behavior expected by normal Postgres drivers;
-- enough catalog compatibility for ORMs and migration tools.
-
-Target compatibility is not a marketing percentage yet. Do not claim “95%”, “98%”, or “99%” until we have a defined application-compatibility corpus and results.
-
-The upstream PostgreSQL regression/conformance suite remains an important guardrail, but PGX also needs a workload-focused compatibility suite representative of real application frameworks.
-
-Recommended application suites:
-
-- Rails + ActiveRecord;
-- Django;
-- Prisma;
-- Drizzle;
-- SQLAlchemy;
-- node-postgres;
-- pgx/Go only as one client among many;
-- migration-heavy workflows;
-- transactional test suites.
-
-The goal is not to support every PostgreSQL operational feature. The goal is that normal application code should not need to know it is connected to PGX.
-
----
-
-# 3. North-star metrics
-
-PGX optimization is **not primarily a TPS benchmark project**.
-
-The most important question is:
-
-> How many isolated Postgres-compatible databases can PGRun provide on one host?
-
-Primary metrics, in priority order:
-
-1. **idle RSS per database**
-2. **incremental RSS per additional database**
-3. **cold start to accepting connections**
-4. **cold start to successful `SELECT 1`**
-5. **time to create a new empty database**
-6. **time to create a database from an existing golden image**
-7. **incremental disk bytes per branch**
-8. **RAM with 10 / 100 / 500 / 1,000 mostly-idle databases**
-9. **RAM under realistic concurrent agent load**
-10. **time to destroy a database**
-11. **first-query latency after idle / scale-to-zero**
-12. **common migration/test workload duration**
-13. **CPU consumed by an idle database**
-14. **background write I/O from an idle database**
-
-Secondary metrics:
-
-- simple query latency;
-- write latency;
-- transactional throughput;
-- migration throughput;
-- test suite wall-clock time.
-
-Do not optimize analytical benchmark throughput at the expense of density, startup, compatibility, or simplicity.
-
----
-
-# 4. Required baseline
-
-Before PGX-specific changes, create a reproducible baseline.
-
-Compare these engines/configurations on the **same hardware, OS, filesystem, dataset, build type, client, and test harness**:
-
-1. PostgreSQL 18.x
-2. upstream-compatible pgrust from this fork before PGX changes
-3. PGX Approach 1
-4. later, PGX Approach 2 prototypes
-
-Use release builds. Record the exact commit SHA, compiler, kernel, CPU, memory, filesystem, mount options, and all database settings.
-
-## 4.1 Baseline database sizes
-
-At minimum test:
-
-- empty database;
-- ~100 MB;
-- ~1 GB;
-- ~10 GB if hardware permits.
-
-The 100 MB and 1 GB tests are especially important because they approximate common development/test datasets.
-
-## 4.2 Baseline concurrency
-
-Measure:
-
-- 1 database;
-- 10 databases;
-- 100 databases;
-- 500 databases when possible;
-- 1,000 databases when possible.
-
-For each count measure two states:
-
-### Idle
-
-Database is running and accepts connections, but there are no active queries.
-
-### Active
-
-Each database has at least one simulated agent doing a bounded workload.
-
-Do not extrapolate 10-database measurements to 1,000. Measure actual density where possible.
-
-## 4.3 Baseline output
-
-Every benchmark run should produce machine-readable output, preferably JSON or CSV, containing:
+Typical database lifetime:
 
 ```text
-engine
-git_sha
-profile
-host
-cpu
-ram_total
-kernel
-filesystem
-dataset_size
-database_count
-connection_count
-cold_start_ms
-ready_ms
-first_query_ms
-idle_rss_bytes
-active_rss_bytes
-cpu_idle_pct
-cpu_active_pct
-disk_physical_bytes
-disk_logical_bytes
-create_ms
-clone_ms
-destroy_ms
-migration_ms
-test_suite_ms
-read_p50_ms
-read_p95_ms
-write_p50_ms
-write_p95_ms
-timestamp
+seconds
+minutes
+hours
+one test run
+one CI job
+one agent task
+one development session
 ```
 
-Raw data must be committed or attached to the experiment. Do not report only screenshots or selected numbers.
+This assumption should influence every PGX design decision.
 
 ---
 
-# 5. Approach 1 — PGX Ephemeral Profile
+# 4. Compatibility philosophy
 
-## Goal
+Do not build “Postgres Lite”.
 
-Answer this question first:
+Build:
 
-> **How much cheaper can pgrust become for disposable databases without changing its fundamental server/storage architecture?**
+> Postgres application semantics without production infrastructure.
 
-This is deliberately the low-risk approach.
+We should preserve as much application-facing PostgreSQL behavior as possible.
 
-Use configuration changes, runtime profiles, compile-time feature exclusion where practical, and narrowly scoped code changes.
+Important functionality to keep includes:
 
-Do **not** initially redesign the storage engine or multiplex thousands of databases into a new shared daemon.
+- Postgres wire protocol
+- SQL parser
+- planner
+- executor
+- transactions
+- MVCC
+- locks
+- isolation
+- schemas
+- tables
+- views
+- indexes
+- foreign keys
+- constraints
+- sequences
+- identity columns
+- JSON
+- JSONB
+- arrays
+- enums
+- timestamps
+- COPY
+- triggers
+- PL/pgSQL where supported
+- prepared statements
+- CTEs
+- subqueries
+- window functions
+- joins
+- common catalog queries
+- EXPLAIN
+- normal DDL
+- temporary tables where possible
+- common ORM behavior
 
-Approach 1 exists to find the actual resource floor of the current architecture.
+A Rails, Django, Prisma, SQLAlchemy, Node, Go, or other normal Postgres application should ideally not need special code for PGX.
 
 ---
 
-# 6. Approach 1 principles
+# 5. Features we probably do not need
 
-## 6.1 Preserve application semantics
+PGX is not a production database.
 
-Do not disable a feature merely because it consumes resources.
+Primary candidates for disabling or removing from the PGX profile include:
 
-Ask:
+- streaming replication
+- physical replicas
+- standby mode
+- synchronous replication
+- WAL sender
+- WAL receiver
+- replication slot synchronization
+- production replication management
+- WAL archiving
+- archive_command
+- PITR
+- timeline management used only by recovery/replication
+- production backup infrastructure
+- pg_basebackup server functionality
+- incremental production backups
+- HA machinery
+- failover machinery
+- long-term WAL retention
+- production-oriented background workers that are unnecessary for ephemeral databases
 
-1. Is this feature visible to normal application SQL?
-2. Is this feature required by Rails/Django/Prisma/etc.?
-3. Is it only required for production operations?
-4. Does disabling it change transaction semantics?
-5. Does disabling it prevent ordinary migrations or tests?
+Do not delete these blindly.
 
-Production-only machinery is the main target.
-
-Application-facing PostgreSQL behavior is not.
-
-## 6.2 Separate durability from transaction semantics
-
-PGX may use weaker crash durability while still preserving transactions during the lifetime of the process.
-
-For example:
-
-```sql
-BEGIN;
-UPDATE accounts SET balance = balance - 10 WHERE id = 1;
-ROLLBACK;
-```
-
-must still behave correctly.
-
-However, a PGX ephemeral mode may explicitly allow:
-
-> if the host loses power or the PGX process is killed unexpectedly, recreate the branch.
-
-That allows us to investigate avoiding expensive durability work without changing normal SQL behavior.
-
-## 6.3 Make changes reversible
+First inspect dependencies and determine whether disabling the subsystem affects application behavior.
 
 Prefer:
 
-- a `pgx_ephemeral` profile;
-- feature flags;
-- runtime GUC defaults;
-- isolated modules;
-- documented build flags;
+- runtime flags
+- Cargo features
+- PGX-specific build profile
+- conditional compilation
+- alternate startup path
 
-over deleting large subsystems immediately.
-
-We need A/B comparisons and must be able to re-enable a feature when an application compatibility test requires it.
+before permanently deleting code.
 
 ---
 
-# 7. Approach 1 — workstream A: no-code configuration profile
+# 6. Features that must not be removed blindly
 
-Before removing any code, test the cheapest possible profile.
+Do not remove these merely because PGX databases are temporary:
 
-Create a documented PGX ephemeral configuration.
+- transactions
+- WAL-related logic required for transaction correctness
+- MVCC
+- locking
+- vacuum
+- analyze
+- statistics
+- catalogs
+- checkpoints
+- recovery-related code that is necessary for correct startup
+- buffer management
+- sequence durability semantics
+- catalog invalidation
+- transaction ID handling
 
-Candidates to test include, subject to what pgrust currently implements:
+Some of these may be simplified or changed later.
+
+First measure and understand them.
+
+---
+
+# 7. Phase 0 — establish baseline
+
+Before any PGX optimization, collect a clean baseline.
+
+We need three initial variants:
+
+```text
+PostgreSQL 18
+PgRust current fork
+PGX experiments
+```
+
+Use the same:
+
+- machine
+- CPU
+- RAM
+- OS
+- kernel
+- filesystem
+- filesystem options
+- dataset
+- connection client
+- test scripts
+- compiler mode
+- release build
+
+Record the exact Git commit for every run.
+
+Do not compare results collected on different machines unless clearly labeled.
+
+---
+
+# 8. Create PGX benchmark harness first
+
+Create:
+
+```text
+benchmarks/pgx/
+```
+
+Suggested structure:
+
+```text
+benchmarks/pgx/
+  README.md
+  run-all.sh
+  run-startup.sh
+  run-memory.sh
+  run-density.sh
+  run-branch.sh
+  run-workload.sh
+  collect-process-metrics.sh
+
+  workloads/
+    basic.sql
+    transactions.sql
+    migration/
+    agent-loop/
+
+  results/
+```
+
+Every benchmark must emit structured output.
+
+Prefer JSON.
+
+Example:
+
+```json
+{
+  "engine": "pgrust",
+  "profile": "baseline",
+  "git_sha": "...",
+  "database_count": 100,
+  "startup_ms": 240,
+  "first_query_ms": 270,
+  "rss_bytes": 123456789,
+  "cpu_idle_percent": 0.2
+}
+```
+
+Do not rely only on terminal output.
+
+---
+
+# 9. Metrics to collect
+
+For every configuration collect:
+
+## Startup
+
+Measure:
+
+```text
+process launch
+-> socket listening
+-> connection accepted
+-> authentication complete
+-> SELECT 1 returns
+```
+
+Record:
+
+- p50
+- p95
+- p99
+
+The most important metric is:
+
+> process start → successful first useful query
+
+Not merely “process started”.
+
+---
+
+# 10. Memory tests
+
+Measure RSS for:
+
+```text
+0 connections
+1 connection
+10 connections
+100 connections
+```
+
+Where possible measure:
+
+```text
+1 database
+10 databases
+100 databases
+500 databases
+1000 databases
+```
+
+Important metrics:
+
+```text
+base runtime RSS
+incremental RSS per connection
+incremental RSS per database
+peak RSS during startup
+peak RSS during migration
+RSS after becoming idle
+```
+
+Do not estimate per-database RAM from one instance if multiple actual instances can be measured.
+
+---
+
+# 11. Idle tests
+
+After startup and after all connections close:
+
+measure for at least several minutes:
+
+- CPU usage
+- wakeups
+- disk writes
+- fsync calls
+- worker/thread activity
+- RSS
+- open file descriptors
+
+Goal:
+
+> An unused PGX database should do almost nothing.
+
+---
+
+# 12. Dataset sizes
+
+Test at minimum:
+
+```text
+empty
+~100 MB
+~1 GB
+```
+
+Optionally:
+
+```text
+~10 GB
+```
+
+The 100 MB and 1 GB cases are most important initially.
+
+---
+
+# 13. Representative application schema
+
+Create a realistic schema approximately similar to a normal SaaS application.
+
+Suggested:
+
+```text
+50–100 tables
+foreign keys
+indexes
+JSONB
+timestamps
+enums
+sequences
+unique constraints
+join tables
+some triggers
+```
+
+Do not benchmark only `SELECT 1`.
+
+---
+
+# 14. Agent workload benchmark
+
+Create a workload that simulates how PGX will actually be used.
+
+Example:
+
+```text
+create database
+connect
+inspect schema
+run migration
+insert test data
+run reads
+run writes
+open transaction
+rollback
+run application tests
+alter schema
+run tests again
+destroy database
+```
+
+Measure total wall-clock time.
+
+This benchmark matters more than generic OLTP benchmark scores.
+
+---
+
+# 15. Phase 1A — configuration-only PGX
+
+Do not modify core architecture yet.
+
+First create a PGX ephemeral configuration.
+
+Suggested file:
+
+```text
+configs/pgx-ephemeral.conf
+```
+
+Investigate these settings.
+
+Do not assume they all exist or behave identically in PgRust.
+
+Test before using.
+
+Candidates:
 
 ```text
 fsync = off
@@ -376,132 +553,126 @@ max_replication_slots = 0
 hot_standby = off
 ```
 
-Also investigate:
-
-- minimum sensible `shared_buffers`;
-- lower `max_connections` matching agent workloads;
-- whether JIT helps or hurts small/short-lived queries;
-- worker counts;
-- parallel worker counts;
-- stats collection overhead;
-- logging overhead;
-- checkpoint behavior;
-- autovacuum behavior for short-lived instances;
-- memory context defaults;
-- stack requirements;
-- IO method;
-- temp buffers;
-- prepared statement/cache behavior;
-- catalog/cache sizing.
-
-Important: **do not assume disabling autovacuum is automatically correct.**
-
-For very short-lived databases it may save work, but real test workloads can still create enough dead tuples or depend on analyze/statistics behavior. Benchmark it both ways.
-
-Likewise, do not assume JIT should be enabled or disabled. Short-lived agent workloads may prefer lower compilation/startup overhead. Measure.
-
-## Deliverable
-
-Add a repeatable profile such as:
+Also experiment with:
 
 ```text
-configs/pgx-ephemeral.conf
+shared_buffers
+max_connections
+work_mem
+maintenance_work_mem
+temp_buffers
+checkpoint behavior
+logging
+statistics
+JIT
+parallel workers
+autovacuum
+background workers
+IO mode
 ```
 
-or the closest structure suitable for this repository.
-
-Document every setting and the reason for it.
-
-Benchmark:
-
-- upstream pgrust defaults;
-- PGX config only.
-
-This establishes the first delta before code is removed.
+The objective is to find the cheapest configuration that still runs normal application workloads correctly.
 
 ---
 
-# 8. Approach 1 — workstream B: identify production-only subsystems
+# 16. Run benchmark after configuration-only changes
 
-The current workspace already contains explicit areas for production functionality, including replication, backup, WAL/archive/recovery, checkpointer, autovacuum, walsender/walreceiver, slots, subscriptions, and related systems.
+Compare:
 
-Create an inventory before changing anything.
+```text
+Postgres
+PgRust baseline
+PgRust + PGX config
+```
 
-Classify each subsystem:
+Do not remove code yet.
 
-### Class A — application compatibility critical
+Create a result document:
 
-Keep.
+```text
+docs/pgx/experiments/001-ephemeral-config.md
+```
 
-Examples:
+Include:
 
-- parser;
-- planner;
-- executor;
-- MVCC;
-- transactions;
-- heap/table access;
-- indexes;
-- locks;
-- catalogs;
-- types;
-- JSONB;
-- sequences;
-- constraints;
-- triggers;
-- COPY;
-- protocol.
+```text
+Hypothesis
+Configuration
+Hardware
+Results
+Compatibility
+Conclusion
+Next step
+```
 
-### Class B — useful but optional in agent/test workloads
+---
 
-Keep initially, benchmark disable/lazy behavior.
+# 17. Inspect where memory actually goes
 
-Examples may include:
+Before deleting features, profile PgRust.
 
-- autovacuum;
-- analyze/statistics collection;
-- JIT;
-- parallel query;
-- some logging/statistics;
-- some background maintenance.
+Determine memory usage for:
 
-### Class C — production operations
+- process/runtime base
+- thread stacks
+- connection state
+- buffers
+- catalog caches
+- relation caches
+- planner
+- executor
+- JIT
+- WAL
+- background workers
+- statistics
+- logging
+- IO workers
+- transaction structures
 
-Primary candidates for exclusion in PGX ephemeral builds.
+If necessary, add temporary instrumentation.
 
-Investigate at minimum:
+Do not optimize from guesses.
 
-- streaming replication;
-- WAL sender;
-- WAL receiver;
-- synchronous replication;
-- replication slots;
-- replication origin;
-- logical replication workers;
-- publication/subscription execution paths;
-- slot synchronization;
-- standby machinery;
-- backup subsystem;
-- basebackup;
-- incremental backup;
-- WAL archive commands;
-- archive recovery;
-- PITR-related operational paths;
-- timeline management needed only for recovery/replication;
-- HA-specific background work.
+Produce:
 
-Do not simply delete the source directories.
+```text
+docs/pgx/memory-profile.md
+```
 
-First determine:
+---
 
-- startup cost;
-- idle memory cost;
-- background CPU cost;
-- binary size contribution;
-- dependency coupling;
-- application-visible catalog/API consequences.
+# 18. Inspect startup path
 
-## Deliverable
+Add timing instrumentation around major initialization stages.
+
+We want output similar to:
+
+```text
+process exec                0 ms
+config loaded               4 ms
+PGDATA opened              13 ms
+control loaded             25 ms
+catalog initialized        72 ms
+WAL initialized            90 ms
+workers initialized       110 ms
+socket listening          125 ms
+connection accepted       140 ms
+SELECT 1                  170 ms
+```
+
+The exact stages depend on PgRust.
+
+Produce:
+
+```text
+docs/pgx/startup-profile.md
+```
+
+Identify the top three startup costs.
+
+---
+
+# 19. Build a feature inventory
 
 Create:
 
@@ -509,424 +680,593 @@ Create:
 docs/pgx/feature-inventory.md
 ```
 
-with columns:
+For every major subsystem document:
 
 ```text
-subsystem
-class
-application_visible
-startup_cost
-idle_ram_cost
-background_cpu
-disk_io
-can_disable_runtime
-can_disable_compile_time
-compatibility_risk
+name
+purpose
+required for application compatibility?
+startup cost
+memory cost
+background CPU cost
+disk IO cost
+dependencies
+can disable at runtime?
+can remove from PGX build?
+compatibility risk
 decision
-notes
 ```
 
-No subsystem should be removed merely because its name sounds production-oriented.
+Classify each feature.
 
----
+## Class A
 
-# 9. Approach 1 — workstream C: compile-time PGX build
-
-After the inventory and config benchmark, create a PGX build/profile that excludes production-only code where it gives measurable benefit.
-
-Possible implementation forms:
-
-- Cargo features;
-- conditional compilation;
-- alternate top-level binary;
-- PGX-specific startup path;
-- no-op implementations for unsupported operational APIs when required by dependencies.
-
-Example conceptual flags:
-
-```text
-pgx-ephemeral
-pgx-no-replication
-pgx-no-backup
-pgx-no-archive
-pgx-minimal-background
-```
-
-The exact structure should follow the existing workspace and avoid unnecessary invasive changes.
-
-### Important
-
-The goal is not binary size by itself.
-
-A 30% smaller binary with identical startup/RAM economics is not a meaningful PGX success.
-
-Every removal must be connected to one or more measured benefits:
-
-- startup;
-- RSS;
-- CPU;
-- disk writes;
-- clone/create latency;
-- runtime complexity.
-
----
-
-# 10. Approach 1 — workstream D: ephemeral durability mode
-
-Implement or formalize an explicit PGX ephemeral durability mode.
-
-This mode should communicate clearly:
-
-> PGX guarantees normal transaction behavior while the instance is running, but the database is disposable and may be recreated after host/process failure.
-
-Investigate the minimum WAL/durability machinery required for correct in-process transactional semantics.
-
-Do **not** remove WAL blindly.
-
-PostgreSQL uses WAL for more than “backup”. Some execution/storage behavior can depend on WAL and recovery assumptions.
-
-Proceed incrementally:
-
-1. start with configuration-level durability relaxation;
-2. measure;
-3. profile CPU/syscalls/disk writes;
-4. identify the remaining WAL/checkpoint cost;
-5. change code only where semantics remain understood;
-6. run conformance and application suites after each material change.
-
-Potential targets:
-
-- avoid fsync;
-- avoid sync commit waits;
-- avoid unnecessary full-page writes;
-- avoid archival;
-- avoid replication-oriented WAL retention;
-- reduce checkpoint work;
-- simplify startup recovery for branches that can be regenerated;
-- avoid production durability barriers that do not protect anything we care about.
-
-A failed PGX database should be replaceable from the PGRun golden image.
-
-This is a product-level property, not merely a Postgres setting.
-
----
-
-# 11. Approach 1 — workstream E: background work
-
-An idle PGX database should be genuinely idle.
-
-Measure all threads/workers/processes after startup.
-
-For each one, determine:
-
-- why it exists;
-- RSS;
-- stack reservation;
-- wakeup frequency;
-- CPU;
-- writes;
-- whether it can be shared;
-- whether it can be lazy;
-- whether it can be disabled in ephemeral mode.
-
-Target:
-
-> an unused branch should produce almost no CPU wakeups and no periodic disk churn.
-
-Pay special attention to:
-
-- checkpointer;
-- autovacuum launcher/workers;
-- stats machinery;
-- logging;
-- IO workers;
-- replication launchers;
-- background schedulers.
-
-Do not optimize by breaking required behavior; convert periodic work to demand-driven work when possible.
-
----
-
-# 12. Approach 1 — workstream F: connection and thread memory
-
-PgRust already differs from PostgreSQL by using a thread-based concurrency model.
-
-This is highly relevant for PGX.
-
-Profile memory associated with:
-
-- one server with zero clients;
-- 1 connection;
-- 10 connections;
-- 100 connections;
-- N isolated databases if current architecture supports them as separate instances.
-
-Measure:
-
-- reserved thread stack;
-- committed stack;
-- per-session catalog/cache state;
-- planner state;
-- executor state;
-- prepared statements;
-- TLS state if applicable;
-- buffers;
-- per-query arenas / memory contexts.
-
-For short-lived agent workloads, large stack reservations or eager per-connection state can dominate.
-
-Investigate:
-
-- smaller safe stack defaults;
-- lazy per-session allocation;
-- connection reuse;
-- shared immutable state;
-- aggressive release of query-local memory;
-- bounded caches.
-
-Do not change stack sizes until the regression suite and representative recursive/deep-query tests pass.
-
----
-
-# 13. Approach 1 — workstream G: startup path
-
-Profile startup end-to-end.
-
-Break the timeline into explicit stages.
+Must remain.
 
 Example:
 
 ```text
-process exec
-config read
-PGDATA open
-control/catalog initialization
-WAL/recovery initialization
-shared state allocation
-background workers
-socket listen
-accept connection
-authentication
-first SELECT 1
+parser
+planner
+executor
+transactions
+MVCC
+locks
+catalogs
+heap
+indexes
+types
+JSONB
+protocol
 ```
 
-Add instrumentation if necessary.
+## Class B
 
-Report both:
+Potentially optional or lazy.
 
-- **server-ready time**
-- **first-useful-query time**
+Example:
 
-PGRun cares about the latter.
+```text
+autovacuum
+analyze
+stats
+JIT
+parallel workers
+logging
+```
 
-Avoid optimizing an internal “started” event while the first client still waits for expensive lazy initialization.
+## Class C
+
+Production infrastructure.
+
+Example:
+
+```text
+streaming replication
+backup
+archive
+standby
+PITR
+HA
+replication slot synchronization
+```
 
 ---
 
-# 14. Approach 1 benchmark matrix
+# 20. Phase 1B — disable production subsystems
 
-After each major optimization group, run the same benchmark matrix.
+Once the inventory exists, start with low-risk production-only functionality.
 
-Do not combine ten changes and benchmark only once.
-
-Suggested experiment sequence:
-
-### A0 — PostgreSQL baseline
-
-PostgreSQL 18.x normal configuration.
-
-### A1 — pgrust baseline
-
-Current pgrust fork before PGX changes.
-
-### A2 — pgrust + PGX config
-
-Only configuration changes.
-
-### A3 — PGX config + production subsystem disablement
-
-Replication/backup/archive/etc. disabled or excluded.
-
-### A4 — PGX ephemeral durability
-
-Durability changes.
-
-### A5 — PGX background minimization
-
-Workers / periodic maintenance changes.
-
-### A6 — PGX memory/startup tuning
-
-Stacks, buffers, eager caches, JIT decision, etc.
-
-For each step show the delta from A1 and previous step.
-
-Example result table:
+Candidates include PgRust workspace areas related to:
 
 ```text
-Metric                    PG18   pgrust   A2    A3    A4    A5    A6
-----------------------------------------------------------------------
+replication
+logical replication
+walreceiver
+walsender
+slotsync
+backup
+basebackup
+archive
+standby
+recovery-specific production paths
+```
+
+Prefer creating a PGX build profile.
+
+Potential conceptual Cargo feature:
+
+```text
+pgx-ephemeral
+```
+
+And optional features such as:
+
+```text
+pgx-no-replication
+pgx-no-backup
+pgx-no-archive
+```
+
+Do not over-engineer the feature system.
+
+One PGX profile is enough initially if that is simpler.
+
+---
+
+# 21. Measure after every feature group
+
+Example progression:
+
+```text
+A0 PostgreSQL
+A1 PgRust
+A2 PgRust + PGX config
+A3 + replication disabled
+A4 + backup/archive disabled
+A5 + durability changes
+A6 + worker/background changes
+A7 + memory/startup tuning
+```
+
+Do not make all changes first and benchmark at the end.
+
+We need to understand what each change buys.
+
+---
+
+# 22. Phase 1C — durability experiment
+
+PGX databases are disposable.
+
+This means PGX may make a different durability tradeoff from production PostgreSQL.
+
+The desired property is:
+
+> Transactions behave normally while PGX is alive, but catastrophic host/process failure may require recreating the database from PGRun.
+
+This is acceptable for agent/test branches.
+
+Investigate:
+
+```text
+fsync removal
+sync commit removal
+full-page write removal
+WAL retention reduction
+checkpoint reduction
+recovery simplification
+```
+
+But do not blindly remove WAL.
+
+Understand exactly which PostgreSQL semantics depend on it.
+
+Run:
+
+- transaction tests
+- rollback tests
+- constraint tests
+- crash tests
+- restart tests
+- corruption checks
+
+Document the exact durability contract.
+
+Suggested:
+
+```text
+docs/pgx/durability.md
+```
+
+---
+
+# 23. PGX durability contract
+
+Eventually we should be able to state something like:
+
+> PGX ephemeral mode provides normal transactional semantics while the database instance is running.
+
+> PGX does not guarantee survival of host or process failure.
+
+> If the runtime fails, PGRun may discard the branch and recreate it from its source/golden snapshot.
+
+Do not publish this wording until implementation matches it.
+
+---
+
+# 24. Phase 1D — minimize background work
+
+Inspect all background workers/threads.
+
+For each:
+
+```text
+why does it exist?
+how often does it wake?
+RAM cost?
+CPU cost?
+disk write cost?
+can it run on demand?
+can it be disabled?
+```
+
+Investigate at least:
+
+- checkpointer
+- autovacuum
+- statistics
+- logging
+- IO workers
+- replication launchers
+- background schedulers
+
+Important goal:
+
+> idle means idle
+
+No unnecessary wakeups.
+
+No periodic writes if avoidable.
+
+---
+
+# 25. Autovacuum
+
+Do not simply disable autovacuum permanently.
+
+Test:
+
+```text
+autovacuum ON
+autovacuum OFF
+autovacuum lazy/delayed
+```
+
+Short-lived branches may often not need normal production maintenance.
+
+But some tests may create many dead rows or depend on statistics.
+
+Measure:
+
+- memory
+- CPU
+- writes
+- application behavior
+- performance after many updates
+
+Decide from data.
+
+---
+
+# 26. Analyze/statistics
+
+Migration/test workloads may depend on reasonable query plans.
+
+Determine whether:
+
+- ANALYZE should remain
+- automatic ANALYZE should remain
+- statistics can be inherited from the golden image
+- statistics collection can be delayed
+- statistics can be shared/copied
+
+This may become important later for instant branches.
+
+---
+
+# 27. JIT
+
+PgRust heavily uses JIT.
+
+Do not assume JIT is beneficial for PGX workloads.
+
+Agent workloads often consist of many short queries.
+
+Benchmark:
+
+```text
+JIT ON
+JIT OFF
+JIT lazy
+```
+
+Measure:
+
+- first query latency
+- migration workload
+- short query latency
+- CPU
+- memory
+- long query performance
+
+PGX may prefer faster startup and lower per-query setup over peak throughput.
+
+---
+
+# 28. Thread stack memory
+
+PgRust uses threads.
+
+Investigate stack configuration carefully.
+
+Measure:
+
+```text
+reserved stack memory
+resident stack memory
+stack per connection
+stack per worker
+```
+
+The current PgRust quickstart uses a large Rust stack.
+
+This may be unacceptable for hundreds/thousands of isolated databases or connections.
+
+Test lower values carefully.
+
+Run:
+
+- regression suite
+- deeply nested SQL
+- recursive CTEs
+- complex planner cases
+- PL/pgSQL recursion if applicable
+
+Never reduce stack size based only on startup success.
+
+---
+
+# 29. Connection memory
+
+Profile one connection.
+
+Then:
+
+```text
+10
+100
+500
+```
+
+Determine whether PgRust eagerly allocates:
+
+- planner structures
+- catalog state
+- buffers
+- stacks
+- caches
+- session state
+
+Convert expensive eager state to lazy allocation where practical.
+
+---
+
+# 30. Cache strategy
+
+PGX should prefer bounded and reclaimable caches.
+
+A database that was active and then becomes unused should not permanently retain large memory caches.
+
+Investigate:
+
+- catalog cache
+- relation cache
+- plan cache
+- buffer cache
+- JIT cache
+
+Question:
+
+> Can this memory be dropped when a PGX database becomes idle?
+
+This becomes more important in Phase 2.
+
+---
+
+# 31. Phase 1 benchmark result table
+
+At the end of Phase 1 produce something like:
+
+```text
+Metric                 PG18   PgRust   PGX-config   PGX-final
+--------------------------------------------------------------
 cold start ms
-first SELECT 1 ms
+first query ms
 idle RSS MB
-1 connection RSS MB
-10 DB RSS MB
-100 DB RSS MB
+1 connection RSS
+10 connections RSS
 idle CPU
 idle writes/min
-100 MB clone ms
-1 GB clone ms
+100 MB workload
+1 GB workload
 migration time
 test suite time
+binary size
 ```
 
-Never replace missing numbers with estimates.
-
----
-
-# 15. Approach 1 success criteria
-
-Approach 1 is successful if it materially improves PGRun unit economics without unacceptable compatibility loss.
-
-We should not hard-code fake expected results, but directional goals are:
-
-- clearly lower idle memory than stock PostgreSQL;
-- clearly lower idle memory than baseline pgrust;
-- low or near-zero idle CPU;
-- minimal idle write I/O;
-- faster start to first query;
-- higher database density on the same host;
-- application suites continue to pass;
-- branch lifecycle remains simple.
-
-A useful milestone would be a **multiple-x density improvement**, not merely a few percent.
-
-If Approach 1 yields only marginal gains, that is still valuable: it proves the fixed-cost floor belongs to the architecture and justifies Approach 2.
-
----
-
-# 16. Compatibility gates for Approach 1
-
-After every material change run:
-
-1. relevant unit tests;
-2. upstream PostgreSQL regression/conformance suite used by pgrust;
-3. PGX application compatibility suite;
-4. PGRun representative workload.
-
-Do not accept an optimization merely because benchmarks improve.
-
-Every benchmark result must be accompanied by compatibility status.
-
-Suggested status:
+For multiple instance tests:
 
 ```text
-PASS      no known application regression
-PARTIAL   expected unsupported production feature only
-FAIL      normal application behavior changed
+Instances              PG18   PgRust   PGX
+-------------------------------------------
+1
+10
+100
+500
+1000
 ```
 
-Production-only failures can be acceptable if documented.
-
-Application-facing failures are blockers unless explicitly scoped.
+Record total RSS and average incremental RSS.
 
 ---
 
-# 17. Approach 2 — PGX Lightweight Runtime
+# 32. Application compatibility suite
 
-## Start condition
+Create a separate PGX compatibility suite.
 
-Do not begin major Approach 2 work until Approach 1 has:
-
-- a stable benchmark harness;
-- measured baselines;
-- profiling evidence;
-- a known idle memory floor;
-- a known startup floor;
-- a list of costs that configuration/feature stripping cannot remove.
-
-Approach 2 answers a different question:
-
-> **Can thousands of mostly-idle Postgres-compatible databases share one lightweight runtime instead of paying the fixed cost of one server instance each?**
-
-This is the Turso-like architectural direction.
-
-The desired mental model is:
-
-> database = lightweight isolated data object
-
-rather than:
-
-> database = heavyweight independent server.
-
----
-
-# 18. Approach 2 target architecture
-
-Conceptual only; validate before implementation.
+At minimum eventually test:
 
 ```text
-                         pgxd
-                shared PGX runtime
-                         |
-       +-----------------+-----------------+
-       |                 |                 |
-    database A        database B        database C
-       |                 |                 |
-   catalog/state      catalog/state      catalog/state
-   overlay storage    overlay storage    overlay storage
-       |                 |                 |
-       +---------- shared runtime ---------+
-                         |
-                 common code/caches/io
+Rails / ActiveRecord
+Django
+Prisma
+SQLAlchemy
+node-postgres
+Go PostgreSQL client
 ```
 
-External clients should still see ordinary Postgres endpoints:
+Use real migrations and CRUD.
 
-```text
-postgres://host/db_a
-postgres://host/db_b
-postgres://host/db_c
-```
+Test:
 
-Isolation must remain strict.
+- create schema
+- migrate
+- insert
+- update
+- delete
+- joins
+- transactions
+- rollback
+- constraints
+- indexes
+- JSONB
+- schema introspection
+- test suite
 
-A bug or transaction in database A must not expose or mutate database B.
+Record pass/fail.
 
 ---
 
-# 19. Approach 2 — workstream A: database as an object
+# 33. Phase 1 go/no-go decision
 
-Define an internal database lifecycle API.
+After Phase 1, answer:
 
-Conceptually:
+## Question 1
+
+Did we materially reduce startup time?
+
+## Question 2
+
+Did we materially reduce idle memory?
+
+## Question 3
+
+Did database density improve by multiples, not merely a few percent?
+
+## Question 4
+
+Did application compatibility remain acceptable?
+
+## Question 5
+
+Where is the remaining fixed cost?
+
+If PgRust with PGX tuning is already cheap enough for PGRun, stop and use it.
+
+Do not redesign architecture unnecessarily.
+
+If a large per-instance cost remains, continue to Phase 2.
+
+---
+
+# 34. Phase 2 — fundamental architecture goal
+
+Phase 2 should pursue the Turso-like idea:
+
+> Database is an object, not a server.
+
+Instead of:
+
+```text
+database
+=
+one full server instance
+```
+
+we want:
+
+```text
+one PGX runtime
+=
+many isolated databases
+```
+
+Concept:
+
+```text
+                    pgxd
+              shared PGX runtime
+
+          /            |            \
+         /             |             \
+      DB A            DB B            DB C
+
+    agent A          agent B          agent C
+```
+
+Each database remains isolated.
+
+Clients still use PostgreSQL connections.
+
+---
+
+# 35. Phase 2 target
+
+Long-term desired behavior:
+
+```text
+10,000 databases exist
+100 are warm
+20 are active
+9,880 consume almost no RAM
+```
+
+Do not treat those numbers as already achievable.
+
+They are the architectural direction.
+
+---
+
+# 36. Database lifecycle
+
+Define an internal database object with a lifecycle similar to:
+
+```text
+CREATE
+STORED
+WARMING
+ACTIVE
+IDLE
+EVICTED
+DESTROYED
+```
+
+Possible API:
 
 ```text
 create()
 open()
 resume()
 connect()
-quiesce()
+idle()
 evict()
 snapshot()
 fork()
 destroy()
 ```
 
-A database that has no active clients should not require a dedicated server process/thread set or large fixed memory allocation.
+The key concept is:
 
-Desired state model:
+> Database existence should not require a dedicated running database server.
+
+---
+
+# 37. Scale-to-zero
+
+When no clients use a database:
 
 ```text
-ABSENT
-  |
-  v
-STORED
-  |
-  v
-WARMING
-  |
-  v
 ACTIVE
   |
   v
@@ -936,660 +1276,1008 @@ IDLE
 EVICTED
 ```
 
-The important transition is:
+Eviction should release:
+
+- caches
+- unnecessary buffers
+- query state
+- JIT state
+- worker state
+- file descriptors where possible
+
+Keep only enough metadata to resume quickly.
+
+When a client reconnects:
 
 ```text
-IDLE -> EVICTED
+EVICTED
+  |
+  v
+WARMING
+  |
+  v
+ACTIVE
 ```
 
-where volatile caches are dropped while durable/branch state remains available.
+Measure:
 
-Target:
-
-> inactive database RAM approaches zero or a very small metadata footprint.
-
-Do not claim literal zero; measure the actual floor.
-
----
-
-# 20. Approach 2 — workstream B: shared runtime
-
-Investigate what can safely be shared across databases:
-
-- networking;
-- accept loop;
-- scheduler;
-- IO runtime;
-- code/JIT infrastructure;
-- immutable type metadata;
-- immutable built-in function metadata;
-- timezone data;
-- common parsing tables;
-- global allocators;
-- telemetry;
-- common read-only catalog templates where valid.
-
-Investigate what must remain isolated:
-
-- user catalogs;
-- transaction state;
-- locks;
-- relation metadata that can change;
-- buffers containing tenant data;
-- temporary state;
-- prepared/session state;
-- credentials;
-- database-local settings;
-- write sets.
-
-Do not prematurely share mutable Postgres state merely to save memory.
-
-Isolation is more important than a benchmark.
+- wake latency
+- first query latency
+- RAM reclaimed
+- CPU required to wake
+- concurrent wake behavior
 
 ---
 
-# 21. Approach 2 — workstream C: lazy loading
+# 38. Shared runtime
 
-No database should eagerly materialize everything at creation time.
+Investigate what can be global/shared.
 
-Creation should ideally become a metadata operation.
+Candidates:
 
-First connection/query can load what is required.
+- network listener
+- IO runtime
+- scheduler
+- common immutable built-in metadata
+- timezone data
+- built-in functions
+- parser tables
+- common libraries
+- JIT infrastructure
+- telemetry
+- allocators
 
-Candidates for lazy loading:
-
-- user catalog entries;
-- relation metadata;
-- index metadata;
-- table pages;
-- statistics;
-- compiled plans;
-- JIT code;
-- caches.
-
-After inactivity, bounded caches should be evictable.
-
-Benchmark:
-
-- cold first query;
-- warm query;
-- memory before first query;
-- memory after load;
-- memory after eviction;
-- resume latency.
+Do not share tenant data or mutable state unsafely.
 
 ---
 
-# 22. Approach 2 — workstream D: copy-on-write storage
+# 39. Database-local state
 
-PGRun already uses snapshots/branching. PGX should eventually expose a storage abstraction that understands this directly.
+Likely must remain isolated:
 
-Desired model:
+- user catalogs
+- relation state
+- table data
+- transaction state
+- locks
+- temporary state
+- session state
+- mutable planner/catalog state
+- credentials
+- local configuration
+
+Never trade away isolation merely to improve a benchmark.
+
+---
+
+# 40. Lazy initialization
+
+Creation should perform almost no unnecessary work.
+
+Desired:
 
 ```text
-golden snapshot
-    |
-    +-- branch A overlay
-    +-- branch B overlay
-    +-- branch C overlay
+create database
+-> allocate identity
+-> attach storage
+-> return connection information
 ```
 
-A 10 GB golden image with a branch that changes 20 MB should not require another physical 10 GB copy.
+Do not load every relation/catalog/cache until needed.
 
-The storage API should move conceptually from:
+First query can load required metadata lazily.
+
+Measure:
+
+```text
+create time
+pre-query RAM
+first query time
+warm query time
+RAM after query
+RAM after eviction
+```
+
+---
+
+# 41. Storage architecture
+
+PGRun already has snapshot/COW infrastructure.
+
+PGX should eventually be able to understand the concept directly.
+
+Desired conceptual model:
+
+```text
+Golden Database
+       |
+       +--- Branch A overlay
+       |
+       +--- Branch B overlay
+       |
+       +--- Branch C overlay
+```
+
+If golden database is 10 GB and Agent A modifies 10 MB:
+
+```text
+physical branch cost ≈ changed blocks
+```
+
+not 10 GB.
+
+Do not immediately rewrite storage.
+
+First integrate with the COW mechanism PGRun already has.
+
+Later consider a native storage abstraction.
+
+---
+
+# 42. Storage interface idea
+
+Current database systems often conceptually operate on:
 
 ```text
 open(PGDATA)
 ```
 
-toward something like:
+PGX may eventually benefit from something more like:
 
 ```text
 open(base_snapshot, writable_overlay)
 ```
 
-The exact API is an implementation detail.
+This is a conceptual target.
 
-Investigate:
-
-- page-level COW;
-- file-level COW;
-- filesystem snapshots;
-- reflinks;
-- object-backed immutable base layers;
-- local mutable overlays;
-- overlay compaction;
-- branch destruction as metadata cleanup.
-
-Do not reimplement ZFS functionality inside PGX without evidence it is needed.
-
-The first architecture prototype can use the capabilities PGRun already has.
-
-The important goal is to make storage/runtime boundaries explicit enough that PGX can later support efficient native branching.
+Do not implement it until profiling justifies it.
 
 ---
 
-# 23. Approach 2 — workstream E: scale to zero
+# 43. Clone benchmark
 
-When an agent stops using a database:
+We need a branch benchmark.
 
-1. wait for a small idle threshold;
-2. ensure no active transaction;
-3. flush only what the selected PGX durability mode requires;
-4. release database-local caches and workers;
-5. retain minimal metadata;
-6. close expensive resources.
+Test golden database sizes:
 
-On the next connection:
-
-1. resolve database identity;
-2. restore/open storage;
-3. rebuild only necessary state;
-4. accept query quickly.
+```text
+100 MB
+1 GB
+10 GB
+```
 
 Measure:
 
-- RAM reclaimed;
-- resume p50/p95;
-- first query p50/p95;
-- CPU cost of suspend/resume;
-- behavior with 100/1,000 databases waking concurrently.
+```text
+clone/create time
+time until connection
+time until first query
+incremental physical storage
+memory consumed
+delete time
+```
 
-Scale-to-zero is useful only if resume latency is acceptable for agents and CI.
-
----
-
-# 24. Approach 2 — workstream F: scheduler and noisy-neighbor control
-
-A shared runtime means one agent must not destroy the experience for others.
-
-PgRust already has scheduler/OOM work that may be useful here.
-
-PGX needs per-database or per-agent resource boundaries for:
-
-- memory;
-- CPU;
-- query concurrency;
-- temp space;
-- result size;
-- statement timeout;
-- lock timeout;
-- IO.
-
-A pathological query in database A should be killable without killing databases B–Z.
-
-This is essential for PGRun density.
-
-Benchmark adversarial cases:
-
-- one DB allocates aggressively;
-- one DB runs a huge sort;
-- one DB locks itself;
-- one DB executes a long query;
-- one DB causes temp spill;
-- 100 DBs wake at once.
+This benchmark should model PGRun directly.
 
 ---
 
-# 25. Approach 2 benchmark matrix
+# 44. PGRun density benchmark
 
-Approach 2 must use the same baseline harness plus new density tests.
+Create the most important test.
 
-Required scenarios:
+Start with one golden database.
 
-### 1 DB
+Then:
 
-Measure overhead versus Approach 1.
+```text
+create 100 branches
+start all
+connect to all
+keep 80 idle
+run workload on 20
+run migrations on 5
+delete 50
+create another 50
+```
 
-A shared runtime must not make the normal single-database experience unusable.
+Measure continuously:
 
-### 100 idle DBs
+- total RSS
+- peak RSS
+- CPU
+- IO
+- startup latency
+- branch latency
+- errors
+
+Run against:
+
+```text
+PostgreSQL
+PgRust
+PGX Phase 1
+PGX Phase 2
+```
+
+This is the primary product benchmark.
+
+---
+
+# 45. Noisy neighbor control
+
+A shared runtime introduces a new risk.
+
+One agent must not kill all other agents.
+
+PGX needs limits for:
+
+- memory
+- CPU
+- query concurrency
+- temp files
+- statement duration
+- lock waits
+- result size
+- IO
+
+Test:
+
+```text
+DB A runs huge sort
+DB B runs SELECT 1
+```
+
+DB B should remain responsive.
+
+Also test:
+
+```text
+DB A allocates too much memory
+DB B–Z continue working
+```
+
+PgRust's existing scheduler and OOM-killer architecture may be useful here.
+
+Reuse it where possible.
+
+---
+
+# 46. Wake storm
+
+Test:
+
+```text
+100 databases wake simultaneously
+```
 
 Measure:
 
-- total RSS;
-- per-DB metadata;
-- CPU wakeups;
-- open file descriptors;
-- background IO.
+```text
+p50 wake
+p95 wake
+p99 wake
+peak RAM
+peak CPU
+errors
+```
 
-### 1,000 idle DBs
+Then eventually:
 
-This is a primary architecture test.
+```text
+500
+1000
+```
 
-### 10,000 stored but inactive DBs
+This matters because many coding agents may start at the same time in CI.
 
-Where feasible, databases do not all need to be resident. This tests whether “database existence” has become cheap.
+---
 
-### Wake storm
+# 47. Stored database test
 
-Start 100 databases/agents simultaneously.
+Eventually test:
+
+```text
+10,000 databases exist
+0 active
+```
+
+They should not require 10,000 fully resident database runtimes.
 
 Measure:
 
-- p50/p95/p99 resume;
-- peak RSS;
-- CPU;
-- errors.
-
-### Mixed workload
-
-Example:
-
-- 1,000 databases exist;
-- 50 active;
-- 100 warm;
-- 850 evicted.
-
-This approximates an agent platform better than a single benchmark DB.
-
----
-
-# 26. Phase comparison
-
-At the end, produce a direct comparison.
-
 ```text
-                        PG18      pgrust     PGX A1      PGX A2
-----------------------------------------------------------------
-architecture             proc      threads     tuned       shared/lazy
-application compat
-idle RSS / DB
-100 idle DB RSS
-1000 idle DB RSS
-cold start
-resume from zero
-clone 100 MB
-clone 1 GB
-destroy
-idle CPU
-idle disk writes
-migration suite
-Rails tests
-Django tests
-Prisma tests
-physical bytes / branch
+total RAM
+metadata RAM / DB
+open FDs
+CPU
+disk IO
 ```
 
-The decision to continue Approach 2 must be based on measured economics.
+This is a major Phase 2 success criterion.
 
 ---
 
-# 27. Benchmark workloads
+# 48. Experiment discipline
 
-Synthetic `SELECT 1` is necessary but insufficient.
+Every change must have an experiment document.
 
-Use at least these workload classes.
-
-## 27.1 Startup
-
-- start;
-- connect;
-- `SELECT 1`;
-- disconnect;
-- destroy.
-
-Repeat enough times for p50/p95/p99.
-
-## 27.2 Schema/migration
-
-Create a realistic application schema with:
-
-- 50–100 tables;
-- foreign keys;
-- indexes;
-- JSONB;
-- enums;
-- sequences;
-- triggers if supported.
-
-Run full migrations from empty.
-
-## 27.3 Agent coding loop
-
-Representative sequence:
-
-```text
-create branch
-connect
-inspect schema
-run migration
-insert fixtures
-run 20-100 queries
-modify schema
-run tests
-destroy
-```
-
-## 27.4 Transaction workload
-
-Mix:
-
-- SELECT;
-- INSERT;
-- UPDATE;
-- DELETE;
-- transactions;
-- rollback;
-- constraint violations;
-- lock waits.
-
-## 27.5 Framework tests
-
-Real test suites are preferred over microbenchmarks.
-
-Track pass rate and wall clock.
-
----
-
-# 28. Observability for experiments
-
-PGX development needs internal instrumentation separate from production observability features.
-
-Add lightweight experiment metrics where needed:
-
-- startup stage timings;
-- allocated/resident memory by major subsystem;
-- number of active databases;
-- number of evicted databases;
-- catalog cache bytes;
-- buffer bytes;
-- query memory;
-- thread stack reservation;
-- WAL bytes generated;
-- physical bytes written;
-- fsync count;
-- worker/thread count;
-- open FD count;
-- suspend/resume counters.
-
-Instrumentation must be possible to disable in normal builds if it changes results materially.
-
----
-
-# 29. What not to do
-
-## Do not rewrite PostgreSQL from scratch
-
-PgRust has already solved a huge compatibility problem. Reuse it.
-
-## Do not optimize for production first
-
-PGX is explicitly an agent/test runtime.
-
-## Do not chase ClickBench
-
-PGX wins on density and lifecycle economics.
-
-## Do not remove SQL features just because they are complicated
-
-Application compatibility is the product.
-
-## Do not delete WAL blindly
-
-Understand dependencies first.
-
-## Do not delete autovacuum blindly
-
-Short-lived workloads still need correct statistics/maintenance in some cases.
-
-## Do not put every database in a Docker container and call that PGX
-
-PGRun already knows how to orchestrate Postgres. PGX must change database economics.
-
-## Do not claim compatibility percentages without a corpus
-
-Publish concrete suites and pass/fail results.
-
-## Do not claim RAM/startup targets as achieved numbers
-
-Targets are hypotheses until benchmarks exist.
-
-## Do not begin shared-runtime work because it sounds elegant
-
-Profile first.
-
----
-
-# 30. Initial implementation order
-
-Follow this order unless measurements give a strong reason not to.
-
-## Step 0 — freeze baseline
-
-- record current commit;
-- build release binary;
-- run conformance;
-- add PGX benchmark harness;
-- collect PostgreSQL and pgrust numbers.
-
-## Step 1 — PGX config only
-
-- add ephemeral configuration;
-- benchmark;
-- commit raw results.
-
-## Step 2 — profile startup + idle memory
-
-- identify top costs;
-- produce subsystem report.
-
-## Step 3 — disable obvious production operations
-
-Start with the least application-visible candidates:
-
-- replication launchers/senders/receivers;
-- logical replication workers;
-- backup;
-- archive;
-- standby-only paths;
-- PITR operational paths.
-
-Prefer runtime/compile-time flags over deletion.
-
-Run compatibility + benchmark.
-
-## Step 4 — durability experiment
-
-- relaxed sync durability;
-- measure WAL/syscalls/write reduction;
-- preserve live transaction semantics;
-- run crash/recreate tests.
-
-## Step 5 — background minimization
-
-- checkpointer behavior;
-- autovacuum experiment;
-- stats/logging;
-- idle worker wakeups.
-
-Benchmark idle economics.
-
-## Step 6 — memory/startup optimization
-
-- stacks;
-- buffers;
-- lazy caches;
-- JIT on/off;
-- eager initialization.
-
-Benchmark density.
-
-## Step 7 — publish Approach 1 report
-
-Must answer:
-
-- where RAM goes;
-- where startup time goes;
-- what was successfully removed;
-- what could not be removed;
-- compatibility regressions;
-- best density;
-- best first-query time;
-- likely architecture floor.
-
-## Step 8 — decide on Approach 2
-
-Only then choose the first architectural prototype.
-
-Recommended first prototype:
-
-> multiple isolated database objects managed by one PGX daemon with database-local state that can be evicted when idle.
-
-Do not attempt COW storage, shared runtime, new WAL semantics, and scale-to-zero all in one change.
-
----
-
-# 31. Suggested repository structure
-
-Use existing repository conventions where possible.
-
-Possible additions:
-
-```text
-LLM.md
-docs/pgx/
-  architecture.md
-  feature-inventory.md
-  compatibility.md
-  experiments/
-    000-baseline.md
-    001-ephemeral-config.md
-    002-no-replication.md
-    003-durability.md
-    ...
-configs/
-  pgx-ephemeral.conf
-benchmarks/pgx/
-  README.md
-  run.sh
-  workloads/
-  results/
-```
-
-If the existing repository has a better location for benchmarks/configs, use it. Do not create parallel infrastructure unnecessarily.
-
----
-
-# 32. Experiment document template
-
-Every material experiment should use this structure:
+Template:
 
 ```markdown
 # Experiment XXX — title
 
 ## Hypothesis
 
-What resource/cost do we expect to reduce?
+What do we believe?
+
+## Current behavior
+
+What happens before this change?
 
 ## Change
 
-Exact code/config change.
+Exactly what was changed.
 
 ## Compatibility risk
 
-What behavior could change?
+What could break?
 
-## Environment
+## Benchmark environment
 
-Hardware, OS, filesystem, commit, compiler.
+Hardware
+OS
+kernel
+filesystem
+commit
+compiler
 
 ## Results
 
-Raw + summarized numbers.
+Raw results.
+
+## Delta
+
+Comparison against baseline.
 
 ## Compatibility
 
-Regression suite / application suite status.
+Regression suite status.
+
+Application suite status.
+
+## Decision
+
+KEEP
+REVERT
+INVESTIGATE
+
+## Next experiment
+
+Exactly one next step.
+```
+
+Do not make undocumented performance changes.
+
+---
+
+# 49. Required docs
+
+Create and maintain:
+
+```text
+docs/pgx/
+  architecture.md
+  feature-inventory.md
+  compatibility.md
+  durability.md
+  memory-profile.md
+  startup-profile.md
+
+  experiments/
+    000-baseline.md
+    001-ephemeral-config.md
+    002-replication.md
+    003-backup-archive.md
+    004-durability.md
+    005-background-workers.md
+    006-memory.md
+    007-startup.md
+```
+
+Add more experiments as needed.
+
+---
+
+# 50. Do not optimize binary size as a primary metric
+
+Binary size is interesting but not a product goal.
+
+Do not celebrate:
+
+```text
+binary -40%
+```
+
+if:
+
+```text
+idle RAM unchanged
+startup unchanged
+database density unchanged
+```
+
+The product wins when running databases become cheaper.
+
+---
+
+# 51. Do not remove features based only on source code size
+
+A subsystem may contain thousands of lines but cost almost nothing at runtime.
+
+Another tiny subsystem may allocate 20 MB per database.
+
+Profile first.
+
+---
+
+# 52. Do not rewrite PgRust
+
+PgRust already provides an enormous amount of PostgreSQL compatibility.
+
+Use it.
+
+The purpose of this fork is not:
+
+> build another PostgreSQL implementation.
+
+The purpose is:
+
+> adapt PgRust for a radically different lifecycle and workload.
+
+---
+
+# 53. Do not optimize for production
+
+If an optimization only helps:
+
+```text
+7-day uptime
+24/7 OLTP
+multi-TB database
+replica failover
+PITR
+HA
+long-lived vacuum stability
+```
+
+it is probably not our current priority.
+
+PGX should still be correct for its supported workload.
+
+But production operations are not the target.
+
+---
+
+# 54. Do not break developer expectations unnecessarily
+
+Normal tooling should continue to work whenever possible.
+
+Examples:
+
+```text
+psql
+Rails
+Django
+Prisma
+SQLAlchemy
+migration tools
+database clients
+```
+
+A developer should receive:
+
+```text
+postgres://host/database
+```
+
+and use it normally.
+
+---
+
+# 55. Never fake benchmark conclusions
+
+Do not write claims like:
+
+```text
+PGX uses 5 MB RAM
+PGX starts in 20 ms
+PGX supports 10,000 databases
+```
+
+unless measurements actually demonstrate them.
+
+Clearly distinguish:
+
+```text
+goal
+hypothesis
+measurement
+```
+
+---
+
+# 56. Target direction, not guaranteed numbers
+
+Possible aspirational targets:
+
+```text
+cold start: <100 ms
+idle incremental RAM: single-digit MB
+100 databases/server: trivial
+1000 databases/server: practical
+inactive database: near-zero resident memory
+```
+
+These are goals for experimentation.
+
+They are not current claims.
+
+---
+
+# 57. First concrete tasks
+
+Do these now, in this order.
+
+## Task 1
+
+Build current fork in release mode.
+
+Verify:
+
+```text
+cargo build --release --locked --bin postgres
+```
+
+Record:
+
+```text
+commit SHA
+binary size
+build environment
+```
+
+## Task 2
+
+Run existing PgRust conformance/regression tests.
+
+Record baseline status.
+
+Do not start optimization work from a broken baseline.
+
+## Task 3
+
+Create:
+
+```text
+benchmarks/pgx/
+```
+
+Implement startup benchmark.
+
+Measure:
+
+```text
+process launch -> SELECT 1
+```
+
+Run at least 30 iterations.
+
+Output p50/p95/p99.
+
+## Task 4
+
+Implement idle memory benchmark.
+
+Measure:
+
+```text
+startup
+connect
+SELECT 1
+disconnect
+wait
+measure RSS
+```
+
+Repeat consistently.
+
+## Task 5
+
+Implement connection memory benchmark.
+
+Measure:
+
+```text
+0
+1
+10
+100
+```
+
+connections.
+
+## Task 6
+
+Create realistic test database.
+
+Approximately:
+
+```text
+100 MB
+50–100 tables
+indexes
+FK
+JSONB
+```
+
+Document generation.
+
+## Task 7
+
+Measure baseline PostgreSQL.
+
+Use PostgreSQL 18.x.
+
+Store results.
+
+## Task 8
+
+Measure baseline PgRust.
+
+Store results.
+
+## Task 9
+
+Create:
+
+```text
+configs/pgx-ephemeral.conf
+```
+
+Start with configuration-only changes.
+
+No core code modification yet.
+
+## Task 10
+
+Measure PGX config.
+
+Compare against PgRust baseline.
+
+Determine what improved.
+
+---
+
+# 58. Next concrete tasks
+
+After config experiment:
+
+## Task 11
+
+Profile startup.
+
+Create:
+
+```text
+docs/pgx/startup-profile.md
+```
+
+## Task 12
+
+Profile memory.
+
+Create:
+
+```text
+docs/pgx/memory-profile.md
+```
+
+## Task 13
+
+Create feature inventory.
+
+Create:
+
+```text
+docs/pgx/feature-inventory.md
+```
+
+## Task 14
+
+Identify production-only subsystems with measurable runtime cost.
+
+Do not choose based only on intuition.
+
+## Task 15
+
+Disable the first production subsystem.
+
+Recommended starting candidates:
+
+```text
+replication workers
+WAL sender
+WAL receiver
+slot synchronization
+```
+
+Run tests.
+
+Run benchmarks.
+
+Document.
+
+## Task 16
+
+Continue with:
+
+```text
+backup
+archive
+standby/recovery operational paths
+```
+
+one group at a time.
+
+## Task 17
+
+Run durability experiment.
+
+Measure:
+
+```text
+fsync
+synchronous commit
+WAL volume
+checkpoint work
+physical writes
+```
+
+## Task 18
+
+Investigate background worker removal/lazy behavior.
+
+## Task 19
+
+Investigate JIT tradeoffs.
+
+## Task 20
+
+Investigate thread stack and per-connection memory.
+
+---
+
+# 59. Phase 1 output
+
+At the end of Phase 1 produce:
+
+```text
+docs/pgx/phase1-results.md
+```
+
+It must contain:
+
+## Baseline
+
+PostgreSQL and PgRust.
+
+## Final PGX configuration
+
+Exact settings/build features.
+
+## Features disabled
+
+Exact list.
+
+## Compatibility impact
+
+Exact failures.
+
+## Startup results
+
+p50/p95/p99.
+
+## Memory results
+
+1/10/100 DB.
+
+## Connection results
+
+1/10/100 connections.
+
+## Idle behavior
+
+CPU and IO.
+
+## Application results
+
+Framework/test compatibility.
 
 ## Conclusion
 
-KEEP / REVERT / INVESTIGATE.
+Answer:
 
-## Next
+> Is this already good enough for PGRun?
 
-One next experiment.
-```
+If yes, stop architecture work and integrate it.
 
-This prevents PGX from becoming an unmeasured collection of “optimizations”.
-
----
-
-# 33. PGRun-specific target workload
-
-PGX must be evaluated in the environment it is actually being built for.
-
-PGRun currently creates disposable database branches for agents/tests. Therefore include a PGRun-like benchmark:
-
-1. prepare golden database;
-2. create 100 branches;
-3. start all;
-4. connect once to all;
-5. keep 80 idle;
-6. actively query 20;
-7. run migrations on 5;
-8. destroy 50;
-9. recreate 50;
-10. record total host RSS and latency throughout.
-
-Repeat for:
-
-- PostgreSQL;
-- pgrust baseline;
-- PGX Approach 1;
-- PGX Approach 2 prototype.
-
-This benchmark is more important to PGX than a generic database benchmark.
+If no, explain exactly why.
 
 ---
 
-# 34. Definition of success
+# 60. Phase 2 start condition
 
-The project is successful if PGX makes this economically reasonable:
+Begin Phase 2 only if Phase 1 demonstrates a fixed per-database cost that prevents desired PGRun density.
 
-```text
-one coding agent
-        =
-one isolated Postgres-compatible database
-```
-
-and eventually:
+Examples:
 
 ```text
-one PGRun host
-        =
-hundreds or thousands of isolated agent databases
+large unavoidable process/runtime base
+large per-server cache
+large eager catalog state
+large thread/runtime footprint
+background machinery that cannot be removed
 ```
 
-without requiring application developers to rewrite their applications for a new SQL dialect or database API.
+Phase 2 should attack measured costs.
 
-A user should receive:
-
-```text
-postgres://...
-```
-
-and normal Postgres tooling should mostly work.
-
-The user should not need to care whether PGRun selected production PostgreSQL or PGX for a disposable branch.
+Not theoretical costs.
 
 ---
 
-# 35. Final design principle
+# 61. Phase 2 first prototype
 
-When evaluating any PGX change, ask:
+Do not build the entire final architecture.
 
-> Does this help a database that lives for minutes instead of years?
+The first experiment should answer one question:
+
+> Can multiple isolated database objects exist inside one PgRust/PGX runtime without paying the full runtime cost per database?
+
+Prototype only enough to measure this.
+
+Do not combine:
+
+```text
+new storage
+new WAL
+new networking
+new scheduler
+new COW
+new cache
+```
+
+into one patch.
+
+---
+
+# 62. Phase 2 second prototype
+
+If shared runtime works, implement idle state eviction.
+
+Goal:
+
+```text
+database exists
+but no clients
+-> release almost all database-local memory
+```
+
+Measure wake latency.
+
+---
+
+# 63. Phase 2 third prototype
+
+Integrate COW branch storage.
+
+Reuse PGRun/ZFS first.
+
+Do not build a new distributed storage system.
+
+---
+
+# 64. Phase 2 fourth prototype
+
+Test:
+
+```text
+1000 existing databases
+20 active
+```
+
+Measure total host economics.
+
+---
+
+# 65. Key question for every change
+
+Before implementing anything, ask:
+
+> Does this reduce the cost of a database that may live for only 5 minutes?
+
+If no, it is probably not important now.
+
+Then ask:
+
+> Does this reduce the cost of an inactive database?
+
+If yes, it may be extremely important.
+
+Then ask:
+
+> Does this break normal Postgres application behavior?
+
+If yes, reconsider.
+
+---
+
+# 66. Long-term North Star
+
+The long-term architecture should make this normal:
+
+```text
+Agent #1 -> its own PGX
+Agent #2 -> its own PGX
+Agent #3 -> its own PGX
+...
+Agent #1000 -> its own PGX
+```
+
+without treating each database as heavyweight infrastructure.
+
+Eventually:
+
+> Database creation becomes a cheap runtime primitive.
+
+---
+
+# 67. Final product principle
+
+PGX exists because agent infrastructure changes the lifetime of databases.
+
+Traditional model:
+
+```text
+few databases
+live for years
+care deeply about crash durability
+HA
+replication
+backup
+operations
+```
+
+PGX model:
+
+```text
+many databases
+live for minutes/hours
+isolated per task
+easy to recreate
+easy to destroy
+cheap while idle
+```
+
+We should not optimize an old architecture for the wrong lifecycle.
+
+The main vision is:
+
+> **PGX — Postgres for agents.**
 
 And:
 
-> Does this make the cost of an inactive database closer to the cost of stored data rather than the cost of a running server?
+> **PGRun — infrastructure that runs PGX at scale.**
 
-If yes, investigate and measure.
+The final success condition is simple:
 
-If it only makes PGX theoretically cleaner, faster on an unrelated benchmark, or more production-capable, it is probably not the current priority.
-
-The long-term vision is simple:
-
-> **PGX is Postgres for agents.**  
-> **PGRun runs them at scale.**
+> Every agent can get its own isolated Postgres-compatible database without the developer thinking about database infrastructure cost.
