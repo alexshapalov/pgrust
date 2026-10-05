@@ -94,6 +94,18 @@ descriptors, an idle-CPU time series and which threads are on-CPU, then
 latency with 20 and 100 active databases. `warm-pool.py --out <dir>` fires
 bursts of simultaneous mint requests against several pool sizes.
 
+## Linux
+
+`linux/setup-host.sh` prepares a Debian/Ubuntu host and builds;
+`linux/run-suite.sh` runs every benchmark above into one results directory.
+See `docs/pgx/linux.md`.
+
+## Allocation trace
+
+`alloc-trace.py` finds which allocations survive database create/drop
+cycles, using PgRust's debug allocation tracker. See
+`docs/pgx/memory-reclamation.md`.
+
 ## Hang reproducer
 
 `repro-vacuum-hang.py --out <dir>` loops a template build plus

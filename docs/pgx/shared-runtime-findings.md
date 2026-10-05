@@ -7,6 +7,15 @@ Engine: commit `a4babda0bf` (the hang fix) or later.
 
 Two items have their own reports: `vacuum-analyze-hang.md` and `cow-cloning.md`.
 
+## Update
+
+Since this report was written: the shared catalog cache is purged on DROP
+DATABASE, two leaks were fixed, and enforced memory limits were added. See
+`memory-reclamation.md` and `memory-limits.md`. Questions 3 and 4 below now
+read: memory grows by about 11 KB per database lifecycle instead of 34 KB
+plus a 650 MB cache; and a per-session, per-database or per-runtime memory
+limit can be enforced. The Linux port is described in `linux.md`.
+
 ## Answers to the seven questions
 
 | # | Question | Answer | Basis |

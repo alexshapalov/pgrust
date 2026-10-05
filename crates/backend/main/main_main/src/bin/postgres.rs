@@ -201,7 +201,7 @@ mod alloc_track {
             m.values().map(|r| r.size).sum::<usize>(),
             slide,
         );
-        for (tname, bt, count, bytes) in rows.iter().take(80) {
+        for (tname, bt, count, bytes) in rows.iter().take(4000) {
             let addrs: Vec<String> = bt.iter().map(|a| format!("0x{a:x}")).collect();
             eprintln!("ALLOC-TRACK leak: thread={} n={} bytes={} bt={}", tname, count, bytes, addrs.join(" "));
         }

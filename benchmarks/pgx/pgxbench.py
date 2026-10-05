@@ -373,8 +373,13 @@ class Engine:
         if name == "pgrust":
             # Launch line from the pgrust README quickstart, unchanged.
             share = pg18_sharedir()
+            # Debian/Ubuntu build PostgreSQL against the system tzdata and
+            # ship no timezone directory of their own.
+            tzdir = os.path.join(share, "timezone")
+            if not os.path.isdir(tzdir):
+                tzdir = "/usr/share/zoneinfo"
             self.env = {"PGRUST_PGSHAREDIR": share,
-                        "PGRUST_TZDIR": os.path.join(share, "timezone"),
+                        "PGRUST_TZDIR": tzdir,
                         "RUST_MIN_STACK": "33554432"}
             self.engine_args = ["-c", "io_method=sync", "-c", "max_stack_depth=60000"]
             self.stack_limit = 65520 * 1024
