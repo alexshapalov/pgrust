@@ -444,9 +444,16 @@ class Server:
             # `ulimit -s` then exec, as in the README; the pid stays the server's.
             # (setrlimit from Python fails with EINVAL on macOS, so use the shell.)
             argv = ["/bin/sh", "-c", 'ulimit -s %d; exec "$0" "$@"' % (eng.stack_limit // 1024)] + argv
+        preexec = None
+        if sys.platform == "linux" and os.environ.get("PGXBENCH_THP_DISABLE") == "1":
+            # Measure without transparent huge pages regardless of the host
+            # setting: PR_SET_THP_DISABLE is inherited across exec.
+            def preexec():
+                ctypes.CDLL(None, use_errno=True).prctl(41, 1, 0, 0, 0)
         self.log = open(self.log_path, "wb")
         self.t_launch = time.perf_counter()
-        self.proc = subprocess.Popen(argv, env=env, stdout=self.log, stderr=subprocess.STDOUT)
+        self.proc = subprocess.Popen(argv, env=env, stdout=self.log, stderr=subprocess.STDOUT,
+                                     preexec_fn=preexec)
         return self
 
     def wait_select1(self, timeout=120.0):

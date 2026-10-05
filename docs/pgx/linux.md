@@ -16,6 +16,11 @@ Status: the suite is ported and runs end to end on Ubuntu 26.04. It has
   session memory limit), scale and warm-pool into
   `benchmarks/pgx/results/<hostname>-<sha>/`. `PGXBENCH_WORKDIR` selects the
   filesystem under test. Defaults are sized for 4 CPUs and 8 GB.
+- `benchmarks/pgx/linux/memory-breakdown.py` — idle memory by Linux-native
+  metrics (PSS split into anonymous / file / shared, huge pages, and PSS by
+  kind of mapping) for PostgreSQL, PgRust defaults, each profile setting
+  added in turn, and the profile. `PGXBENCH_THP_DISABLE=1` measures with
+  transparent huge pages off for the server process.
 - The harness itself: `/proc`-based memory (PSS), thread, file-descriptor
   and per-thread CPU readings; gdb backtraces in the hang reproducer; ZFS
   pool allocation as the physical-space measure in `cow.py`.
@@ -41,16 +46,38 @@ overlay filesystem:
 Two things seen there that must be checked on a real host, because a
 container on a busy laptop cannot settle them:
 
-1. **Idle memory is much higher on Linux.** Default configuration: about
-   303 MB PSS (67 MB footprint on macOS). PGX profile: about 97 MB (23.7 MB
-   on macOS). Part of this may be the metric, part may be real (how the
-   allocator commits memory, the buffer pool, transparent huge pages). Not
-   investigated. Every memory number in the other reports is macOS-only
-   until this is understood.
+1. **Idle memory looked much higher on Linux. Most of that is transparent
+   huge pages, and the rest is a difference in what is counted.** Measured
+   with `linux/memory-breakdown.py` (PSS, `/proc/<pid>/smaps`), idle server:
+
+   | | Huge pages `always` | Huge pages off for the process |
+   |---|---|---|
+   | PostgreSQL 18 | 21.7 MB | 21.6 MB |
+   | PgRust defaults | 297.4 MB (232 MB in huge pages) | 77.8 MB |
+   | PGX profile | 93.9 MB (56 MB in huge pages) | 44.6 MB |
+
+   - With huge pages on `always` (the Docker Desktop kernel's setting), the
+     kernel backs each thread's stack reservation and each allocator arena
+     with 2 MB pages on first touch. 36 threads and a handful of arenas turn
+     into 232 MB. The fix on such a host is the kernel setting or a
+     per-process opt-out, not anything in PgRust's configuration.
+   - With them off, the PGX profile is 44.6 MB: 16.7 MB of anonymous memory
+     (close to the 23.7 MB macOS footprint) plus 27.9 MB of the server
+     binary's own pages. The macOS footprint does not count clean
+     file-backed pages; PSS does. That 27.9 MB is shared between runtimes on
+     the same host and is reclaimable under pressure.
+   - The branch host is set to `madvise`, not `always` (read from
+     `/sys/kernel/mm/transparent_hugepage/enabled`), so it should behave
+     like the right-hand column. To be confirmed on a real host.
+   - These are from an arm64 container (64 KB-page kernels differ; this one
+     reports its page size in the JSON). Treat them as an explanation of the
+     effect, not as the Linux baseline.
 2. **`file_copy_method = clone` did nothing on overlayfs**, as expected for
    a filesystem without reflinks: each clone cost its full 19 MB and minting
-   was slower than a plain copy. Whether it shares blocks on the branch
-   host's ZFS is the first thing to measure there.
+   was slower than a plain copy. Whether it shares blocks on ZFS is the
+   first thing to measure on a real host. The branch host's pool has the
+   prerequisites: `feature@block_cloning` is active and
+   `zfs_bclone_enabled` is 1.
 
 ## The branch host
 

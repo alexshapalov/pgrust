@@ -6,7 +6,7 @@
 #
 # PGXBENCH_WORKDIR is where every scratch cluster lives, so it selects the
 # filesystem under test. Steps (default: all, in this order):
-#   regress baseline profile ephemeral cow churn noisy scale pool
+#   cow memory regress baseline profile churn scale noisy ephemeral pool
 #
 # Sized for a small host by default (4 CPUs, 8 GB); override with the
 # PGX_* variables below. Everything runs at nice 5.
@@ -19,12 +19,15 @@ OUT="$HERE/results/$(hostname -s)-$(git -C "$REPO" rev-parse --short=10 HEAD)"
 PROFILE="$REPO/configs/pgx-ephemeral.conf"
 mkdir -p "$OUT"
 STEPS=("$@")
-[ ${#STEPS[@]} -eq 0 ] && STEPS=(regress baseline profile ephemeral cow churn noisy scale pool)
+[ ${#STEPS[@]} -eq 0 ] && STEPS=(cow memory regress baseline profile churn scale noisy ephemeral pool)
 PY="nice -n 5 python3"
 
 for step in "${STEPS[@]}"; do
     echo "=== $step  $(date -u +%H:%M:%S)"
     case "$step" in
+    memory)
+        $PY "$HERE/linux/memory-breakdown.py" --with-postgres --out "$OUT/memory"
+        PGXBENCH_THP_DISABLE=1 $PY "$HERE/linux/memory-breakdown.py" --with-postgres --out "$OUT/memory-thp-disabled" ;;
     regress)
         $PY "$HERE/regress-baseline.py" --out "$OUT/regress" > "$OUT/regress-summary.json"
         $PY "$HERE/classify-regress-diffs.py" "$OUT/regress" ;;
