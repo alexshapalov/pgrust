@@ -23,6 +23,7 @@ mcx = { path = "../../../_support/mcx" }
 libc = "0.2"
 elog = { path = "../../utils/error/elog" }
 cache_syscache = { path = "../../utils/cache/cache_syscache" }
+l2cache = { path = "../../utils/cache/l2cache" }
 dbcommands_seams = { path = "../dbcommands_seams" }
 pg_database = { path = "../../catalog/pg_database" }
 pg_database_seams = { path = "../../catalog/pg_database_seams" }

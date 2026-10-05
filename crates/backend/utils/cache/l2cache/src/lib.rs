@@ -632,6 +632,41 @@ pub fn insert(
     entry
 }
 
+/// Drop every entry that belongs to database `db` (DROP DATABASE).
+///
+/// Keys carry the database oid, and nothing else ever removes a dropped
+/// database's entries: they are not superseded (no generation moves for a
+/// database nobody can connect to) and only the global budget would evict
+/// them, arbitrarily and late. A server that creates and drops databases
+/// continuously otherwise carries every dropped database's catalog image
+/// until the budget is reached. Correctness-preserving like any eviction:
+/// a later probe is an L2 miss. Shared-catalog entries (`db == InvalidOid`)
+/// are never touched. Returns `(entries_removed, bytes_removed)`.
+pub fn purge_database(db: Oid) -> (usize, usize) {
+    if db == types_core::InvalidOid {
+        return (0, 0);
+    }
+    let mut n_removed = 0usize;
+    let mut bytes_removed = 0usize;
+    for s in shards().iter() {
+        let mut map = s.map.lock().unwrap();
+        map.retain(|k, b| {
+            if k.db != db {
+                return true;
+            }
+            for (_, _, sz) in b.entries.iter() {
+                n_removed += 1;
+                bytes_removed += *sz;
+                s.count.fetch_sub(1, Ordering::Relaxed);
+            }
+            false
+        });
+    }
+    ENTRIES.fetch_sub(n_removed, Ordering::Relaxed);
+    BYTES.fetch_sub(bytes_removed, Ordering::Relaxed);
+    (n_removed, bytes_removed)
+}
+
 /// Test/debug: drop every entry (does not touch generations or views).
 pub fn clear_all() {
     for s in shards().iter() {
@@ -834,6 +869,28 @@ mod tests {
         assert!(t.join().unwrap());
         // Gate is gone; next acquire owns again.
         assert!(matches!(acquire_gate(k, 1), GateOutcome::Owner(_)));
+    }
+
+    #[test]
+    fn purge_database_removes_only_that_database() {
+        // Oids no other test uses: the map is process-global.
+        const DB_A: Oid = 4_100_001;
+        const DB_B: Oid = 4_100_002;
+        let put = |db: Oid, id: u32| {
+            let key = L2Key { kind: KIND_REL, id, db, hash: 0 };
+            insert(key, 1, Arc::new(id) as L2Value, 100, |_| true);
+        };
+        for id in 0..3 {
+            put(DB_A, 9_000 + id);
+        }
+        for id in 0..2 {
+            put(DB_B, 9_000 + id);
+        }
+        // Shared catalogs are never purged.
+        assert_eq!(purge_database(types_core::InvalidOid), (0, 0));
+        assert_eq!(purge_database(DB_A), (3, 300));
+        assert_eq!(purge_database(DB_A), (0, 0));
+        assert_eq!(purge_database(DB_B), (2, 200));
     }
 
     #[test]

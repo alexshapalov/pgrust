@@ -5062,6 +5062,7 @@ dependencies = [
  "heapam_visibility_seams",
  "heaptuple",
  "init_small",
+ "l2cache",
  "libc",
  "lmgr",
  "mbutils",

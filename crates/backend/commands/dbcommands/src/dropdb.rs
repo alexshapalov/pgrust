@@ -379,6 +379,10 @@ fn dropdb_guts(
     bufmgr::DropDatabaseBuffers(db_id)?;
     smgr::ForgetDatabaseSyncRequests(db_id)?;
 
+    // pgrust-only: the process-wide shared catalog cache keys entries by
+    // database and has no other way to learn that this one is gone.
+    l2cache::purge_database(db_id);
+
     if request_checkpoint {
         checkpointer::RequestCheckpoint(
             transam_xlog::CHECKPOINT_IMMEDIATE
