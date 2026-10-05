@@ -261,6 +261,18 @@ fn install_guc_tables_owned_vars() {
         get: backing::pgrust_memory_watchdog_limit,
         set: backing::set_pgrust_memory_watchdog_limit,
     });
+    vars::pgrust_session_memory_limit.install(GucVarAccessors {
+        get: backing::pgrust_session_memory_limit,
+        set: backing::set_pgrust_session_memory_limit,
+    });
+    vars::pgrust_database_memory_limit.install(GucVarAccessors {
+        get: backing::pgrust_database_memory_limit,
+        set: backing::set_pgrust_database_memory_limit,
+    });
+    vars::pgrust_runtime_memory_limit.install(GucVarAccessors {
+        get: backing::pgrust_runtime_memory_limit,
+        set: backing::set_pgrust_runtime_memory_limit,
+    });
     vars::pgrust_memory_watchdog_test_hog.install(GucVarAccessors {
         get: backing::pgrust_memory_watchdog_test_hog,
         set: backing::set_pgrust_memory_watchdog_test_hog,

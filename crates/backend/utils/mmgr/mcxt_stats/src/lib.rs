@@ -413,6 +413,9 @@ pub fn init_seams() {
     mcx::set_root_observer(observe_root);
     mcx::set_session_cleanup_sink(session_cleanup_push);
     mcx::set_oom_observer(oom_observer);
+    // pgrust-only memory limits never refuse an allocation in a critical
+    // section (a failure there is a PANIC).
+    mcx::limits::set_critical_section_probe(|| init_small::globals::CritSectionCount() != 0);
     mcxt_seams::handle_log_memory_context_interrupt::set(handle_log_memory_context_interrupt);
     mcxt_seams::log_memory_context_pending::set(log_memory_context_pending);
     mcxt_seams::process_log_memory_context_interrupt::set(process_log_memory_context_interrupt);

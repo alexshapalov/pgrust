@@ -376,6 +376,9 @@ pub static pgrust_memory_watchdog_dump: GucBoolVar = GucSlot::new("pgrust_memory
 pub static pgrust_memory_watchdog_interval: GucIntVar = GucSlot::new("pgrust_memory_watchdog_interval");
 pub static pgrust_memory_watchdog_threshold: GucIntVar = GucSlot::new("pgrust_memory_watchdog_threshold");
 pub static pgrust_memory_watchdog_limit: GucIntVar = GucSlot::new("pgrust_memory_watchdog_limit");
+pub static pgrust_session_memory_limit: GucIntVar = GucSlot::new("pgrust_session_memory_limit");
+pub static pgrust_database_memory_limit: GucIntVar = GucSlot::new("pgrust_database_memory_limit");
+pub static pgrust_runtime_memory_limit: GucIntVar = GucSlot::new("pgrust_runtime_memory_limit");
 pub static pgrust_memory_watchdog_test_hog: GucIntVar = GucSlot::new("pgrust_memory_watchdog_test_hog");
 // pgrust-only (docs/design/test-views.md D1, no C symbol): the ephemeral-
 // database janitor. prefix (PGC_POSTMASTER, '' = feature off) arms janitor

@@ -263,6 +263,27 @@ int_var!(
     set_pgrust_memory_watchdog_limit,
     0
 );
+// Enforced memory-context ceilings in MB (mcx::limits), 0 = off. Unlike the
+// watchdog above, which only reports, these refuse allocations: the
+// statement that asked fails with the ordinary out-of-memory ERROR.
+int_var!(
+    I_pgrust_session_memory_limit,
+    pgrust_session_memory_limit,
+    set_pgrust_session_memory_limit,
+    0
+);
+int_var!(
+    I_pgrust_database_memory_limit,
+    pgrust_database_memory_limit,
+    set_pgrust_database_memory_limit,
+    0
+);
+int_var!(
+    I_pgrust_runtime_memory_limit,
+    pgrust_runtime_memory_limit,
+    set_pgrust_runtime_memory_limit,
+    0
+);
 // Connection-scaling admission control (docs/design/connection-scaling.md
 // D1 + D6). All process-global cells per this file's header law:
 // max_active_queries and connection_queue_timeout are PGC_SIGHUP (read on

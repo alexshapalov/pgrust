@@ -201,6 +201,7 @@ impl SlabArena {
                 .map_err(|_| AllocError)?;
             let layout = Layout::from_size_align(self.block_size, self.block_size)
                 .map_err(|_| AllocError)?;
+            crate::limits::admit(self.block_size)?;
             let p = Global.allocate(layout)?;
             addr = p.cast::<u8>().as_ptr().expose_provenance();
             // SAFETY: fresh block; header fits its prefix (chunks_per_block >= 1).

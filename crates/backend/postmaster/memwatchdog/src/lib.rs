@@ -344,6 +344,14 @@ fn announce(state: &mut WatchState, l: &Ledger, base: i32) {
 }
 
 fn tick(state: &mut WatchState) {
+    // Enforced limits are independent of the watchdog's master switch; this
+    // thread is merely the one that carries SIGHUP-changed values to mcx.
+    let mb = |v: i32| (v.max(0) as usize) << 20;
+    mcx::limits::configure(
+        mb(guc_tables::backing::pgrust_session_memory_limit()),
+        mb(guc_tables::backing::pgrust_database_memory_limit()),
+        mb(guc_tables::backing::pgrust_runtime_memory_limit()),
+    );
     if !guc_tables::backing::pgrust_memory_watchdog() {
         state.latched = 0;
         state.announced = None; // re-announce on re-enable

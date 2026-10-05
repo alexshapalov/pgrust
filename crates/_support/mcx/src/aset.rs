@@ -456,6 +456,7 @@ impl AllocSet {
     #[cold]
     #[inline(never)]
     fn alloc_dedicated(&mut self, layout: Layout, acct: &Acct) -> Result<NonNull<[u8]>, AllocError> {
+        crate::limits::admit(layout.size())?;
         let out = Global.allocate(layout)?;
         self.dedicated.push((out.cast::<u8>(), layout));
         self.mem_allocated += layout.size();
@@ -502,6 +503,7 @@ impl AllocSet {
         } else {
             self.next_block_size.max(csize)
         };
+        crate::limits::admit(blksize)?;
         let mut block = Block::alloc(blksize)?;
         self.mem_allocated += blksize;
         crate::global_footprint::add(blksize);

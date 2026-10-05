@@ -147,6 +147,7 @@ impl BumpArena {
         }
         acct.check_limit(blksize)?;
         self.blocks.try_reserve(1).map_err(|_| AllocError)?;
+        crate::limits::admit(blksize)?;
         let block = Block::alloc(blksize)?;
         self.mem_allocated += blksize;
         crate::global_footprint::add(blksize);
@@ -191,6 +192,7 @@ impl BumpArena {
         let layout = Layout::from_size_align(size, layout.align()).map_err(|_| AllocError)?;
         self.oversize.try_reserve(1).map_err(|_| AllocError)?;
         acct.check_limit(size)?;
+        crate::limits::admit(layout.size())?;
         let p = Global.allocate(layout)?;
         self.mem_allocated += size;
         crate::global_footprint::add(size);
@@ -251,6 +253,7 @@ impl BumpArena {
             acct.check_limit(delta)?;
             // SAFETY: (ptr, cur_layout) is the live Global allocation recorded
             // for this chunk; new_size >= cur_layout.size().
+            crate::limits::admit(delta)?;
             let new = unsafe { Global.grow(ptr, cur_layout, new_layout)? };
             self.oversize[i] = (new.cast(), new_layout);
             self.mem_allocated += delta;

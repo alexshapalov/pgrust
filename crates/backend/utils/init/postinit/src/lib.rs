@@ -862,6 +862,10 @@ pub fn InitPostgres(
 
     gtrace("p.dblookup");
     init_small::globals::SetMyDatabaseId(dboid);
+    // pgrust-only memory limits: every thread attached to a database is
+    // charged to it; only client backends are ever refused.
+    mcx::limits::join_database(dboid);
+    mcx::limits::enforce(miscinit::GetMyBackendType() == BackendType::Backend);
 
     // MyProc->databaseId: plain atomic store, no lock (C relies on the
     // database lock for searchers of this database's ID).

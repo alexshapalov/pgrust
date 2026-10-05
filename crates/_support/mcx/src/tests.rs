@@ -1877,3 +1877,71 @@ fn allocated_subtree_counts_malloc_children() {
     drop(v);
     assert_eq!(root.subtree_allocated(), baseline);
 }
+
+// pgrust-only enforced limits. One test: the ceilings are process-global, so
+// the phases must not run concurrently with each other. Other tests are
+// unaffected — only threads that opted in with enforce(true) are refused.
+#[test]
+fn limits_refuse_only_enforced_threads_and_name_the_ceiling() {
+    const MB: usize = 1 << 20;
+    // Err carries the out-of-memory error's hint, which names the ceiling.
+    let alloc = |bytes: usize| -> Result<(), Option<std::string::String>> {
+        let ctx = MemoryContext::new("limit-probe");
+        let r: PgResult<PgVec<'_, u8>> = vec_with_capacity_in(ctx.mcx(), bytes);
+        r.map(|_| ()).map_err(|e| e.hint.clone())
+    };
+    let session_hint = Some(std::string::String::from("The session reached pgrust.session_memory_limit."));
+    let database_hint = Some(
+        std::string::String::from(
+            "The sessions of this database together reached pgrust.database_memory_limit.",
+        ),
+    );
+
+    // Session ceiling: 4MB.
+    limits::configure(4 * MB, 0, 0);
+    std::thread::spawn(move || {
+        // Not opted in: never refused.
+        assert!(alloc(16 * MB).is_ok());
+        limits::enforce(true);
+        assert!(alloc(MB).is_ok());
+        assert_eq!(alloc(16 * MB), Err(session_hint));
+        assert_eq!(limits::take_last_refusal(), None, "consumed by the error");
+        // The refused request charged nothing; the session keeps working.
+        assert!(alloc(MB).is_ok());
+        assert!(limits::thread_bytes() < MB);
+    })
+    .join()
+    .unwrap();
+
+    // Database ceiling: 8MB across two threads of database 4_200_001.
+    limits::configure(0, 8 * MB, 0);
+    const DB: u32 = 4_200_001;
+    let (hold_tx, hold_rx) = std::sync::mpsc::channel::<()>();
+    let (ready_tx, ready_rx) = std::sync::mpsc::channel::<()>();
+    let holder = std::thread::spawn(move || {
+        limits::join_database(DB);
+        let ctx = MemoryContext::new("holder");
+        let _v: PgVec<'_, u8> = vec_with_capacity_in(ctx.mcx(), 6 * MB).unwrap();
+        ready_tx.send(()).unwrap();
+        hold_rx.recv().unwrap();
+    });
+    ready_rx.recv().unwrap();
+    assert!(limits::database_bytes(DB) >= 6 * MB);
+    std::thread::spawn(move || {
+        limits::join_database(DB);
+        limits::enforce(true);
+        assert!(alloc(MB).is_ok());
+        // 6MB held by a sibling + 4MB exceeds 8MB.
+        assert_eq!(alloc(4 * MB), Err(database_hint));
+        // A session of another database is not affected.
+        limits::join_database(DB + 1);
+        assert!(alloc(4 * MB).is_ok());
+    })
+    .join()
+    .unwrap();
+    hold_tx.send(()).unwrap();
+    holder.join().unwrap();
+    assert_eq!(limits::database_bytes(DB), 0, "an exited thread leaves nothing charged");
+
+    limits::configure(0, 0, 0);
+}

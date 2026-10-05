@@ -178,6 +178,7 @@ impl GenArena {
         acct.check_limit(blksize)?;
         self.blocks.try_reserve(1).map_err(|_| AllocError)?;
         let layout = Layout::from_size_align(blksize, align).map_err(|_| AllocError)?;
+        crate::limits::admit(blksize)?;
         let p = Global.allocate(layout)?;
         let addr = p.cast::<u8>().as_ptr().expose_provenance();
         let idx = self.blocks.len() as u32;

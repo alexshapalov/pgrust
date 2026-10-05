@@ -750,12 +750,14 @@ pub mod global_footprint {
     #[inline]
     pub(crate) fn add(n: usize) {
         BYTES.fetch_add(n, Relaxed);
+        crate::limits::charge(n);
     }
 
     #[inline]
     pub(crate) fn sub(n: usize) {
         let prev = BYTES.fetch_sub(n, Relaxed);
         debug_assert!(prev >= n, "global footprint underflow: {prev} - {n}");
+        crate::limits::uncharge(n);
     }
 
     /// Block bytes currently committed to live contexts, process-wide,
@@ -779,6 +781,307 @@ pub mod global_footprint {
 
     pub fn uncharge_engine_estate(n: usize) {
         sub(n);
+    }
+}
+
+/// Enforced memory limits (pgrust-only; PGX shared runtime).
+///
+/// Three independent ceilings on memory-context bytes, all off at 0:
+///
+/// - **session**: what one backend thread's contexts hold;
+/// - **database**: the sum over every thread attached to one database;
+/// - **runtime**: the process-wide [`global_footprint`], applied only to
+///   threads already holding more than [`RUNTIME_FLOOR`], so that a small
+///   session keeps working while a large one is refused.
+///
+/// Enforcement is a refused block allocation: the allocator returns
+/// `AllocError`, the caller raises the ordinary out-of-memory ERROR, the
+/// statement aborts and its memory is released. Nothing is killed and no
+/// other session is touched. Accounting and checks are at BLOCK grain (the
+/// same sites as `global_footprint`), never per chunk.
+///
+/// What is and is not covered: bytes held in memory contexts and registered
+/// engine estates. Plain Rust heap allocations outside contexts, thread
+/// stacks and allocator retention are not charged to anyone.
+///
+/// Only threads that called [`limits::enforce`] are ever refused (client
+/// backends); auxiliary threads are charged but never refused. Refusals are
+/// also suppressed inside critical sections ([`limits::crit_enter`]) —
+/// an allocation failure there is a PANIC — and requests below
+/// [`SMALL_REQUEST`] are admitted until the ceiling is exceeded by 25%, so
+/// that error reporting and transaction abort, which allocate small amounts,
+/// can still run for a session that is at its limit.
+pub mod limits {
+    use allocator_api2::alloc::AllocError;
+    use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering::Relaxed};
+
+    /// Below this a thread is never refused for the runtime limit.
+    pub const RUNTIME_FLOOR: usize = 16 << 20;
+    /// Requests below this get 25% of overdraft (see module docs).
+    pub const SMALL_REQUEST: usize = 64 << 10;
+
+    static SESSION_LIMIT: AtomicUsize = AtomicUsize::new(0);
+    static DATABASE_LIMIT: AtomicUsize = AtomicUsize::new(0);
+    static RUNTIME_LIMIT: AtomicUsize = AtomicUsize::new(0);
+    static REFUSALS: AtomicU64 = AtomicU64::new(0);
+    static CRIT_PROBE: core::sync::atomic::AtomicPtr<()> =
+        core::sync::atomic::AtomicPtr::new(core::ptr::null_mut());
+
+    /// Which ceiling refused an allocation (for the error detail).
+    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+    pub enum Refused {
+        Session,
+        Database,
+        Runtime,
+    }
+
+    /// Set the three ceilings in bytes (0 = off). Called from the memory
+    /// watchdog tick with the GUC values.
+    pub fn configure(session: usize, database: usize, runtime: usize) {
+        SESSION_LIMIT.store(session, Relaxed);
+        DATABASE_LIMIT.store(database, Relaxed);
+        RUNTIME_LIMIT.store(runtime, Relaxed);
+    }
+
+    /// Allocations refused since process start.
+    pub fn refusals() -> u64 {
+        REFUSALS.load(Relaxed)
+    }
+
+    #[inline]
+    fn any_limit() -> bool {
+        SESSION_LIMIT.load(Relaxed) | DATABASE_LIMIT.load(Relaxed) | RUNTIME_LIMIT.load(Relaxed) != 0
+    }
+
+    #[inline]
+    fn over(used: usize, n: usize, limit: usize) -> bool {
+        if limit == 0 {
+            return false;
+        }
+        let ceiling = if n < SMALL_REQUEST { limit + limit / 4 } else { limit };
+        used.saturating_add(n) > ceiling
+    }
+
+    #[cfg(any(feature = "std", test))]
+    mod imp {
+        use super::*;
+        use alloc::sync::Arc;
+        use core::cell::{Cell, RefCell};
+        use std::collections::HashMap;
+        use std::sync::{Mutex, Weak};
+
+        pub(super) struct ThreadAcct {
+            pub bytes: Cell<usize>,
+            pub enforce: Cell<bool>,
+            pub last_refusal: Cell<Option<Refused>>,
+            pub group: RefCell<Option<Arc<AtomicUsize>>>,
+        }
+
+        impl Drop for ThreadAcct {
+            // A thread that exits still holding context bytes (or whose
+            // contexts are freed elsewhere later) must not leave them charged
+            // to its database forever.
+            fn drop(&mut self) {
+                if let Some(g) = self.group.borrow().as_ref() {
+                    sub_sat(g, self.bytes.get());
+                }
+            }
+        }
+
+        std::thread_local! {
+            pub(super) static ACCT: ThreadAcct = const {
+                ThreadAcct {
+                    bytes: Cell::new(0),
+                    enforce: Cell::new(false),
+                    last_refusal: Cell::new(None),
+                    group: RefCell::new(None),
+                }
+            };
+        }
+
+        pub(super) fn sub_sat(a: &AtomicUsize, n: usize) {
+            let _ = a.fetch_update(Relaxed, Relaxed, |v| Some(v.saturating_sub(n)));
+        }
+
+        pub(super) fn groups() -> &'static Mutex<HashMap<u32, Weak<AtomicUsize>>> {
+            static G: std::sync::OnceLock<Mutex<HashMap<u32, Weak<AtomicUsize>>>> = std::sync::OnceLock::new();
+            G.get_or_init(|| Mutex::new(HashMap::new()))
+        }
+    }
+
+    /// Charge `n` bytes to the calling thread and its database group.
+    #[inline]
+    pub(crate) fn charge(n: usize) {
+        #[cfg(any(feature = "std", test))]
+        let _ = imp::ACCT.try_with(|a| {
+            a.bytes.set(a.bytes.get() + n);
+            if let Some(g) = a.group.borrow().as_ref() {
+                g.fetch_add(n, Relaxed);
+            }
+        });
+        #[cfg(not(any(feature = "std", test)))]
+        let _ = n;
+    }
+
+    /// Release `n` bytes. Saturating: a context may be freed by a thread
+    /// other than the one that grew it.
+    #[inline]
+    pub(crate) fn uncharge(n: usize) {
+        #[cfg(any(feature = "std", test))]
+        let _ = imp::ACCT.try_with(|a| {
+            let had = a.bytes.get();
+            let take = had.min(n);
+            a.bytes.set(had - take);
+            if let Some(g) = a.group.borrow().as_ref() {
+                imp::sub_sat(g, take);
+            }
+        });
+        #[cfg(not(any(feature = "std", test)))]
+        let _ = n;
+    }
+
+    /// May the calling thread take `n` more bytes from the system?
+    #[inline]
+    pub(crate) fn admit(n: usize) -> Result<(), AllocError> {
+        if !any_limit() {
+            return Ok(());
+        }
+        admit_slow(n)
+    }
+
+    #[cold]
+    #[inline(never)]
+    fn admit_slow(n: usize) -> Result<(), AllocError> {
+        #[cfg(any(feature = "std", test))]
+        {
+            let verdict = imp::ACCT
+                .try_with(|a| {
+                    if !a.enforce.get() || in_critical_section() {
+                        return None;
+                    }
+                    let mine = a.bytes.get();
+                    let refused = if over(mine, n, SESSION_LIMIT.load(Relaxed)) {
+                        Some(Refused::Session)
+                    } else if a
+                        .group
+                        .borrow()
+                        .as_ref()
+                        .is_some_and(|g| over(g.load(Relaxed), n, DATABASE_LIMIT.load(Relaxed)))
+                    {
+                        Some(Refused::Database)
+                    } else if mine.saturating_add(n) > RUNTIME_FLOOR
+                        && over(crate::global_footprint::bytes(), n, RUNTIME_LIMIT.load(Relaxed))
+                    {
+                        Some(Refused::Runtime)
+                    } else {
+                        None
+                    };
+                    if refused.is_some() {
+                        a.last_refusal.set(refused);
+                    }
+                    refused
+                })
+                .ok()
+                .flatten();
+            if verdict.is_some() {
+                REFUSALS.fetch_add(1, Relaxed);
+                return Err(AllocError);
+            }
+        }
+        let _ = n;
+        Ok(())
+    }
+
+    /// Opt the calling thread into enforcement (client backends).
+    pub fn enforce(on: bool) {
+        #[cfg(any(feature = "std", test))]
+        let _ = imp::ACCT.try_with(|a| a.enforce.set(on));
+        #[cfg(not(any(feature = "std", test)))]
+        let _ = on;
+    }
+
+    /// Attach the calling thread to database `db`'s group, moving the bytes
+    /// it already holds. `db == 0` detaches.
+    pub fn join_database(db: u32) {
+        #[cfg(any(feature = "std", test))]
+        let _ = imp::ACCT.try_with(|a| {
+            let mine = a.bytes.get();
+            if let Some(old) = a.group.borrow_mut().take() {
+                imp::sub_sat(&old, mine);
+            }
+            if db == 0 {
+                return;
+            }
+            let mut map = imp::groups().lock().unwrap();
+            map.retain(|_, w| w.strong_count() > 0);
+            let g = match map.get(&db).and_then(|w| w.upgrade()) {
+                Some(g) => g,
+                None => {
+                    let g = alloc::sync::Arc::new(AtomicUsize::new(0));
+                    map.insert(db, alloc::sync::Arc::downgrade(&g));
+                    g
+                }
+            };
+            g.fetch_add(mine, Relaxed);
+            *a.group.borrow_mut() = Some(g);
+        });
+        #[cfg(not(any(feature = "std", test)))]
+        let _ = db;
+    }
+
+    /// Install the "is this thread inside a critical section?" probe
+    /// (init_small's CritSectionCount). No refusals while it returns true.
+    pub fn set_critical_section_probe(f: fn() -> bool) {
+        CRIT_PROBE.store(f as *mut (), Relaxed);
+    }
+
+    fn in_critical_section() -> bool {
+        let p = CRIT_PROBE.load(Relaxed);
+        if p.is_null() {
+            return false;
+        }
+        // SAFETY: only set_critical_section_probe stores here, always from this fn type.
+        let f: fn() -> bool = unsafe { core::mem::transmute(p) };
+        f()
+    }
+
+    /// The ceiling that refused this thread's most recent allocation, read
+    /// and cleared (for the out-of-memory error's detail line).
+    pub fn take_last_refusal() -> Option<Refused> {
+        #[cfg(any(feature = "std", test))]
+        {
+            return imp::ACCT.try_with(|a| a.last_refusal.take()).ok().flatten();
+        }
+        #[cfg(not(any(feature = "std", test)))]
+        None
+    }
+
+    /// Context bytes held by the calling thread.
+    pub fn thread_bytes() -> usize {
+        #[cfg(any(feature = "std", test))]
+        {
+            return imp::ACCT.try_with(|a| a.bytes.get()).unwrap_or(0);
+        }
+        #[cfg(not(any(feature = "std", test)))]
+        0
+    }
+
+    /// Context bytes held by all threads attached to database `db`.
+    pub fn database_bytes(db: u32) -> usize {
+        #[cfg(any(feature = "std", test))]
+        {
+            return imp::groups()
+                .lock()
+                .unwrap()
+                .get(&db)
+                .and_then(|w| w.upgrade())
+                .map_or(0, |g| g.load(Relaxed));
+        }
+        #[cfg(not(any(feature = "std", test)))]
+        {
+            let _ = db;
+            0
+        }
     }
 }
 
@@ -1657,11 +1960,23 @@ pub fn oom_named(context_name: &str, request: usize) -> PgError {
         let f: fn(&str, usize) = unsafe { core::mem::transmute(p) };
         f(context_name, request);
     }
-    PgError::error("out of memory")
+    let err = PgError::error("out of memory")
         .with_sqlstate(ERRCODE_OUT_OF_MEMORY)
         .with_detail(alloc::format!(
             "Failed on request of size {request} in memory context \"{context_name}\"."
-        ))
+        ));
+    match limits::take_last_refusal() {
+        Some(limits::Refused::Session) => {
+            err.with_hint("The session reached pgrust.session_memory_limit.")
+        }
+        Some(limits::Refused::Database) => {
+            err.with_hint("The sessions of this database together reached pgrust.database_memory_limit.")
+        }
+        Some(limits::Refused::Runtime) => {
+            err.with_hint("The server reached pgrust.runtime_memory_limit.")
+        }
+        None => err,
+    }
 }
 
 #[cfg(debug_assertions)]
