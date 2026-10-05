@@ -207,12 +207,17 @@ pub(crate) fn flush_subscription(
 
 pub(crate) fn drop_entry(key: PgStat_HashKey) {
     let mut store = pgsync::lock(&SHARED_STATS);
-    let existed = store.remove(&key).is_some();
+    store.remove(&key);
     // pgstat_drop_entry (pgstat_shmem.c:1027): database stats contain other
     // stats — dropping the database entry also drops every entry of that
-    // dboid (pgstat_drop_database_and_contents). C only cascades when the
-    // shared entry was found; mirror that.
-    if existed && key.kind == PGSTAT_KIND_DATABASE {
+    // dboid (pgstat_drop_database_and_contents). C cascades only when the
+    // database's own entry was found, which in C it always is by the time a
+    // database can be dropped. Here the relation entries of a database can
+    // exist without it (ensure_entry_for_pending creates them at first
+    // count), and skipping the cascade then strands every one of them for
+    // the life of the server — unbounded growth under create/drop churn.
+    // Dropping the contents unconditionally is the same observable result.
+    if key.kind == PGSTAT_KIND_DATABASE {
         store.retain(|k, _| k.dboid != key.dboid);
     }
 }

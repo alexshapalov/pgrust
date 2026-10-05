@@ -167,9 +167,18 @@ mod alloc_track {
 
     fn dump_map(m: &HashMap<usize, Rec>, when: &str) {
         // Group by backtrace.
+        // Thread names end in a per-thread vpid ("pg:autovacuum worker:1651");
+        // grouping on the full name splits one call site into a row per
+        // thread and hides anything allocated by many short-lived threads.
+        fn kind(name: &'static str) -> &'static str {
+            match name.rfind(':') {
+                Some(i) if i > 0 && name[i + 1..].bytes().all(|b| b.is_ascii_digit()) => &name[..i],
+                _ => name,
+            }
+        }
         let mut groups: HashMap<(&'static str, &[usize]), (usize, usize)> = HashMap::new();
         for r in m.values() {
-            let e = groups.entry((r.tname, &r.bt[..r.n])).or_insert((0, 0));
+            let e = groups.entry((kind(r.tname), &r.bt[..r.n])).or_insert((0, 0));
             e.0 += 1;
             e.1 += r.size;
         }
@@ -192,7 +201,7 @@ mod alloc_track {
             m.values().map(|r| r.size).sum::<usize>(),
             slide,
         );
-        for (tname, bt, count, bytes) in rows.iter().take(25) {
+        for (tname, bt, count, bytes) in rows.iter().take(80) {
             let addrs: Vec<String> = bt.iter().map(|a| format!("0x{a:x}")).collect();
             eprintln!("ALLOC-TRACK leak: thread={} n={} bytes={} bt={}", tname, count, bytes, addrs.join(" "));
         }

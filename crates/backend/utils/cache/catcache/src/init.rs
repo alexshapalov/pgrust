@@ -31,13 +31,19 @@ pub(crate) fn catalog_cache_initialize_cache(cache_id: i32) -> PgResult<()> {
         // Set once for the backend's life, never rebuilt (catalog schemas
         // are immutable), so the leak below is honest.
         let copied: TupleDescData<'_> = tupdesc::CreateTupleDescCopyConstr(mcx, relation.descr())?;
-        // Justified bare Box: the droppy descriptor header cannot live in a
-        // no-drop arena; the leak is C's never-freed CacheMemoryContext copy.
-        let leaked: &mut TupleDescData<'_> = Box::leak(Box::new(copied));
-        // SAFETY: the header is leaked and its inner allocations live in the
+        // The header lives in CacheMemoryContext next to its inner
+        // allocations — C's never-freed CacheMemoryContext copy. ManuallyDrop
+        // because the arena runs no destructors (the fields' memory goes with
+        // the context). It must NOT be a bare leaked Box: the context is
+        // reclaimed when the backend thread ends, a global-heap box is not,
+        // and one header per catalog cache per connection then accumulates
+        // for the life of the server.
+        let leaked: &TupleDescData<'_> =
+            &**mcx::alloc_leak_in(mcx, core::mem::ManuallyDrop::new(copied))?;
+        // SAFETY: the header and its inner allocations live in the
         // ManuallyDrop'd, never-reset CacheMemoryContext (crate::STATE); it
-        // is written once here and no path frees or rebuilds it, so
-        // extending to 'static is sound.
+        // is written once here and no path frees or rebuilds it while the
+        // state exists, so extending to 'static is sound.
         let td: &'static TupleDescData<'static> =
             unsafe { core::mem::transmute::<&TupleDescData<'_>, &'static TupleDescData<'static>>(leaked) };
 
