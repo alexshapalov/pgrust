@@ -73,7 +73,12 @@ def main():
     binary = args.binary or (os.path.join(pb.REPO, "target", "release", "postgres")
                              if args.engine == "pgrust" else os.path.join(prefix, "bin", "postgres"))
     engine = pb.Engine(args.engine, binary, args.server_arg, args.conf)
-    pg_regress = os.path.join(prefix, "lib", "postgresql", "pgxs", "src", "test", "regress", "pg_regress")
+    pg_regress = next((c for c in (
+        os.path.join(prefix, "lib", "postgresql", "pgxs", "src", "test", "regress", "pg_regress"),  # Homebrew
+        os.path.join(prefix, "lib", "pgxs", "src", "test", "regress", "pg_regress"),  # Debian/Ubuntu
+    ) if os.path.exists(c)), None)
+    if pg_regress is None:
+        sys.exit("pg_regress not found under %s (Debian/Ubuntu: apt install postgresql-server-dev-18)" % prefix)
     pkglibdir = subprocess.run([os.path.join(prefix, "bin", "pg_config"), "--pkglibdir"],
                                capture_output=True, text=True, check=True).stdout.strip()
 

@@ -126,9 +126,7 @@ class Bench:
         except OSError:
             pass
         if self.hung:
-            subprocess.run(["sample", str(self.srv.proc.pid), "1", "-file",
-                            os.path.join(self.args.out, "hang-sample-%d.txt" % int(time.time()))],
-                           capture_output=True)
+            pb.stack_dump(self.srv.proc.pid, os.path.join(self.args.out, "hang-sample-%d.txt" % int(time.time())))
             self.srv.proc.kill()
         self.srv.stop()
         self.ws.cleanup()

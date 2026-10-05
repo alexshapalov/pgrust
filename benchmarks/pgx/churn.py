@@ -29,11 +29,6 @@ WORKLOAD = ("INSERT INTO accounts(email) VALUES ('churn@example.com');"
             "CREATE TABLE scratch(id int PRIMARY KEY, v text); INSERT INTO scratch VALUES (1, 'x')")
 
 
-def fd_count(pid):
-    out = subprocess.run(["lsof", "-p", str(pid)], capture_output=True, text=True).stdout
-    return max(len(out.splitlines()) - 1, 0)
-
-
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out", required=True)
@@ -67,7 +62,7 @@ def main():
         dbs = int(admin.query("SELECT count(*) FROM pg_database WHERE datname LIKE 'tdb\\_%'")[0][0])
         du = subprocess.run(["du", "-sk", srv.datadir], capture_output=True, text=True).stdout
         return {"footprint_bytes": m[pb.MEM_KEY], "rss_bytes": m["rss_bytes_sum"], "threads": m.get("thread_count"),
-                "fds": fd_count(srv.proc.pid), "ephemeral_databases": dbs, "datadir_bytes": int(du.split()[0]) * 1024}
+                "fds": pb.fd_count(srv.proc.pid), "ephemeral_databases": dbs, "datadir_bytes": int(du.split()[0]) * 1024}
 
     try:
         srv.wait_select1()

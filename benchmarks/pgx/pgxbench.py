@@ -74,10 +74,21 @@ class PgConn:
 
     def _until_ready(self):
         rows = []
+        error = None
         while True:
-            kind, body = self._read_msg()
+            try:
+                kind, body = self._read_msg()
+            except ServerNotReady:
+                if error:  # FATAL: the server closed the connection after the error
+                    raise ServerNotReady(error)
+                raise
             if kind == b"E":
-                raise ServerNotReady(body.replace(b"\0", b" ").decode(errors="replace"))
+                # Keep reading to ReadyForQuery so the connection stays usable
+                # after an ordinary ERROR.
+                error = error or body.replace(b"\0", b" ").decode(errors="replace")
+                continue
+            if kind == b"Z" and error:
+                raise ServerNotReady(error)
             if kind == b"R" and struct.unpack("!i", body[:4])[0] != 0:
                 raise RuntimeError("server requested authentication; initdb with trust auth")
             if kind == b"D":
@@ -189,18 +200,130 @@ def _proc_sample(pid):
     except OSError:
         return None
     tick_ns = 1_000_000_000 // os.sysconf("SC_CLK_TCK")
-    return {
+    out = {
         "pid": pid,
         "rss_bytes": int(status["VmRSS"].split()[0]) * 1024,
         "pss_bytes": pss * 1024,
         "cpu_user_ns": int(stat[11]) * tick_ns,
         "cpu_system_ns": int(stat[12]) * tick_ns,
+        "idle_wakeups": int(status.get("voluntary_ctxt_switches", "0").split()[0]),
     }
+    try:
+        with open("/proc/%d/io" % pid) as f:
+            io = dict(l.strip().split(": ") for l in f)
+        out["disk_read_bytes"] = int(io["read_bytes"])
+        out["disk_written_bytes"] = int(io["write_bytes"])
+    except (OSError, KeyError, ValueError):
+        pass
+    return out
 
 
 def thread_count(pid):
-    out = subprocess.run(["ps", "-M", "-p", str(pid)], capture_output=True, text=True).stdout
-    return max(len(out.splitlines()) - 1, 0)
+    if sys.platform == "darwin":
+        out = subprocess.run(["ps", "-M", "-p", str(pid)], capture_output=True, text=True).stdout
+        return max(len(out.splitlines()) - 1, 0)
+    try:
+        return len(os.listdir("/proc/%d/task" % pid))
+    except OSError:
+        return 0
+
+
+def fd_count(pid):
+    """Open file descriptors of one process."""
+    if sys.platform == "darwin":
+        out = subprocess.run(["lsof", "-p", str(pid)], capture_output=True, text=True).stdout
+        return max(len(out.splitlines()) - 1, 0)
+    try:
+        return len(os.listdir("/proc/%d/fd" % pid))
+    except OSError:
+        return 0
+
+
+_WAIT_LEAVES = ("__psynch_cvwait", "kevent", "__semwait_signal", "mach_msg", "poll", "__select", "read",
+                "__psynch_mutexwait", "nanosleep", "recvfrom", "accept", "__workq_kernreturn", "semaphore_wait")
+
+
+def busy_threads(pid, seconds):
+    """Which threads of `pid` are on-CPU: share of one core per thread name.
+
+    macOS: share of `sample` hits whose leaf frame is not a wait.
+    Linux: per-thread CPU time from /proc/<pid>/task/*/stat over the window.
+    """
+    import collections
+    if sys.platform != "darwin":
+        tick = os.sysconf("SC_CLK_TCK")
+
+        def snap():
+            out = {}
+            for tid in os.listdir("/proc/%d/task" % pid):
+                try:
+                    with open("/proc/%d/task/%s/stat" % (pid, tid)) as f:
+                        raw = f.read()
+                    name = raw[raw.index("(") + 1:raw.rindex(")")]
+                    fields = raw.rsplit(")", 1)[1].split()
+                    out[tid] = (name, int(fields[11]) + int(fields[12]))
+                except (OSError, ValueError):
+                    pass
+            return out
+        a = snap()
+        time.sleep(seconds)
+        b = snap()
+        busy = collections.Counter()
+        for tid, (name, ticks) in b.items():
+            delta = ticks - a.get(tid, (name, ticks))[1]
+            if delta > 0:
+                busy[re.sub(r"[:\d]+$", "", name)] += delta / tick / seconds
+        return {"window_s": seconds,
+                "busy_share_by_thread": {k: round(v, 4) for k, v in busy.most_common(8)}}
+    out = subprocess.run(["sample", str(pid), str(seconds)], capture_output=True, text=True).stdout
+    graph = out.split("Call graph:")[-1].split("Total number in stack")[0]
+    busy = collections.Counter()
+    total = 0
+    for block in re.split(r"\n    (?=\d+ Thread_)", graph):
+        head = block.split("\n")[0]
+        m = re.match(r"\s*(\d+) Thread_\d+:? *(.*)", head)
+        if not m:
+            continue
+        total = max(total, int(m.group(1)))
+        name = re.sub(r":\d+$", "", m.group(2).strip()) or "main"
+        name = re.sub(r"\d+$", "", name)
+        lines = block.split("\n")[1:]
+        for i, line in enumerate(lines):
+            lm = re.match(r"^([ +!:|]+)(\d+) (\S+)", line)
+            if not lm:
+                continue
+            depth = len(lm.group(1))
+            nxt = re.match(r"^([ +!:|]+)\d+ ", lines[i + 1]) if i + 1 < len(lines) else None
+            is_leaf = not nxt or len(nxt.group(1)) <= depth
+            if is_leaf and not lm.group(3).startswith(_WAIT_LEAVES):
+                busy[name] += int(lm.group(2))
+    return {"window_s": seconds,
+            "busy_share_by_thread": {k: round(v / total, 4) for k, v in busy.most_common(8)} if total else {}}
+
+
+def stack_dump(pid, path, seconds=3):
+    """Write thread backtraces of `pid` to `path`. Returns the tool used, or None."""
+    if sys.platform == "darwin":
+        subprocess.run(["sample", str(pid), str(seconds), "-file", path], capture_output=True)
+        return "sample"
+    for tool, argv in (("gdb", ["gdb", "-p", str(pid), "-batch", "-ex", "thread apply all bt"]),
+                       ("eu-stack", ["eu-stack", "-p", str(pid)])):
+        if shutil.which(tool):
+            out = subprocess.run(argv, capture_output=True, text=True)
+            with open(path, "w") as f:
+                f.write(out.stdout + out.stderr)
+            return tool
+    # No debugger: at least record each thread's name, state and kernel wait.
+    with open(path, "w") as f:
+        for tid in sorted(os.listdir("/proc/%d/task" % pid), key=int):
+            try:
+                with open("/proc/%d/task/%s/stat" % (pid, tid)) as st:
+                    raw = st.read()
+                f.write("%s %s state=%s\n" % (tid, raw[raw.index("("):raw.rindex(")") + 1],
+                                              raw.rsplit(")", 1)[1].split()[0]))
+            except OSError:
+                pass
+    return None
 
 
 def memory_sample(root_pid):
@@ -212,8 +335,7 @@ def memory_sample(root_pid):
     """
     procs = [s for s in (_proc_sample(p) for p in process_tree(root_pid)) if s]
     sample = {"process_count": len(procs), "processes": procs}
-    if sys.platform == "darwin":
-        sample["thread_count"] = sum(thread_count(p["pid"]) for p in procs)
+    sample["thread_count"] = sum(thread_count(p["pid"]) for p in procs)
     for key in ("rss_bytes", "phys_footprint_bytes", "pss_bytes", "cpu_user_ns",
                 "cpu_system_ns", "idle_wakeups", "disk_read_bytes", "disk_written_bytes"):
         if procs and key in procs[0]:
@@ -274,7 +396,10 @@ class Workspace:
 
     def __init__(self, engine, workdir=None):
         self.engine = engine
-        self.root = tempfile.mkdtemp(prefix="pgxbench-", dir=workdir or "/tmp")
+        # PGXBENCH_WORKDIR puts every scratch cluster on the filesystem under
+        # test (a ZFS dataset on a PGRun host). Keep the path short: it holds
+        # the Unix socket.
+        self.root = tempfile.mkdtemp(prefix="pgxbench-", dir=workdir or os.environ.get("PGXBENCH_WORKDIR") or "/tmp")
         self.template = os.path.join(self.root, "template")
         self.sockdir = self.root
         subprocess.run([os.path.join(pg18_prefix(), "bin", "initdb"), "-D", self.template,
@@ -436,16 +561,31 @@ def collect_env(engine):
             "macos": tool_version("sw_vers", "-productVersion"),
             "filesystem": tool_version("sh", "-c", "mount | grep ' on / ' | head -1"),
         })
+    else:
+        env.update({
+            "cpu_model": tool_version("sh", "-c", "grep -m1 'model name' /proc/cpuinfo | cut -d: -f2-"),
+            "ram_bytes": os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES"),
+            "distribution": tool_version("sh", "-c", ". /etc/os-release; echo $PRETTY_NAME"),
+            "zfs": tool_version("sh", "-c", "zfs version 2>/dev/null | head -1"),
+        })
     return env
 
 
 def system_cpu_idle_percent():
     """How busy the rest of the machine is; timings from a busy host are noisy."""
-    if sys.platform != "darwin":
-        return None
-    out = subprocess.run(["top", "-l", "2", "-n", "0", "-s", "1"], capture_output=True, text=True).stdout
-    idle = re.findall(r"CPU usage:.* ([0-9.]+)% idle", out)
-    return float(idle[-1]) if idle else None
+    if sys.platform == "darwin":
+        out = subprocess.run(["top", "-l", "2", "-n", "0", "-s", "1"], capture_output=True, text=True).stdout
+        idle = re.findall(r"CPU usage:.* ([0-9.]+)% idle", out)
+        return float(idle[-1]) if idle else None
+
+    def snap():
+        with open("/proc/stat") as f:
+            v = [int(x) for x in f.readline().split()[1:]]
+        return v[3] + v[4], sum(v)
+    i0, t0 = snap()
+    time.sleep(1)
+    i1, t1 = snap()
+    return round((i1 - i0) / max(t1 - t0, 1) * 100, 2)
 
 
 def write_result(out_dir, name, engine, payload):

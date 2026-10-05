@@ -33,7 +33,26 @@ M = 1048576.0
 ROW_BYTES = 300  # measured: heap row + two index entries in the template schema
 
 
+def zfs_dataset(path):
+    """The ZFS dataset holding `path`, or None when it is not on ZFS."""
+    if sys.platform == "darwin":
+        return None
+    out = subprocess.run(["df", "--output=fstype,source", path], capture_output=True, text=True).stdout.splitlines()
+    if len(out) >= 2 and out[1].split()[0] == "zfs":
+        return out[1].split()[1]
+    return None
+
+
 def volume_used(path):
+    """Bytes in use where `path` lives: the ZFS pool's allocation, else the volume's."""
+    ds = zfs_dataset(path)
+    if ds:
+        # Pool-level ALLOC sees block cloning; per-dataset `used` charges a
+        # cloned block to every dataset that references it.
+        out = subprocess.run(["zpool", "list", "-Hp", "-o", "allocated", ds.split("/")[0]],
+                             capture_output=True, text=True).stdout.strip()
+        if out.isdigit():
+            return int(out)
     st = os.statvfs(path)
     return (st.f_blocks - st.f_bfree) * st.f_frsize
 
@@ -64,7 +83,8 @@ class Run:
         """Flush everything so volume usage reflects the databases, not dirty buffers."""
         self.admin.query("CHECKPOINT")
         os.sync()
-        time.sleep(self.args.settle)
+        # ZFS accounts space when a transaction group commits (every ~5 s).
+        time.sleep(max(self.args.settle, 7.0) if zfs_dataset(self.srv.datadir) else self.args.settle)
 
     def physical(self):
         """Used bytes on the volume, excluding WAL."""
@@ -182,10 +202,11 @@ def main():
 
     os.makedirs(args.out, exist_ok=True)
     path = os.path.join(args.out, "cow.json")
-    fs = subprocess.run(["sh", "-c", "mount | grep -E ' on (/System/Volumes/Data|/) ' | head -2"],
-                        capture_output=True, text=True).stdout.strip()
+    where = args.workdir or os.environ.get("PGXBENCH_WORKDIR") or "/tmp"
+    fs = subprocess.run(["sh", "-c", "df -h %s | tail -1; mount | grep -E ' on (/System/Volumes/Data|%s) ' | head -2"
+                         % (where, where)], capture_output=True, text=True).stdout.strip()
     doc = {"benchmark": "cow", "git_commit": pb.git("rev-parse", "HEAD"), "conf": args.conf,
-           "platform": sys.platform, "filesystem": fs, "runs": []}
+           "platform": sys.platform, "filesystem": fs, "zfs_dataset": zfs_dataset(where), "runs": []}
     for size in [int(x) for x in args.sizes.split(",")]:
         for method in args.methods.split(","):
             doc["runs"].append(one(args, method, size))

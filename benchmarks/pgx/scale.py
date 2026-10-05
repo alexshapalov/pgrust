@@ -27,43 +27,12 @@ import pgxbench as pb  # noqa: E402
 import ephemeral as eph  # noqa: E402
 
 M = 1048576.0
-WAIT_LEAVES = ("__psynch_cvwait", "kevent", "__semwait_signal", "mach_msg", "poll", "__select", "read",
-               "__psynch_mutexwait", "nanosleep", "recvfrom", "accept", "__workq_kernreturn", "semaphore_wait")
 ACTIVE_SQL = ("SELECT count(*) FROM t1 WHERE account_id < 50;"
               "UPDATE t2 SET name = name WHERE id = 1")
 
 
 def cpu_ns(s):
     return s["cpu_user_ns_sum"] + s["cpu_system_ns_sum"]
-
-
-def busy_threads(pid, seconds):
-    """Share of `sample` hits per thread whose leaf frame is not a wait."""
-    out = subprocess.run(["sample", str(pid), str(seconds)], capture_output=True, text=True).stdout
-    graph = out.split("Call graph:")[-1].split("Total number in stack")[0]
-    busy = collections.Counter()
-    total = 0
-    for block in re.split(r"\n    (?=\d+ Thread_)", graph):
-        head = block.split("\n")[0]
-        m = re.match(r"\s*(\d+) Thread_\d+:? *(.*)", head)
-        if not m:
-            continue
-        total = max(total, int(m.group(1)))
-        name = re.sub(r":\d+$", "", m.group(2).strip()) or "main"
-        name = re.sub(r"\d+$", "", name)
-        # Leaf lines carry their own sample counts; sum those not in a wait.
-        lines = block.split("\n")[1:]
-        for i, line in enumerate(lines):
-            lm = re.match(r"^([ +!:|]+)(\d+) (\S+)", line)
-            if not lm:
-                continue
-            depth = len(lm.group(1))
-            nxt = re.match(r"^([ +!:|]+)\d+ ", lines[i + 1]) if i + 1 < len(lines) else None
-            is_leaf = not nxt or len(nxt.group(1)) <= depth
-            if is_leaf and not lm.group(3).startswith(WAIT_LEAVES):
-                busy[name] += int(lm.group(2))
-    return {"samples_per_thread": total,
-            "busy_share_by_thread": {k: round(v / total, 4) for k, v in busy.most_common(8)} if total else {}}
 
 
 def main():
@@ -135,7 +104,7 @@ def main():
                 series.append(round((cpu_ns(cur) - cpu_ns(prev)) / ((now - t_prev) * 1e9) * 100, 4))
                 prev, t_prev = cur, now
             du = subprocess.run(["du", "-sk", srv.datadir], capture_output=True, text=True).stdout
-            fds = len(subprocess.run(["lsof", "-p", str(pid)], capture_output=True, text=True).stdout.splitlines()) - 1
+            fds = pb.fd_count(pid)
             row = {"databases": n, "mint_ms": ({k: round(v * 1e3, 1) for k, v in pb.summarize(lat).items()}
                                                if lat else None),
                    "footprint_bytes": prev[pb.MEM_KEY], "rss_bytes": prev["rss_bytes_sum"],
@@ -146,7 +115,7 @@ def main():
                    "idle_cpu_percent_last_minute": round(sum(series[-6:]) / len(series[-6:]), 4),
                    "idle_disk_written_bytes": prev.get("disk_written_bytes_sum", 0) - s_first.get("disk_written_bytes_sum", 0),
                    "idle_wakeups": prev.get("idle_wakeups_sum", 0) - s_first.get("idle_wakeups_sum", 0),
-                   "on_cpu": busy_threads(pid, 10)}
+                   "on_cpu": pb.busy_threads(pid, 10)}
             doc["idle"].append(row)
             save()
             print("n=%-5d footprint=%.0f MB threads=%s fds=%s  idle cpu mean=%.3f%% last-minute=%.3f%%  busy=%s" % (

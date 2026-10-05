@@ -133,8 +133,7 @@ def main():
                     except Exception as e:  # noqa: BLE001
                         report[name] = "unavailable: " + str(e)[:120]
             s0 = pb.memory_sample(pid)
-            subprocess.run(["sample", str(pid), "3", "-file", os.path.join(hang_dir, "sample.txt")],
-                           capture_output=True)
+            report["stack_tool"] = pb.stack_dump(pid, os.path.join(hang_dir, "sample.txt"))
             s1 = pb.memory_sample(pid)
             report.update({
                 "threads": s1.get("thread_count"),
