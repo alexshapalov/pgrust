@@ -51,6 +51,9 @@ thread_local! {
     static LAST_VISIT_MODS: RefCell<std::collections::HashMap<Oid, i64>> =
         RefCell::new(std::collections::HashMap::new());
     static SKIPPED_IDLE: Cell<u64> = const { Cell::new(0) };
+    // get_database_list result reused between launcher wakes while
+    // pgrust.autovacuum_skip_idle_databases is on (see database_list).
+    static DBLIST_CACHE: RefCell<Option<(std::time::Instant, Vec<AvwDbase>)>> = const { RefCell::new(None) };
     static GOT_SIGUSR2: Cell<bool> = const { Cell::new(false) };
 }
 
@@ -474,6 +477,35 @@ fn db_comparator(a: &AvlDbase, b: &AvlDbase) -> core::cmp::Ordering {
     b.adl_score.cmp(&a.adl_score)
 }
 
+/// The launcher wakes every naptime/ndatabases; with thousands of databases
+/// that is many times a second, and each wake re-scanned pg_database in its
+/// own transaction only to choose one database. With
+/// pgrust.autovacuum_skip_idle_databases on, the list is reused for up to a
+/// quarter of autovacuum_naptime (at most 15 s). What can be stale: a
+/// database created since (picked up at the next refresh; a brand-new
+/// database has nothing to vacuum yet), a dropped one (its stats entry is
+/// gone, so it is skipped; a worker that does start on it exits as it
+/// always has for a vanished database), and datfrozenxid/datminmxid up to
+/// 15 s old (the wraparound test compares ages of hundreds of millions of
+/// transactions, so seconds of staleness cannot change its outcome).
+fn database_list() -> PgResult<Vec<AvwDbase>> {
+    if !skip_idle_databases() {
+        DBLIST_CACHE.with_borrow_mut(|c| *c = None);
+        return get_database_list();
+    }
+    let max_age = std::time::Duration::from_millis(
+        ((autovacuum_naptime() as u64) * 1000 / 4).clamp(1000, 15_000),
+    );
+    if let Some(list) = DBLIST_CACHE.with_borrow(|c| {
+        c.as_ref().filter(|(t, _)| t.elapsed() < max_age).map(|(_, l)| l.clone())
+    }) {
+        return Ok(list);
+    }
+    let list = get_database_list()?;
+    DBLIST_CACHE.with_borrow_mut(|c| *c = Some((std::time::Instant::now(), list.clone())));
+    Ok(list)
+}
+
 // get_database_list: the launcher's only transaction; seqscan pg_database.
 fn get_database_list() -> PgResult<Vec<AvwDbase>> {
     let mut dblist = Vec::new();
@@ -568,7 +600,7 @@ fn do_start_worker() -> PgResult<StartOutcome> {
         return Ok(StartOutcome::None);
     }
 
-    let dblist = get_database_list()?;
+    let dblist = database_list()?;
 
     let recent_xid = varsup::ReadNextTransactionId()?;
     let mut xid_force_limit = recent_xid.wrapping_sub(g::autovacuum_freeze_max_age() as u32);
