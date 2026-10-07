@@ -4,7 +4,8 @@
 --mode limits (default): one fresh server per case, PGX profile.
   none      one session runs a ~1.2 GB array_agg; no limit set
   session   same query, pgrust.session_memory_limit
-  database  two sessions of one database run ~420 MB each at once,
+  database  two sessions of one database run ~330 MB each at once (Linux:
+            ~65 bytes per array_agg element),
             pgrust.database_memory_limit; a session of another database runs
             the same query at the same time and must succeed
   runtime   four sessions in four databases run ~840 MB each at once,
@@ -184,7 +185,7 @@ def mode_limits(args):
         ("none", prof, [("solo", 30_000_000)]),
         ("session", prof + ["pgrust.session_memory_limit=%d" % args.session_mb], [("solo", 30_000_000)]),
         ("database", prof + ["pgrust.database_memory_limit=%d" % args.database_mb],
-         [("shared", 10_000_000), ("shared", 10_000_000), ("other", 10_000_000)]),
+         [("shared", 5_000_000), ("shared", 5_000_000), ("other", 5_000_000)]),
         ("runtime", prof + ["pgrust.runtime_memory_limit=%d" % args.runtime_mb],
          [("r1", 20_000_000), ("r2", 20_000_000), ("r3", 20_000_000), ("r4", 20_000_000)]),
     ]
