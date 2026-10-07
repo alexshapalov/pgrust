@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pgxbench as pb  # noqa: E402
 import ephemeral as eph  # noqa: E402
 
-NOISY_SQL = "SELECT sum(g * g % 7) FROM generate_series(1, 20000000) g"
+NOISY_SQL = "SELECT sum((g::bigint * g) % 7) FROM generate_series(1, 20000000) g"
 B_QUERY = "SELECT count(*) FROM t1 WHERE account_id < 50"
 
 
@@ -102,12 +102,17 @@ def main():
                         nc_err.append(str(e)[:160])
                     time.sleep(0.25)
 
+            noisy_err = []
+
             def noisy(i):
-                c = connect("noisy%d" % i)
-                while not stop[0]:
-                    c.query(NOISY_SQL)
-                    noisy_done[0] += 1
-                c.close()
+                try:
+                    c = connect("noisy%d" % i)
+                    while not stop[0]:
+                        c.query(NOISY_SQL)
+                        noisy_done[0] += 1
+                    c.close()
+                except Exception as e:  # noqa: BLE001 - a dead noisy client invalidates the level
+                    noisy_err.append(str(e)[:160])
             ths = [threading.Thread(target=noisy, args=(i,), daemon=True) for i in range(n)]
             for t in ths:
                 t.start()
@@ -130,7 +135,7 @@ def main():
                    "server_cpu_percent_of_one_core": round(((s1["cpu_user_ns_sum"] + s1["cpu_system_ns_sum"])
                                                             - (s0["cpu_user_ns_sum"] + s0["cpu_system_ns_sum"]))
                                                            / (args.seconds * 1e9) * 100, 1),
-                   "load1": round(load, 2), "noisy_queries_completed": noisy_done[0],
+                   "load1": round(load, 2), "noisy_queries_completed": noisy_done[0], "noisy_errors": noisy_err[:3],
                    "pss_mb": round((s1.get(pb.MEM_KEY) or 0) / 1048576.0, 1)}
             doc["levels"].append(row)
             with open(path, "w") as f:
