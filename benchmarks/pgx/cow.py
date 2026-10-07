@@ -210,6 +210,36 @@ def one(args, method, target_mb):
         out["write_update_one_table"] = {"table_total_bytes_before": rel,
                                          "logical_growth_bytes": dbsize() - logical_base,
                                          "physical_growth_bytes": r.physical() - base}
+
+        # Agent-shaped writes in a fresh clone each, so every figure starts
+        # from an untouched branch: scattered single-row updates across all
+        # tables, an index build, and a migration that rewrites a table.
+        def measure(tag, sqls):
+            c = r.conn(name(tag))
+            c.query("SELECT 1")
+            b0, l0 = r.physical(), int(c.query("SELECT pg_database_size(current_database())")[0][0])
+            t0 = time.perf_counter()
+            for q in sqls:
+                c.query(q)
+            dt = time.perf_counter() - t0
+            c.query("CHECKPOINT")
+            res = {"seconds": round(dt, 3),
+                   "logical_growth_bytes": int(c.query("SELECT pg_database_size(current_database())")[0][0]) - l0,
+                   "physical_growth_bytes": r.physical() - b0}
+            c.close()
+            print("   %-22s logical %+7.1f MB  physical %+7.1f MB  (%.2fs)" % (
+                tag, res["logical_growth_bytes"] / M, res["physical_growth_bytes"] / M, dt), flush=True)
+            return res
+        out["agent_writes"] = {
+            "scattered_updates_1000": measure("scatter", [
+                "UPDATE t%d SET name = name || '!' WHERE id = %d" % (i % (args.tables - 1), (i * 7919) % rows + 1)
+                for i in range(1000)]),
+            "create_index": measure("index", ["CREATE INDEX t2_payload_n ON t2 ((payload->>'n'))"]),
+            "migration_rewrite": measure("migrate", [
+                "ALTER TABLE t3 ADD COLUMN status text NOT NULL DEFAULT 'new'",
+                "ALTER TABLE t3 ADD COLUMN r float8 NOT NULL DEFAULT random()",  # volatile default: full rewrite
+                "CREATE INDEX t3_status ON t3(status)"]),
+        }
         w.close()
 
         # delete
