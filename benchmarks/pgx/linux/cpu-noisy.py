@@ -89,6 +89,11 @@ def main():
         admin.query("CREATE DATABASE quiet")
         for i in range(1 if args.same_db else max(levels)):
             admin.query("CREATE DATABASE noisy%d" % i)
+        # Noisy clients log in as an ordinary role: superusers are exempt
+        # from database connection limits (as in PostgreSQL).
+        admin.query("CREATE ROLE agent LOGIN")
+        for i in range(1 if args.same_db else max(levels)):
+            admin.query("ALTER DATABASE noisy%d OWNER TO agent" % i)
         if args.same_db and args.conn_limit >= 0:
             admin.query("ALTER DATABASE noisy0 CONNECTION LIMIT %d" % args.conn_limit)
         admin.close()
@@ -132,7 +137,8 @@ def main():
             def noisy(i):
                 try:
                     try:
-                        c = connect("noisy0" if args.same_db else "noisy%d" % i)
+                        c = pb.PgConn(ws.sockdir, args.port, user="agent",
+                                      database="noisy0" if args.same_db else "noisy%d" % i, timeout=600)
                     except Exception as e:  # noqa: BLE001 - connection limit
                         refused.append(str(e)[:120])
                         return
