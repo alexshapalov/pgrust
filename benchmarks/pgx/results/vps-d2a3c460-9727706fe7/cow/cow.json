@@ -1,0 +1,594 @@
+{
+  "benchmark": "cow",
+  "git_commit": "9727706fe7e821e5187da635538952b29a2b5d44",
+  "conf": "/home/ubuntu/pgrust/configs/pgx-ephemeral.conf",
+  "platform": "linux",
+  "filesystem": "tank/pgx-bench   48G   82M   47G   1% /tank/pgx-bench\ntank/pgx-bench on /tank/pgx-bench type zfs (rw,noatime,xattr,noacl,casesensitive)",
+  "zfs_dataset": "tank/pgx-bench",
+  "runs": [
+    {
+      "method": "copy",
+      "target_mb": 15,
+      "template": {
+        "tables": 50,
+        "rows_per_table": 489,
+        "logical_bytes": 19644943,
+        "build_s": 1.7127927850006017,
+        "seal_s": 0.2820895360000577
+      },
+      "clone": {
+        "count": 5,
+        "samples": [
+          {
+            "mint_to_select1_s": 0.09735402400019666,
+            "first_real_query_s": 0.0075630649998856825
+          },
+          {
+            "mint_to_select1_s": 0.10142897100013215,
+            "first_real_query_s": 0.0021822310000061407
+          },
+          {
+            "mint_to_select1_s": 0.09018669899978704,
+            "first_real_query_s": 0.001814901999750873
+          },
+          {
+            "mint_to_select1_s": 0.08500751199972001,
+            "first_real_query_s": 0.0019429590001891484
+          },
+          {
+            "mint_to_select1_s": 0.08970680399943376,
+            "first_real_query_s": 0.002916067000114708
+          }
+        ],
+        "mint_to_select1_ms_median": 90.18669899978704,
+        "first_real_query_ms_median": 2.1822310000061407,
+        "logical_bytes_per_clone": 19644943,
+        "physical_bytes_per_clone": 3878912.0
+      },
+      "writes_insert": [
+        {
+          "inserted_mb_nominal": 1,
+          "cumulative_nominal_mb": 1,
+          "insert_s": 0.1896869690008316,
+          "cumulative_logical_growth_bytes": 1187840,
+          "cumulative_physical_growth_bytes": 8040448
+        },
+        {
+          "inserted_mb_nominal": 10,
+          "cumulative_nominal_mb": 11,
+          "insert_s": 1.5402466249997815,
+          "cumulative_logical_growth_bytes": 12959744,
+          "cumulative_physical_growth_bytes": 77611008
+        },
+        {
+          "inserted_mb_nominal": 100,
+          "cumulative_nominal_mb": 111,
+          "insert_s": 19.72287495100045,
+          "cumulative_logical_growth_bytes": 129884160,
+          "cumulative_physical_growth_bytes": 191343616
+        }
+      ],
+      "write_update_one_table": {
+        "table_total_bytes_before": 204800,
+        "logical_growth_bytes": 81920,
+        "physical_growth_bytes": 1183744
+      },
+      "delete": {
+        "count": 4,
+        "drop_ms_median": 35.89154649989723,
+        "physical_bytes_returned_per_clone": -126976.0
+      }
+    },
+    {
+      "method": "clone",
+      "target_mb": 15,
+      "template": {
+        "tables": 50,
+        "rows_per_table": 489,
+        "logical_bytes": 19644943,
+        "build_s": 1.6547716960003527,
+        "seal_s": 0.294898240999828
+      },
+      "clone": {
+        "count": 5,
+        "samples": [
+          {
+            "mint_to_select1_s": 0.07945185300013691,
+            "first_real_query_s": 0.0067907529992226046
+          },
+          {
+            "mint_to_select1_s": 0.06466633699983504,
+            "first_real_query_s": 0.0024158959995475016
+          },
+          {
+            "mint_to_select1_s": 0.09149998000066262,
+            "first_real_query_s": 0.002827721999892674
+          },
+          {
+            "mint_to_select1_s": 0.06943042599959881,
+            "first_real_query_s": 0.0025548430003254907
+          },
+          {
+            "mint_to_select1_s": 0.07018016900019575,
+            "first_real_query_s": 0.003169528999933391
+          }
+        ],
+        "mint_to_select1_ms_median": 70.18016900019575,
+        "first_real_query_ms_median": 2.827721999892674,
+        "logical_bytes_per_clone": 19644943,
+        "physical_bytes_per_clone": -107733811.2
+      },
+      "writes_insert": [
+        {
+          "inserted_mb_nominal": 1,
+          "cumulative_nominal_mb": 1,
+          "insert_s": 0.1442686149994188,
+          "cumulative_logical_growth_bytes": 1187840,
+          "cumulative_physical_growth_bytes": 8138752
+        },
+        {
+          "inserted_mb_nominal": 10,
+          "cumulative_nominal_mb": 11,
+          "insert_s": 1.4385568309999144,
+          "cumulative_logical_growth_bytes": 12959744,
+          "cumulative_physical_growth_bytes": 77864960
+        },
+        {
+          "inserted_mb_nominal": 100,
+          "cumulative_nominal_mb": 111,
+          "insert_s": 20.10610982899925,
+          "cumulative_logical_growth_bytes": 129884160,
+          "cumulative_physical_growth_bytes": 192330752
+        }
+      ],
+      "write_update_one_table": {
+        "table_total_bytes_before": 204800,
+        "logical_growth_bytes": 81920,
+        "physical_growth_bytes": 1282048
+      },
+      "delete": {
+        "count": 4,
+        "drop_ms_median": 32.56926900030521,
+        "physical_bytes_returned_per_clone": -192512.0
+      }
+    },
+    {
+      "method": "copy",
+      "target_mb": 100,
+      "template": {
+        "tables": 50,
+        "rows_per_table": 6431,
+        "logical_bytes": 77971983,
+        "build_s": 13.593805548000091,
+        "seal_s": 1.119241184999737
+      },
+      "clone": {
+        "count": 5,
+        "samples": [
+          {
+            "mint_to_select1_s": 0.16713229599918122,
+            "first_real_query_s": 0.006187477000821673
+          },
+          {
+            "mint_to_select1_s": 0.19421582100039814,
+            "first_real_query_s": 0.003432474999499391
+          },
+          {
+            "mint_to_select1_s": 0.18513506900035281,
+            "first_real_query_s": 0.004625554000085685
+          },
+          {
+            "mint_to_select1_s": 0.15746897400003945,
+            "first_real_query_s": 0.0024177199993573595
+          },
+          {
+            "mint_to_select1_s": 0.16982345999986137,
+            "first_real_query_s": 0.002543946000514552
+          }
+        ],
+        "mint_to_select1_ms_median": 169.82345999986137,
+        "first_real_query_ms_median": 3.432474999499391,
+        "logical_bytes_per_clone": 77971983,
+        "physical_bytes_per_clone": 42895769.6
+      },
+      "writes_insert": [
+        {
+          "inserted_mb_nominal": 1,
+          "cumulative_nominal_mb": 1,
+          "insert_s": 0.16248438999991777,
+          "cumulative_logical_growth_bytes": 1196032,
+          "cumulative_physical_growth_bytes": 1875968
+        },
+        {
+          "inserted_mb_nominal": 10,
+          "cumulative_nominal_mb": 11,
+          "insert_s": 1.5523697850003373,
+          "cumulative_logical_growth_bytes": 12967936,
+          "cumulative_physical_growth_bytes": 75441152
+        },
+        {
+          "inserted_mb_nominal": 100,
+          "cumulative_nominal_mb": 111,
+          "insert_s": 20.46433301399975,
+          "cumulative_logical_growth_bytes": 129859584,
+          "cumulative_physical_growth_bytes": 152626176
+        }
+      ],
+      "write_update_one_table": {
+        "table_total_bytes_before": 1376256,
+        "logical_growth_bytes": 1253376,
+        "physical_growth_bytes": 13340672
+      },
+      "delete": {
+        "count": 4,
+        "drop_ms_median": 63.024925500030804,
+        "physical_bytes_returned_per_clone": -10153984.0
+      }
+    },
+    {
+      "method": "clone",
+      "target_mb": 100,
+      "template": {
+        "tables": 50,
+        "rows_per_table": 6431,
+        "logical_bytes": 77971983,
+        "build_s": 14.105132628999854,
+        "seal_s": 1.1921648010002173
+      },
+      "clone": {
+        "count": 5,
+        "samples": [
+          {
+            "mint_to_select1_s": 0.08997346100022696,
+            "first_real_query_s": 0.0069588960004693945
+          },
+          {
+            "mint_to_select1_s": 0.07157216199993854,
+            "first_real_query_s": 0.0036215710006217705
+          },
+          {
+            "mint_to_select1_s": 0.08487226800025383,
+            "first_real_query_s": 0.0030309379999380326
+          },
+          {
+            "mint_to_select1_s": 0.07443432100080827,
+            "first_real_query_s": 0.002972549999867624
+          },
+          {
+            "mint_to_select1_s": 0.07227445900025486,
+            "first_real_query_s": 0.003262480999183026
+          }
+        ],
+        "mint_to_select1_ms_median": 74.43432100080827,
+        "first_real_query_ms_median": 3.262480999183026,
+        "logical_bytes_per_clone": 77971983,
+        "physical_bytes_per_clone": -48644915.2
+      },
+      "writes_insert": [
+        {
+          "inserted_mb_nominal": 1,
+          "cumulative_nominal_mb": 1,
+          "insert_s": 0.1718373680005243,
+          "cumulative_logical_growth_bytes": 1196032,
+          "cumulative_physical_growth_bytes": 9117696
+        },
+        {
+          "inserted_mb_nominal": 10,
+          "cumulative_nominal_mb": 11,
+          "insert_s": 1.6289854919996287,
+          "cumulative_logical_growth_bytes": 12967936,
+          "cumulative_physical_growth_bytes": 83653632
+        },
+        {
+          "inserted_mb_nominal": 100,
+          "cumulative_nominal_mb": 111,
+          "insert_s": 19.86746987799961,
+          "cumulative_logical_growth_bytes": 129859584,
+          "cumulative_physical_growth_bytes": 160769024
+        }
+      ],
+      "write_update_one_table": {
+        "table_total_bytes_before": 1376256,
+        "logical_growth_bytes": 1253376,
+        "physical_growth_bytes": 13537280
+      },
+      "delete": {
+        "count": 4,
+        "drop_ms_median": 59.16388750029,
+        "physical_bytes_returned_per_clone": -11518976.0
+      }
+    },
+    {
+      "method": "copy",
+      "target_mb": 500,
+      "template": {
+        "tables": 50,
+        "rows_per_table": 34393,
+        "logical_bytes": 355893775,
+        "build_s": 71.81044565699995,
+        "seal_s": 5.103730566000195
+      },
+      "clone": {
+        "count": 5,
+        "samples": [
+          {
+            "mint_to_select1_s": 0.5005711739995604,
+            "first_real_query_s": 0.009574345000146423
+          },
+          {
+            "mint_to_select1_s": 0.7176670810003998,
+            "first_real_query_s": 0.005608380000012403
+          },
+          {
+            "mint_to_select1_s": 0.4579093760003161,
+            "first_real_query_s": 0.006190678999701049
+          },
+          {
+            "mint_to_select1_s": 0.46063476000017545,
+            "first_real_query_s": 0.005244516999482585
+          },
+          {
+            "mint_to_select1_s": 0.476044973000171,
+            "first_real_query_s": 0.005579507999755151
+          }
+        ],
+        "mint_to_select1_ms_median": 476.044973000171,
+        "first_real_query_ms_median": 5.608380000012403,
+        "logical_bytes_per_clone": 355893775,
+        "physical_bytes_per_clone": 309223424.0
+      },
+      "writes_insert": [
+        {
+          "inserted_mb_nominal": 1,
+          "cumulative_nominal_mb": 1,
+          "insert_s": 0.19881534199976159,
+          "cumulative_logical_growth_bytes": 1220608,
+          "cumulative_physical_growth_bytes": 8949760
+        },
+        {
+          "inserted_mb_nominal": 10,
+          "cumulative_nominal_mb": 11,
+          "insert_s": 1.815521921999789,
+          "cumulative_logical_growth_bytes": 12943360,
+          "cumulative_physical_growth_bytes": 91276288
+        },
+        {
+          "inserted_mb_nominal": 100,
+          "cumulative_nominal_mb": 111,
+          "insert_s": 21.580771453000125,
+          "cumulative_logical_growth_bytes": 129310720,
+          "cumulative_physical_growth_bytes": 158384128
+        }
+      ],
+      "write_update_one_table": {
+        "table_total_bytes_before": 6955008,
+        "logical_growth_bytes": 6471680,
+        "physical_growth_bytes": 66060288
+      },
+      "delete": {
+        "count": 4,
+        "drop_ms_median": 60.74243050034056,
+        "physical_bytes_returned_per_clone": -273408.0
+      }
+    },
+    {
+      "method": "clone",
+      "target_mb": 500,
+      "template": {
+        "tables": 50,
+        "rows_per_table": 34393,
+        "logical_bytes": 355893775,
+        "build_s": 67.82430467300037,
+        "seal_s": 4.905439629999819
+      },
+      "clone": {
+        "count": 5,
+        "samples": [
+          {
+            "mint_to_select1_s": 0.12480606500048452,
+            "first_real_query_s": 0.011181119999491784
+          },
+          {
+            "mint_to_select1_s": 0.09467421999943326,
+            "first_real_query_s": 0.0049791830006142845
+          },
+          {
+            "mint_to_select1_s": 0.25045301700083655,
+            "first_real_query_s": 0.0068736299999727635
+          },
+          {
+            "mint_to_select1_s": 0.08661801300058869,
+            "first_real_query_s": 0.006370281999807048
+          },
+          {
+            "mint_to_select1_s": 0.08566046499981894,
+            "first_real_query_s": 0.0068614459996751975
+          }
+        ],
+        "mint_to_select1_ms_median": 94.67421999943326,
+        "first_real_query_ms_median": 6.8614459996751975,
+        "logical_bytes_per_clone": 355893775,
+        "physical_bytes_per_clone": -72785920.0
+      },
+      "writes_insert": [
+        {
+          "inserted_mb_nominal": 1,
+          "cumulative_nominal_mb": 1,
+          "insert_s": 0.16006357300011587,
+          "cumulative_logical_growth_bytes": 1220608,
+          "cumulative_physical_growth_bytes": 6828032
+        },
+        {
+          "inserted_mb_nominal": 10,
+          "cumulative_nominal_mb": 11,
+          "insert_s": 1.503959532999943,
+          "cumulative_logical_growth_bytes": 12943360,
+          "cumulative_physical_growth_bytes": 91870208
+        },
+        {
+          "inserted_mb_nominal": 100,
+          "cumulative_nominal_mb": 111,
+          "insert_s": 20.276787856000738,
+          "cumulative_logical_growth_bytes": 129310720,
+          "cumulative_physical_growth_bytes": 158109696
+        }
+      ],
+      "write_update_one_table": {
+        "table_total_bytes_before": 6955008,
+        "logical_growth_bytes": 6471680,
+        "physical_growth_bytes": 67170304
+      },
+      "delete": {
+        "count": 4,
+        "drop_ms_median": 57.86980250013585,
+        "physical_bytes_returned_per_clone": -414720.0
+      }
+    },
+    {
+      "method": "copy",
+      "target_mb": 1000,
+      "template": {
+        "tables": 50,
+        "rows_per_table": 69345,
+        "logical_bytes": 706798095,
+        "build_s": 133.75945393700022,
+        "seal_s": 6.305347690000417
+      },
+      "clone": {
+        "count": 5,
+        "samples": [
+          {
+            "mint_to_select1_s": 1.100816352000038,
+            "first_real_query_s": 0.013414621999800147
+          },
+          {
+            "mint_to_select1_s": 1.241839465999874,
+            "first_real_query_s": 0.014316734000203724
+          },
+          {
+            "mint_to_select1_s": 0.9024541919998228,
+            "first_real_query_s": 0.015661575000194716
+          },
+          {
+            "mint_to_select1_s": 0.843550943000082,
+            "first_real_query_s": 0.015640557999176963
+          },
+          {
+            "mint_to_select1_s": 0.840783248999287,
+            "first_real_query_s": 0.014005773000462796
+          }
+        ],
+        "mint_to_select1_ms_median": 902.4541919998228,
+        "first_real_query_ms_median": 14.316734000203724,
+        "logical_bytes_per_clone": 706798095,
+        "physical_bytes_per_clone": 671795609.6
+      },
+      "writes_insert": [
+        {
+          "inserted_mb_nominal": 1,
+          "cumulative_nominal_mb": 1,
+          "insert_s": 0.20191484200040577,
+          "cumulative_logical_growth_bytes": 1204224,
+          "cumulative_physical_growth_bytes": 7458816
+        },
+        {
+          "inserted_mb_nominal": 10,
+          "cumulative_nominal_mb": 11,
+          "insert_s": 1.6469540289999713,
+          "cumulative_logical_growth_bytes": 12918784,
+          "cumulative_physical_growth_bytes": 86459392
+        },
+        {
+          "inserted_mb_nominal": 100,
+          "cumulative_nominal_mb": 111,
+          "insert_s": 20.696796444999563,
+          "cumulative_logical_growth_bytes": 129425408,
+          "cumulative_physical_growth_bytes": 158248960
+        }
+      ],
+      "write_update_one_table": {
+        "table_total_bytes_before": 14000128,
+        "logical_growth_bytes": 12869632,
+        "physical_growth_bytes": 226242560
+      },
+      "delete": {
+        "count": 4,
+        "drop_ms_median": 62.279384499561274,
+        "physical_bytes_returned_per_clone": 23244800.0
+      }
+    },
+    {
+      "method": "clone",
+      "target_mb": 1000,
+      "template": {
+        "tables": 50,
+        "rows_per_table": 69345,
+        "logical_bytes": 706798095,
+        "build_s": 147.9755173069998,
+        "seal_s": 6.257907535999948
+      },
+      "clone": {
+        "count": 5,
+        "samples": [
+          {
+            "mint_to_select1_s": 0.16361120199962897,
+            "first_real_query_s": 0.02048008000019763
+          },
+          {
+            "mint_to_select1_s": 0.1464489230002073,
+            "first_real_query_s": 0.011416049000217754
+          },
+          {
+            "mint_to_select1_s": 0.120912092999788,
+            "first_real_query_s": 0.009488899000643869
+          },
+          {
+            "mint_to_select1_s": 0.11466380000001664,
+            "first_real_query_s": 0.010609484000269731
+          },
+          {
+            "mint_to_select1_s": 0.12494805400001496,
+            "first_real_query_s": 0.01088644999981625
+          }
+        ],
+        "mint_to_select1_ms_median": 124.94805400001496,
+        "first_real_query_ms_median": 10.88644999981625,
+        "logical_bytes_per_clone": 706798095,
+        "physical_bytes_per_clone": -28184576.0
+      },
+      "writes_insert": [
+        {
+          "inserted_mb_nominal": 1,
+          "cumulative_nominal_mb": 1,
+          "insert_s": 0.17685975099993811,
+          "cumulative_logical_growth_bytes": 1204224,
+          "cumulative_physical_growth_bytes": 9379840
+        },
+        {
+          "inserted_mb_nominal": 10,
+          "cumulative_nominal_mb": 11,
+          "insert_s": 1.7658045210000637,
+          "cumulative_logical_growth_bytes": 12918784,
+          "cumulative_physical_growth_bytes": 77403136
+        },
+        {
+          "inserted_mb_nominal": 100,
+          "cumulative_nominal_mb": 111,
+          "insert_s": 22.304017456999645,
+          "cumulative_logical_growth_bytes": 129425408,
+          "cumulative_physical_growth_bytes": 160542720
+        }
+      ],
+      "write_update_one_table": {
+        "table_total_bytes_before": 14000128,
+        "logical_growth_bytes": 12869632,
+        "physical_growth_bytes": 123146240
+      },
+      "delete": {
+        "count": 4,
+        "drop_ms_median": 76.80030600022292,
+        "physical_bytes_returned_per_clone": -7051264.0
+      }
+    }
+  ]
+}

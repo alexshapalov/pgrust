@@ -86,6 +86,9 @@ changed limit takes effect within about a second of the reload.
   runtime limit sees it) but not in any session or database. The PGX profile
   turns the runtime off.
 - **A hard guarantee against the operating system's out-of-memory killer.**
+  (Linux, measured: with `runtime_memory_limit=700` inside a 1 GiB cgroup
+  the query fails with 53200 at a 674 MB cgroup peak; with no limit the
+  kernel kills the whole runtime. See `linux-results.md`.)
   These are budgets on the largest and most variable part of memory, not a
   cgroup. A cgroup limit around the runtime is still the backstop, and
   `pgrust.runtime_memory_limit` should be set below it.

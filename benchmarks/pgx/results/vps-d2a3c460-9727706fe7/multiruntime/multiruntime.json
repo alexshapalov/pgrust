@@ -1,0 +1,220 @@
+{
+  "benchmark": "multiruntime",
+  "git_commit": "9727706fe7e821e5187da635538952b29a2b5d44",
+  "conf": "/home/ubuntu/pgrust/configs/pgx-ephemeral.conf",
+  "template": {
+    "tables": 50,
+    "rows_per_table": 200
+  },
+  "layouts": [
+    {
+      "layout": "1x1000",
+      "runtimes": 1,
+      "databases_per_runtime": 1000,
+      "aborted_on_memory": false,
+      "mint_errors": 0,
+      "mint_error_examples": [],
+      "mint_ms": {
+        "n": 1000000.0,
+        "min": 57.6,
+        "p50": 71.7,
+        "p95": 87.1,
+        "p99": 96.4,
+        "max": 350.2,
+        "mean": 72.9
+      },
+      "mint_wall_s": 73.0,
+      "base_pss_mb_total": 92.5,
+      "base_pss_mb_per_runtime": [
+        92.5
+      ],
+      "idle_pss_mb_total": 719.4,
+      "idle_rss_mb_total": 723.3,
+      "idle_pss_mb_per_runtime": [
+        719.4
+      ],
+      "threads_total": 8,
+      "fds_total": 40,
+      "idle_cpu_percent_of_one_core": 5.281,
+      "host_mem_available_mb": 5575,
+      "active": [
+        {
+          "active": 20,
+          "queries": 36343,
+          "errors": 0,
+          "error_examples": [],
+          "latency_ms": {
+            "n": 36343000.0,
+            "min": 0.41,
+            "p50": 0.65,
+            "p95": 1.63,
+            "p99": 2.45,
+            "max": 46.09,
+            "mean": 0.82
+          },
+          "pss_mb_total": 847.7,
+          "cpu_percent_of_one_core": 99.2
+        },
+        {
+          "active": 50,
+          "queries": 76540,
+          "errors": 0,
+          "error_examples": [],
+          "latency_ms": {
+            "n": 76540000.0,
+            "min": 0.4,
+            "p50": 1.67,
+            "p95": 7.93,
+            "p99": 13.13,
+            "max": 107.67,
+            "mean": 2.57
+          },
+          "pss_mb_total": 1014.1,
+          "cpu_percent_of_one_core": 206.9
+        }
+      ]
+    },
+    {
+      "layout": "2x500",
+      "runtimes": 2,
+      "databases_per_runtime": 500,
+      "aborted_on_memory": false,
+      "mint_errors": 0,
+      "mint_error_examples": [],
+      "mint_ms": {
+        "n": 1000000.0,
+        "min": 64.6,
+        "p50": 77.5,
+        "p95": 98.7,
+        "p99": 116.0,
+        "max": 149.7,
+        "mean": 80.2
+      },
+      "mint_wall_s": 40.3,
+      "base_pss_mb_total": 166.6,
+      "base_pss_mb_per_runtime": [
+        81.9,
+        84.6
+      ],
+      "idle_pss_mb_total": 839.9,
+      "idle_rss_mb_total": 880.9,
+      "idle_pss_mb_per_runtime": [
+        434.1,
+        405.7
+      ],
+      "threads_total": 17,
+      "fds_total": 94,
+      "idle_cpu_percent_of_one_core": 9.36,
+      "host_mem_available_mb": 5283,
+      "active": [
+        {
+          "active": 20,
+          "queries": 36327,
+          "errors": 0,
+          "error_examples": [],
+          "latency_ms": {
+            "n": 36327000.0,
+            "min": 0.41,
+            "p50": 0.65,
+            "p95": 1.64,
+            "p99": 2.56,
+            "max": 59.23,
+            "mean": 0.82
+          },
+          "pss_mb_total": 985.1,
+          "cpu_percent_of_one_core": 102.0
+        },
+        {
+          "active": 50,
+          "queries": 76890,
+          "errors": 0,
+          "error_examples": [],
+          "latency_ms": {
+            "n": 76890000.0,
+            "min": 0.42,
+            "p50": 1.65,
+            "p95": 7.72,
+            "p99": 13.05,
+            "max": 127.11,
+            "mean": 2.51
+          },
+          "pss_mb_total": 1129.7,
+          "cpu_percent_of_one_core": 212.6
+        }
+      ]
+    },
+    {
+      "layout": "4x250",
+      "runtimes": 4,
+      "databases_per_runtime": 250,
+      "aborted_on_memory": false,
+      "mint_errors": 0,
+      "mint_error_examples": [],
+      "mint_ms": {
+        "n": 1000000.0,
+        "min": 68.7,
+        "p50": 101.7,
+        "p95": 160.2,
+        "p99": 197.0,
+        "max": 224.2,
+        "mean": 107.9
+      },
+      "mint_wall_s": 27.5,
+      "base_pss_mb_total": 289.2,
+      "base_pss_mb_per_runtime": [
+        70.3,
+        75.1,
+        70.1,
+        73.7
+      ],
+      "idle_pss_mb_total": 1022.6,
+      "idle_rss_mb_total": 1141.2,
+      "idle_pss_mb_per_runtime": [
+        261.4,
+        257.3,
+        253.1,
+        250.9
+      ],
+      "threads_total": 32,
+      "fds_total": 168,
+      "idle_cpu_percent_of_one_core": 11.169,
+      "host_mem_available_mb": 4836,
+      "active": [
+        {
+          "active": 20,
+          "queries": 36276,
+          "errors": 0,
+          "error_examples": [],
+          "latency_ms": {
+            "n": 36276000.0,
+            "min": 0.4,
+            "p50": 0.65,
+            "p95": 1.62,
+            "p99": 2.48,
+            "max": 56.9,
+            "mean": 0.82
+          },
+          "pss_mb_total": 1139.9,
+          "cpu_percent_of_one_core": 103.1
+        },
+        {
+          "active": 50,
+          "queries": 75877,
+          "errors": 0,
+          "error_examples": [],
+          "latency_ms": {
+            "n": 75877000.0,
+            "min": 0.42,
+            "p50": 1.7,
+            "p95": 8.34,
+            "p99": 13.94,
+            "max": 163.24,
+            "mean": 2.64
+          },
+          "pss_mb_total": 1285.9,
+          "cpu_percent_of_one_core": 214.2
+        }
+      ]
+    }
+  ]
+}

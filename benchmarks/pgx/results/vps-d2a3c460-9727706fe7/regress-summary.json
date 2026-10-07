@@ -1,0 +1,11 @@
+{
+  "scheduled": 231,
+  "reported": 231,
+  "byte_exact_pass": 219,
+  "order_only_diff": 0,
+  "real_diff": 12,
+  "not_reported": [],
+  "pg_regress_exit_code": 1,
+  "server_died_during_run": false,
+  "elapsed_s": 31.6
+}

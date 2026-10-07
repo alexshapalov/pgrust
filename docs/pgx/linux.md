@@ -1,8 +1,9 @@
 # Running the PGX benchmarks on Linux / ZFS
 
-Status: the suite is ported and runs end to end on Ubuntu 26.04. It has
-**not yet been run on a PGRun branch host**; that is waiting on a decision
-(below). No Linux numbers in this repository should be read as results.
+Status: the suite has been run on a dedicated 4 vCPU / 8 GB OVH VPS with a
+real ZFS pool on its own partition. Results and the answers to the open
+questions: `linux-results.md`. The section on the branch host below is the
+earlier inspection, kept for reference; nothing was run there.
 
 ## What exists
 
@@ -16,6 +17,12 @@ Status: the suite is ported and runs end to end on Ubuntu 26.04. It has
   session memory limit), scale and warm-pool into
   `benchmarks/pgx/results/<hostname>-<sha>/`. `PGXBENCH_WORKDIR` selects the
   filesystem under test. Defaults are sized for 4 CPUs and 8 GB.
+- `benchmarks/pgx/linux/limits.py` — session/database/runtime memory limits
+  with bystander checks; `--mode cgroup` starts each server in its own
+  systemd scope with a hard `memory.max` (needs passwordless sudo).
+- `benchmarks/pgx/linux/multiruntime.py` — 1×1000 vs 2×500 vs 4×250.
+- `benchmarks/pgx/linux/cpu-noisy.py` — quiet database latency with 0…N
+  CPU-bound neighbours.
 - `benchmarks/pgx/linux/memory-breakdown.py` — idle memory by Linux-native
   metrics (PSS split into anonymous / file / shared, huge pages, and PSS by
   kind of mapping) for PostgreSQL, PgRust defaults, each profile setting

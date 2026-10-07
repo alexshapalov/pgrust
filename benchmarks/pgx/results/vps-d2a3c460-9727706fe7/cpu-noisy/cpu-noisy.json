@@ -1,0 +1,162 @@
+{
+  "benchmark": "cpu-noisy",
+  "git_commit": "9727706fe7e821e5187da635538952b29a2b5d44",
+  "settings": [
+    "max_connections=50",
+    "statement_timeout=0"
+  ],
+  "cpus": 4,
+  "noisy_sql": "SELECT sum((g::bigint * g) % 7) FROM generate_series(1, 20000000) g",
+  "levels": [
+    {
+      "noisy_clients": 0,
+      "quiet_latency_ms": {
+        "n": 5245,
+        "min": 0.4,
+        "p50": 0.58,
+        "p95": 0.87,
+        "p99": 1.14,
+        "max": 13.89,
+        "mean": 0.62
+      },
+      "quiet_errors": 0,
+      "quiet_error_examples": [],
+      "new_connection_ms": {
+        "n": 119,
+        "min": 3.0,
+        "p50": 3.84,
+        "p95": 5.0,
+        "p99": 5.8,
+        "max": 8.66,
+        "mean": 3.97
+      },
+      "new_connection_errors": 0,
+      "host_cpu_busy_percent": 3.8,
+      "server_cpu_percent_of_one_core": 9.3,
+      "load1": 0.59,
+      "noisy_queries_completed": 0,
+      "noisy_errors": [],
+      "pss_mb": 117.4
+    },
+    {
+      "noisy_clients": 1,
+      "quiet_latency_ms": {
+        "n": 5214,
+        "min": 0.38,
+        "p50": 0.56,
+        "p95": 0.83,
+        "p99": 2.06,
+        "max": 80.95,
+        "mean": 0.64
+      },
+      "quiet_errors": 0,
+      "quiet_error_examples": [],
+      "new_connection_ms": {
+        "n": 119,
+        "min": 2.99,
+        "p50": 3.77,
+        "p95": 5.0,
+        "p99": 8.93,
+        "max": 9.77,
+        "mean": 3.92
+      },
+      "new_connection_errors": 0,
+      "host_cpu_busy_percent": 30.5,
+      "server_cpu_percent_of_one_core": 107.5,
+      "load1": 0.87,
+      "noisy_queries_completed": 6,
+      "noisy_errors": [],
+      "pss_mb": 144.0
+    },
+    {
+      "noisy_clients": 2,
+      "quiet_latency_ms": {
+        "n": 5144,
+        "min": 0.35,
+        "p50": 0.53,
+        "p95": 0.88,
+        "p99": 2.95,
+        "max": 68.13,
+        "mean": 0.7
+      },
+      "quiet_errors": 0,
+      "quiet_error_examples": [],
+      "new_connection_ms": {
+        "n": 118,
+        "min": 3.12,
+        "p50": 3.89,
+        "p95": 8.28,
+        "p99": 17.76,
+        "max": 50.61,
+        "mean": 4.78
+      },
+      "new_connection_errors": 0,
+      "host_cpu_busy_percent": 55.5,
+      "server_cpu_percent_of_one_core": 202.5,
+      "load1": 1.35,
+      "noisy_queries_completed": 12,
+      "noisy_errors": [],
+      "pss_mb": 149.3
+    },
+    {
+      "noisy_clients": 4,
+      "quiet_latency_ms": {
+        "n": 4683,
+        "min": 0.35,
+        "p50": 0.59,
+        "p95": 3.41,
+        "p99": 6.22,
+        "max": 78.16,
+        "mean": 1.15
+      },
+      "quiet_errors": 0,
+      "quiet_error_examples": [],
+      "new_connection_ms": {
+        "n": 117,
+        "min": 3.15,
+        "p50": 7.67,
+        "p95": 13.42,
+        "p99": 21.14,
+        "max": 26.12,
+        "mean": 8.17
+      },
+      "new_connection_errors": 0,
+      "host_cpu_busy_percent": 99.3,
+      "server_cpu_percent_of_one_core": 368.9,
+      "load1": 3.09,
+      "noisy_queries_completed": 24,
+      "noisy_errors": [],
+      "pss_mb": 154.9
+    },
+    {
+      "noisy_clients": 6,
+      "quiet_latency_ms": {
+        "n": 4248,
+        "min": 0.37,
+        "p50": 0.9,
+        "p95": 4.89,
+        "p99": 8.33,
+        "max": 36.44,
+        "mean": 1.77
+      },
+      "quiet_errors": 0,
+      "quiet_error_examples": [],
+      "new_connection_ms": {
+        "n": 116,
+        "min": 4.17,
+        "p50": 8.09,
+        "p95": 15.9,
+        "p99": 26.8,
+        "max": 45.97,
+        "mean": 9.25
+      },
+      "new_connection_errors": 0,
+      "host_cpu_busy_percent": 99.5,
+      "server_cpu_percent_of_one_core": 370.9,
+      "load1": 5.08,
+      "noisy_queries_completed": 23,
+      "noisy_errors": [],
+      "pss_mb": 167.0
+    }
+  ]
+}

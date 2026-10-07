@@ -1,0 +1,346 @@
+{
+  "benchmark": "conns",
+  "engine": "pgrust",
+  "git_commit": "9727706fe7e821e5187da635538952b29a2b5d44",
+  "load_average_at_end": [
+    7.65380859375,
+    1.919921875,
+    0.8759765625
+  ],
+  "system_cpu_idle_percent_at_end": 99.75,
+  "recorded_at_utc": "2026-10-07T07:41:42+00:00",
+  "definition": "fresh server per measurement; N connections opened over a Unix socket, each runs SELECT 1 and stays idle; memory sampled after settle_s. per_connection_bytes = (median at N - median at lowest N) / delta N using pss_bytes_sum",
+  "settle_s": 5.0,
+  "iterations": 3,
+  "summary": {
+    "0": {
+      "rss_bytes_sum_median": 208793600.0,
+      "pss_bytes_sum_median": 204910592.0,
+      "process_count": 1,
+      "thread_count": 30
+    },
+    "1": {
+      "rss_bytes_sum_median": 213659648.0,
+      "pss_bytes_sum_median": 209922048.0,
+      "process_count": 1,
+      "thread_count": 31,
+      "per_connection_bytes": 5011456.0
+    },
+    "10": {
+      "rss_bytes_sum_median": 271409152.0,
+      "pss_bytes_sum_median": 267503616.0,
+      "process_count": 1,
+      "thread_count": 40,
+      "per_connection_bytes": 6259302.4
+    },
+    "100": {
+      "rss_bytes_sum_median": 834588672.0,
+      "pss_bytes_sum_median": 830710784.0,
+      "process_count": 1,
+      "thread_count": 130,
+      "per_connection_bytes": 6258001.92
+    }
+  },
+  "samples": [
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 46754,
+          "rss_bytes": 210960384,
+          "pss_bytes": 207053824,
+          "cpu_user_ns": 30000000,
+          "cpu_system_ns": 80000000,
+          "idle_wakeups": 19,
+          "disk_read_bytes": 540672,
+          "disk_written_bytes": 210362
+        }
+      ],
+      "thread_count": 30,
+      "rss_bytes_sum": 210960384,
+      "pss_bytes_sum": 207053824,
+      "cpu_user_ns_sum": 30000000,
+      "cpu_system_ns_sum": 80000000,
+      "idle_wakeups_sum": 19,
+      "disk_read_bytes_sum": 540672,
+      "disk_written_bytes_sum": 210362,
+      "connections": 0,
+      "repetition": 0
+    },
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 46806,
+          "rss_bytes": 207806464,
+          "pss_bytes": 203908096,
+          "cpu_user_ns": 40000000,
+          "cpu_system_ns": 80000000,
+          "idle_wakeups": 25,
+          "disk_read_bytes": 573440,
+          "disk_written_bytes": 210362
+        }
+      ],
+      "thread_count": 31,
+      "rss_bytes_sum": 207806464,
+      "pss_bytes_sum": 203908096,
+      "cpu_user_ns_sum": 40000000,
+      "cpu_system_ns_sum": 80000000,
+      "idle_wakeups_sum": 25,
+      "disk_read_bytes_sum": 573440,
+      "disk_written_bytes_sum": 210362,
+      "connections": 1,
+      "repetition": 0
+    },
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 46920,
+          "rss_bytes": 273190912,
+          "pss_bytes": 269388800,
+          "cpu_user_ns": 60000000,
+          "cpu_system_ns": 120000000,
+          "idle_wakeups": 27,
+          "disk_read_bytes": 540672,
+          "disk_written_bytes": 210362
+        }
+      ],
+      "thread_count": 40,
+      "rss_bytes_sum": 273190912,
+      "pss_bytes_sum": 269388800,
+      "cpu_user_ns_sum": 60000000,
+      "cpu_system_ns_sum": 120000000,
+      "idle_wakeups_sum": 27,
+      "disk_read_bytes_sum": 540672,
+      "disk_written_bytes_sum": 210362,
+      "connections": 10,
+      "repetition": 0
+    },
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 46982,
+          "rss_bytes": 829153280,
+          "pss_bytes": 825245696,
+          "cpu_user_ns": 200000000,
+          "cpu_system_ns": 490000000,
+          "idle_wakeups": 127,
+          "disk_read_bytes": 540672,
+          "disk_written_bytes": 210518
+        }
+      ],
+      "thread_count": 130,
+      "rss_bytes_sum": 829153280,
+      "pss_bytes_sum": 825245696,
+      "cpu_user_ns_sum": 200000000,
+      "cpu_system_ns_sum": 490000000,
+      "idle_wakeups_sum": 127,
+      "disk_read_bytes_sum": 540672,
+      "disk_written_bytes_sum": 210518,
+      "connections": 100,
+      "repetition": 0
+    },
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 47150,
+          "rss_bytes": 208793600,
+          "pss_bytes": 204910592,
+          "cpu_user_ns": 30000000,
+          "cpu_system_ns": 100000000,
+          "idle_wakeups": 21,
+          "disk_read_bytes": 540672,
+          "disk_written_bytes": 210440
+        }
+      ],
+      "thread_count": 30,
+      "rss_bytes_sum": 208793600,
+      "pss_bytes_sum": 204910592,
+      "cpu_user_ns_sum": 30000000,
+      "cpu_system_ns_sum": 100000000,
+      "idle_wakeups_sum": 21,
+      "disk_read_bytes_sum": 540672,
+      "disk_written_bytes_sum": 210440,
+      "connections": 0,
+      "repetition": 1
+    },
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 47203,
+          "rss_bytes": 215187456,
+          "pss_bytes": 211292160,
+          "cpu_user_ns": 50000000,
+          "cpu_system_ns": 70000000,
+          "idle_wakeups": 18,
+          "disk_read_bytes": 573440,
+          "disk_written_bytes": 210362
+        }
+      ],
+      "thread_count": 31,
+      "rss_bytes_sum": 215187456,
+      "pss_bytes_sum": 211292160,
+      "cpu_user_ns_sum": 50000000,
+      "cpu_system_ns_sum": 70000000,
+      "idle_wakeups_sum": 18,
+      "disk_read_bytes_sum": 573440,
+      "disk_written_bytes_sum": 210362,
+      "connections": 1,
+      "repetition": 1
+    },
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 47256,
+          "rss_bytes": 271409152,
+          "pss_bytes": 267503616,
+          "cpu_user_ns": 60000000,
+          "cpu_system_ns": 110000000,
+          "idle_wakeups": 31,
+          "disk_read_bytes": 540672,
+          "disk_written_bytes": 210440
+        }
+      ],
+      "thread_count": 40,
+      "rss_bytes_sum": 271409152,
+      "pss_bytes_sum": 267503616,
+      "cpu_user_ns_sum": 60000000,
+      "cpu_system_ns_sum": 110000000,
+      "idle_wakeups_sum": 31,
+      "disk_read_bytes_sum": 540672,
+      "disk_written_bytes_sum": 210440,
+      "connections": 10,
+      "repetition": 1
+    },
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 47317,
+          "rss_bytes": 834854912,
+          "pss_bytes": 830949376,
+          "cpu_user_ns": 240000000,
+          "cpu_system_ns": 470000000,
+          "idle_wakeups": 114,
+          "disk_read_bytes": 540672,
+          "disk_written_bytes": 210362
+        }
+      ],
+      "thread_count": 130,
+      "rss_bytes_sum": 834854912,
+      "pss_bytes_sum": 830949376,
+      "cpu_user_ns_sum": 240000000,
+      "cpu_system_ns_sum": 470000000,
+      "idle_wakeups_sum": 114,
+      "disk_read_bytes_sum": 540672,
+      "disk_written_bytes_sum": 210362,
+      "connections": 100,
+      "repetition": 1
+    },
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 47470,
+          "rss_bytes": 202838016,
+          "pss_bytes": 198934528,
+          "cpu_user_ns": 50000000,
+          "cpu_system_ns": 90000000,
+          "idle_wakeups": 18,
+          "disk_read_bytes": 540672,
+          "disk_written_bytes": 210440
+        }
+      ],
+      "thread_count": 30,
+      "rss_bytes_sum": 202838016,
+      "pss_bytes_sum": 198934528,
+      "cpu_user_ns_sum": 50000000,
+      "cpu_system_ns_sum": 90000000,
+      "idle_wakeups_sum": 18,
+      "disk_read_bytes_sum": 540672,
+      "disk_written_bytes_sum": 210440,
+      "connections": 0,
+      "repetition": 2
+    },
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 47523,
+          "rss_bytes": 213659648,
+          "pss_bytes": 209922048,
+          "cpu_user_ns": 50000000,
+          "cpu_system_ns": 100000000,
+          "idle_wakeups": 18,
+          "disk_read_bytes": 573440,
+          "disk_written_bytes": 210440
+        }
+      ],
+      "thread_count": 31,
+      "rss_bytes_sum": 213659648,
+      "pss_bytes_sum": 209922048,
+      "cpu_user_ns_sum": 50000000,
+      "cpu_system_ns_sum": 100000000,
+      "idle_wakeups_sum": 18,
+      "disk_read_bytes_sum": 573440,
+      "disk_written_bytes_sum": 210440,
+      "connections": 1,
+      "repetition": 2
+    },
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 47577,
+          "rss_bytes": 268247040,
+          "pss_bytes": 264358912,
+          "cpu_user_ns": 60000000,
+          "cpu_system_ns": 120000000,
+          "idle_wakeups": 34,
+          "disk_read_bytes": 540672,
+          "disk_written_bytes": 210440
+        }
+      ],
+      "thread_count": 40,
+      "rss_bytes_sum": 268247040,
+      "pss_bytes_sum": 264358912,
+      "cpu_user_ns_sum": 60000000,
+      "cpu_system_ns_sum": 120000000,
+      "idle_wakeups_sum": 34,
+      "disk_read_bytes_sum": 540672,
+      "disk_written_bytes_sum": 210440,
+      "connections": 10,
+      "repetition": 2
+    },
+    {
+      "process_count": 1,
+      "processes": [
+        {
+          "pid": 47640,
+          "rss_bytes": 834588672,
+          "pss_bytes": 830710784,
+          "cpu_user_ns": 220000000,
+          "cpu_system_ns": 480000000,
+          "idle_wakeups": 121,
+          "disk_read_bytes": 540672,
+          "disk_written_bytes": 210362
+        }
+      ],
+      "thread_count": 130,
+      "rss_bytes_sum": 834588672,
+      "pss_bytes_sum": 830710784,
+      "cpu_user_ns_sum": 220000000,
+      "cpu_system_ns_sum": 480000000,
+      "idle_wakeups_sum": 121,
+      "disk_read_bytes_sum": 540672,
+      "disk_written_bytes_sum": 210362,
+      "connections": 100,
+      "repetition": 2
+    }
+  ]
+}

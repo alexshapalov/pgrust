@@ -124,5 +124,7 @@ restarts are cheap.
 - Whether the session-root leak per *connection* (as opposed to per database
   lifecycle) matches the per-thread estimate; no connection-only churn test
   was run.
-- Linux behaviour. The tracker and the footprint metric used here are
-  macOS-specific in practice; the fixes are platform-independent.
+- ~~Linux behaviour.~~ Measured since (`linux-results.md`): on Linux/ZFS
+  the same test gives ~11 KB per lifecycle (85 → 262 MB over 10,000) once
+  transparent huge pages are off for the process; with mimalloc's default
+  THP behaviour it was ~18 KB.
