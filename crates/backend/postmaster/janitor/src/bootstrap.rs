@@ -140,6 +140,18 @@ fn claim(db: Oid) -> Claim {
     Claim::Claimed
 }
 
+/// Forget backfill state for databases that no longer exist (`live` is
+/// every database oid, from the reap tick's catalog scan). An in-flight
+/// claim is kept: its session settles it.
+pub(crate) fn retain_backfilled(live: &[Oid]) {
+    let mut g = BACKFILL.lock().unwrap_or_else(|e| e.into_inner());
+    if g.done.is_empty() {
+        return;
+    }
+    let live: std::collections::HashSet<Oid> = live.iter().copied().collect();
+    g.done.retain(|o| live.contains(o));
+}
+
 fn settle(db: Oid, done: bool) {
     let mut g = BACKFILL.lock().unwrap_or_else(|e| e.into_inner());
     g.inflight.retain(|&o| o != db);

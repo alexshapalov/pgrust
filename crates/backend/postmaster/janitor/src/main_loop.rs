@@ -326,6 +326,10 @@ fn reap_pass(prefix: &str, streaks: &mut StreakTracker) -> PgResult<()> {
     // per rebuild until marking silently stops at the table bound and
     // every batch re-pays the pre-checkpoint).
     registry::retain_template_flush_marks(&all_oids);
+    // Same hygiene for the builtin-backfill bookkeeping: one oid per
+    // database ever connected, never removed on DROP, so it grew with every
+    // ephemeral database lifecycle.
+    crate::bootstrap::retain_backfilled(&all_oids);
     let own = g::MyDatabaseId();
     let default_grace_secs = crate::ephemeral_db_grace_secs().max(0) as u64;
     // The one monotonic authority (determinism choke; never std::time).
