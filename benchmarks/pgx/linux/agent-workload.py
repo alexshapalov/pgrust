@@ -48,6 +48,7 @@ PREFIX = "tdb_"
 
 
 def pool_alloc():
+    subprocess.run(["sudo", "-n", "zpool", "sync", "tank"], capture_output=True)
     out = subprocess.run(["zpool", "list", "-Hp", "-o", "allocated", "tank"], capture_output=True, text=True).stdout.strip()
     return int(out) if out.isdigit() else None
 
@@ -63,8 +64,7 @@ def gen_django_project(root, models, tests):
 SECRET_KEY = "bench"
 DEBUG = False
 USE_TZ = True
-INSTALLED_APPS = ["django.contrib.auth", "django.contrib.contenttypes", "django.contrib.admin",
-                  "django.contrib.sessions", "django.contrib.messages", "app"]
+INSTALLED_APPS = ["django.contrib.auth", "django.contrib.contenttypes", "django.contrib.sessions", "app"]
 DATABASES = {"default": {"ENGINE": "django.db.backends.postgresql", "NAME": os.environ["BENCH_DB"],
              "USER": "postgres", "HOST": os.environ["BENCH_HOST"], "PORT": os.environ["BENCH_PORT"],
              "TEST": {"NAME": "test_" + os.environ["BENCH_DB"]}}}
@@ -178,7 +178,7 @@ RAILS_SQL = [
     "INSERT INTO \"tasks\" (\"project_id\", \"title\", \"position\", \"created_at\", \"updated_at\") SELECT p.id, 't' || g, g, now(), now() FROM projects p, generate_series(1, 200) g",
     "SELECT COUNT(*) FROM \"tasks\" WHERE \"tasks\".\"project_id\" IN (SELECT id FROM projects) AND \"tasks\".\"done\" = FALSE",
     "SAVEPOINT active_record_2",
-    "INSERT INTO \"users\" (\"email\", \"created_at\", \"updated_at\") VALUES ('a@x.io', now(), now())",
+    "EXPECT-ERROR:INSERT INTO \"users\" (\"email\", \"created_at\", \"updated_at\") VALUES ('a@x.io', now(), now())",
     "ROLLBACK TO SAVEPOINT active_record_2",
     "ROLLBACK",
     "SELECT pg_advisory_unlock(7123456789)",
@@ -272,7 +272,15 @@ def one_engine(args, label, engine_key, port):
                     t1 = time.perf_counter()
                     try:
                         for sql in RAILS_SQL:
-                            c.query(sql)
+                            if sql.startswith("EXPECT-ERROR:"):
+                                try:
+                                    c.query(sql[len("EXPECT-ERROR:"):])
+                                    raise RuntimeError("expected a unique violation: " + sql)
+                                except pb.ServerNotReady as e:
+                                    if "23505" not in str(e):
+                                        raise
+                            else:
+                                c.query(sql)
                     except Exception as e:  # noqa: BLE001
                         rec.update(ok=False, failed_phase="sql", output_tail=str(e)[:600])
                     rec["phases"]["schema_load_migrate_test_s"] = round(time.perf_counter() - t1, 3)
