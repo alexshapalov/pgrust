@@ -61,7 +61,8 @@ use types_rel::RowExclusiveLock;
 use types_tuple::NameData;
 
 use crate::builtins::{
-    PGRUST_PIN_DATABASE_FOID, PGRUST_SEAL_TEMPLATE_FOID, PGRUST_UNPIN_DATABASE_FOID,
+    PGRUST_PIN_DATABASE_FOID, PGRUST_RUNTIME_STATUS_FOID, PGRUST_SEAL_TEMPLATE_FOID,
+    PGRUST_UNPIN_DATABASE_FOID,
 };
 
 /// One builtin's pg_proc row description; `descr` is its pg_description
@@ -102,6 +103,14 @@ const BUILTIN_ROWS: &[BuiltinRow] = &[
         argtypes: &[TEXTOID],
         argnames: &["dbname"],
         descr: "freeze-vacuum a database and seal it as a template via the janitor",
+    },
+    BuiltinRow {
+        foid: PGRUST_RUNTIME_STATUS_FOID,
+        name: "pgrust_runtime_status",
+        rettype: TEXTOID,
+        argtypes: &[],
+        argnames: &[],
+        descr: "runtime memory, database, connection and janitor status as a JSON object",
     },
 ];
 

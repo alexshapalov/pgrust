@@ -32,6 +32,7 @@ use crate::registry;
 pub const PGRUST_PIN_DATABASE_FOID: Oid = 9001;
 pub const PGRUST_UNPIN_DATABASE_FOID: Oid = 9002;
 pub const PGRUST_SEAL_TEMPLATE_FOID: Oid = 9005;
+pub const PGRUST_RUNTIME_STATUS_FOID: Oid = 9006;
 
 /// Decode the text arg of a STRICT single-arg builtin into an owned name.
 fn text_arg0(fcinfo: &mut Fcinfo) -> PgResult<String> {
@@ -184,6 +185,88 @@ pub fn fc_pgrust_seal_template(
 }
 
 /// The extra-builtin table seams_init appends to EXTRA_BUILTINS.
+
+/// `pgrust_runtime_status()` -> text (a JSON object): the runtime facts a
+/// control plane needs without parsing logs or shelling into the host.
+/// Superuser only. Cheap: one pg_database scan, one procarray pass, two
+/// /proc reads. Field names are a stable interface (docs/pgx/pgrun-interface.md);
+/// add fields, do not rename them.
+pub fn fc_pgrust_runtime_status(
+    _flinfo: Option<&mut FmgrInfo>,
+    fcinfo: &mut Fcinfo,
+) -> PgResult<Datum> {
+    if !superuser_seams::superuser::call()? {
+        return Err(ereport(ERROR)
+            .errcode(ERRCODE_INSUFFICIENT_PRIVILEGE)
+            .errmsg("must be superuser to call pgrust_runtime_status".to_string())
+            .into_error()
+            .into());
+    }
+    let prefix = crate::ephemeral_db_prefix();
+    let mut all: Vec<Oid> = Vec::new();
+    let rows = if prefix.is_empty() {
+        Vec::new()
+    } else {
+        crate::dbscan::scan_prefix_rows_collect(&prefix, Some(&mut all))?
+    };
+    let spare_prefix = format!("{prefix}spare_");
+    let ephemeral = rows.iter().filter(|r| !r.istemplate && !r.name.starts_with(&spare_prefix)).count();
+    let spares = rows.iter().filter(|r| r.name.starts_with(&spare_prefix)).count();
+    let connections = procarray::CountDBConnections(types_core::InvalidOid)?;
+    let (vm_rss_kb, threads) = proc_status();
+    let pss_kb = proc_pss_kb();
+    let (retired_pending, retired_reclaimed) = mcx::retired_session_root_counts();
+    let json = format!(
+        concat!(
+            "{{\"pid\":{pid},",
+            "\"memory\":{{\"rss_bytes\":{rss},\"pss_bytes\":{pss},\"context_bytes\":{ctx},",
+            "\"session_limit_mb\":{sl},\"database_limit_mb\":{dl},\"runtime_limit_mb\":{rl},",
+            "\"retired_session_roots_pending\":{rp},\"retired_session_roots_reclaimed\":{rr}}},",
+            "\"threads\":{thr},\"connections\":{conn},",
+            "\"databases\":{{\"total\":{dbt},\"ephemeral\":{eph},\"spares\":{spr},\"pinned\":{pin}}},",
+            "\"janitor\":{{\"prefix\":\"{pfx}\",\"pool_size\":{pool},\"pending_mints\":{pend}}}}}"
+        ),
+        pid = std::process::id(),
+        rss = vm_rss_kb.map_or("null".into(), |k| (k * 1024).to_string()),
+        pss = pss_kb.map_or("null".into(), |k| (k * 1024).to_string()),
+        ctx = mcx::global_footprint::bytes(),
+        sl = guc_tables::vars::pgrust_session_memory_limit.read(),
+        dl = guc_tables::vars::pgrust_database_memory_limit.read(),
+        rl = guc_tables::vars::pgrust_runtime_memory_limit.read(),
+        rp = retired_pending,
+        rr = retired_reclaimed,
+        thr = threads.map_or("null".into(), |t| t.to_string()),
+        conn = connections,
+        dbt = all.len(),
+        eph = ephemeral,
+        spr = spares,
+        pin = registry::pinned_names().len(),
+        pfx = prefix.replace('\\', "\\\\").replace('"', "\\\""),
+        pool = crate::ephemeral_db_pool_size(),
+        pend = registry::pending_ensure_count(),
+    );
+    Ok(types_fmgr::varlena_result(varlena::cstring_to_text(fcinfo.result_mcx(), json.as_bytes())?))
+}
+
+fn proc_status() -> (Option<u64>, Option<u64>) {
+    let Ok(s) = std::fs::read_to_string("/proc/self/status") else { return (None, None) };
+    let field = |name: &str| {
+        s.lines()
+            .find(|l| l.starts_with(name))
+            .and_then(|l| l.split_whitespace().nth(1))
+            .and_then(|v| v.parse::<u64>().ok())
+    };
+    (field("VmRSS:"), field("Threads:"))
+}
+
+fn proc_pss_kb() -> Option<u64> {
+    let s = std::fs::read_to_string("/proc/self/smaps_rollup").ok()?;
+    s.lines()
+        .find(|l| l.starts_with("Pss:"))
+        .and_then(|l| l.split_whitespace().nth(1))
+        .and_then(|v| v.parse::<u64>().ok())
+}
+
 pub static JANITOR_BUILTINS: &[FmgrBuiltin] = &[
     FmgrBuiltin {
         foid: PGRUST_PIN_DATABASE_FOID,
@@ -208,6 +291,14 @@ pub static JANITOR_BUILTINS: &[FmgrBuiltin] = &[
         strict: true,
         retset: false,
         func: fc_pgrust_seal_template,
+    },
+    FmgrBuiltin {
+        foid: PGRUST_RUNTIME_STATUS_FOID,
+        name: "pgrust_runtime_status",
+        nargs: 0,
+        strict: true,
+        retset: false,
+        func: fc_pgrust_runtime_status,
     },
 ];
 

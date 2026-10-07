@@ -436,6 +436,11 @@ pgsync::process_global! {
     });
 }
 
+/// Mint requests waiting for (or being served by) the janitor.
+pub(crate) fn pending_ensure_count() -> usize {
+    with_registry(|r| r.ensures.len())
+}
+
 fn with_registry<R>(f: impl FnOnce(&mut RegistryState) -> R) -> R {
     let mut guard = REGISTRY.lock().unwrap_or_else(|e| e.into_inner());
     f(&mut guard)
