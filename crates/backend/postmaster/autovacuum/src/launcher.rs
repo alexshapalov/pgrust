@@ -682,7 +682,17 @@ fn do_start_worker() -> PgResult<StartOutcome> {
         if !for_xid_wrap && !for_multi_wrap && skip_idle_databases() {
             if let Some(entry) = pgstat::pgstat_fetch_stat_dbentry(avdb.adw_datid) {
                 let mods = database_mod_count(&entry);
-                let unchanged = LAST_VISIT_MODS.with_borrow(|m| m.get(&avdb.adw_datid) == Some(&mods));
+                // A database never visited counts as visited at zero writes:
+                // one that has had no inserts, updates or deletes since it was
+                // created (a fresh clone of a sealed, frozen, analyzed
+                // template, or an empty CREATE DATABASE) has nothing for a
+                // worker to do, and minting 1000 of them used to cost 1000
+                // worker launches within one naptime. Wraparound is still
+                // checked above for every database. (After a statistics
+                // reset the counters restart at zero; stock autovacuum then
+                // also finds no dead tuples to act on until new writes.)
+                let unchanged =
+                    LAST_VISIT_MODS.with_borrow(|m| m.get(&avdb.adw_datid).copied().unwrap_or(0) == mods);
                 if unchanged {
                     SKIPPED_IDLE.set(SKIPPED_IDLE.get() + 1);
                     return Ok(StartOutcome::SkippedIdle(avdb.adw_datid));
