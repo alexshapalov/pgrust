@@ -1666,6 +1666,22 @@ fn build_createdb_stmt<'mcx>(
     let mut options = NodeList::make1(mcx, def(mcx, "template", &p.template)?)?;
     options.lappend(mcx, def(mcx, "strategy", strategy_word)?)?;
     options.lappend(mcx, def(mcx, "owner", &p.owner_name)?)?;
+    let connlimit = crate::ephemeral_db_connection_limit();
+    if connlimit >= 0 {
+        options.lappend(
+            mcx,
+            Node::mk(
+                mcx,
+                DefElem {
+                    defnamespace: None,
+                    defname: Some("connection_limit"),
+                    arg: Some(Node::mk_integer(mcx, connlimit)?),
+                    defaction: DefElemAction::DEFELEM_UNSPEC,
+                    location: -1,
+                },
+            )?,
+        )?;
+    }
     if p.spare {
         options.lappend(mcx, def(mcx, "allow_connections", "false")?)?;
     }

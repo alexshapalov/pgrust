@@ -396,6 +396,8 @@ pub static pgrust_ephemeral_db_max_per_role: GucIntVar = GucSlot::new("pgrust_ep
 // symbol): how many pre-minted spare clones PER POOLED TEMPLATE the
 // janitor keeps warm (0 = off). PGC_SIGHUP, re-read every janitor tick.
 pub static pgrust_ephemeral_db_pool_size: GucIntVar = GucSlot::new("pgrust_ephemeral_db_pool_size");
+pub static pgrust_ephemeral_db_connection_limit: GucIntVar =
+    GucSlot::new("pgrust_ephemeral_db_connection_limit");
 // pgrust-only (test-views.md mint-strategy addendum, no C symbol): swept-
 // relation count at or above which a janitor mint picks CREATE DATABASE
 // STRATEGY wal_log (zero checkpoints) over file_copy; -1 = never (always

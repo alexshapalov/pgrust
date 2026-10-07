@@ -337,6 +337,10 @@ fn install_guc_tables_owned_vars() {
         get: backing::pgrust_ephemeral_db_pool_size,
         set: backing::set_pgrust_ephemeral_db_pool_size,
     });
+    vars::pgrust_ephemeral_db_connection_limit.install(GucVarAccessors {
+        get: backing::pgrust_ephemeral_db_connection_limit,
+        set: backing::set_pgrust_ephemeral_db_connection_limit,
+    });
     vars::pgrust_ephemeral_db_wal_log_threshold.install(GucVarAccessors {
         get: backing::pgrust_ephemeral_db_wal_log_threshold,
         set: backing::set_pgrust_ephemeral_db_wal_log_threshold,

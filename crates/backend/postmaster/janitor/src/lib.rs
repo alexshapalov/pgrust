@@ -106,6 +106,12 @@ pub fn ephemeral_db_pool_size() -> i32 {
     guc_tables::vars::pgrust_ephemeral_db_pool_size.read()
 }
 
+/// `pgrust.ephemeral_db_connection_limit` (PGC_SIGHUP, -1 = none): the
+/// CONNECTION LIMIT each mint applies.
+pub fn ephemeral_db_connection_limit() -> i32 {
+    guc_tables::vars::pgrust_ephemeral_db_connection_limit.read()
+}
+
 /// `pgrust.ephemeral_db_wal_log_threshold` (PGC_SIGHUP, default -1 = never
 /// wal_log). Swept-relation count at or above which a mint's CREATE
 /// DATABASE picks STRATEGY wal_log (zero checkpoints) over file_copy.

@@ -128,13 +128,15 @@ fn table_counts_match_compiled_backend_shape() {
     //   runtime_memory_limit (-> 185) = 503 (the count was not updated then).
     // PGX autovacuum idle-skip (pgrust-only, docs/pgx/autovacuum.md): Bool +1
     //   pgrust.autovacuum_skip_idle_databases (-> 148) = 504.
+    // PGX per-database CPU share (pgrust-only, docs/pgx/linux-noisy-neighbor.md):
+    //   Int +1 pgrust.ephemeral_db_connection_limit (-> 186) = 505.
     let test_validator = usize::from(cfg!(feature = "oauth-test-validator"));
     assert_eq!(ConfigureNamesBool.len(), 148 + test_validator);
-    assert_eq!(ConfigureNamesInt.len(), 185);
+    assert_eq!(ConfigureNamesInt.len(), 186);
     assert_eq!(ConfigureNamesReal.len(), 31);
     assert_eq!(ConfigureNamesString.len(), 90 + test_validator);
     assert_eq!(ConfigureNamesEnum.len(), 50);
-    assert_eq!(all_settings().count(), 504 + 2 * test_validator);
+    assert_eq!(all_settings().count(), 505 + 2 * test_validator);
     assert_eq!(GucContext_Names.len(), PGC_USERSET as usize + 1);
     assert_eq!(GucSource_Names.len(), PGC_S_SESSION as usize + 1);
     assert_eq!(config_group_names.len(), DEVELOPER_OPTIONS as usize + 1);

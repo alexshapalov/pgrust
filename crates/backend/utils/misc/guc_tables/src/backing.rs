@@ -447,6 +447,13 @@ int_var!(
     set_pgrust_ephemeral_db_pool_size,
     0
 );
+// CONNECTION LIMIT given to every minted ephemeral database (-1 = none).
+int_var!(
+    I_pgrust_ephemeral_db_connection_limit,
+    pgrust_ephemeral_db_connection_limit,
+    set_pgrust_ephemeral_db_connection_limit,
+    -1
+);
 // Mint-strategy pick (test-views.md mint-strategy addendum): PGC_SIGHUP,
 // read by the janitor at each strategy pick.
 int_var!(
