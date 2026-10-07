@@ -47,8 +47,10 @@ CREATE TABLE events(id bigint PRIMARY KEY, account_id bigint NOT NULL, payload j
 INSERT INTO events SELECT g, (g % 100000) + 1, jsonb_build_object('type', CASE g % 3 WHEN 0 THEN 'click' WHEN 1 THEN 'view' ELSE 'buy' END, 'amount', g % 1000, 'tags', jsonb_build_array('a' || (g % 10), 'b' || (g % 7))) FROM generate_series(1, 100000) g;
 CREATE TABLE copy_target(id bigint, account_id bigint, note text);
 CREATE TABLE scratch(id bigserial PRIMARY KEY, account_id bigint, note text);
-VACUUM ANALYZE;
 """
+# VACUUM cannot run inside the implicit transaction of a multi-statement
+# query string; it is sent on its own.
+VACUUM_SQL = "VACUUM ANALYZE"
 
 
 def ops(copy_file):
@@ -101,6 +103,7 @@ def run_engine(label, engine, args, copy_file, port):
         c = pb.PgConn(ws.sockdir, port, timeout=1800)
         t0 = time.perf_counter()
         c.query(SCHEMA)
+        c.query(VACUUM_SQL)
         out["load_s"] = round(time.perf_counter() - t0, 2)
         peak = [pb.memory_sample(pid).get(pb.MEM_KEY, 0)]
         stop = [False]

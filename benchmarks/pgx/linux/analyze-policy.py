@@ -41,8 +41,10 @@ INSERT INTO orders SELECT g, (g % 20000) + 1,
   FROM generate_series(1, 200000) g;
 CREATE INDEX orders_status ON orders(status);
 CREATE INDEX orders_account ON orders(account_id);
-VACUUM ANALYZE;
 """
+# VACUUM cannot run inside the implicit transaction of a multi-statement
+# query string; it is sent on its own.
+VACUUM_SQL = "VACUUM ANALYZE"
 
 
 def explain(c, sql):
@@ -95,6 +97,7 @@ def main():
         admin.query("CREATE DATABASE tpl")
         c = connect("tpl")
         c.query(SCHEMA)
+        c.query(VACUUM_SQL)
         c.close()
         for i, g in enumerate(int(x) for x in args.growth.split(",")):
             db = "branch_%d" % g
