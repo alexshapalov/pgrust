@@ -63,6 +63,17 @@ for step in "${STEPS[@]}"; do
         $PY "$HERE/linux/query-bench.py" --out "$OUT/query-bench" ;;
     analyze)
         $PY "$HERE/linux/analyze-policy.py" --out "$OUT/analyze-policy" ;;
+    scale-naptime)
+        for nap in ${PGX_NAPTIMES:-60 300}; do
+            $PY "$HERE/scale.py" --counts "${PGX_SCALE_COUNTS:-0,100,300,1000}" --active "" --long-idle-seconds 60 \
+                --guc pgrust.autovacuum_skip_idle_databases=on --guc autovacuum_naptime=$nap \
+                --out "$OUT/scale-skipidle-naptime$nap"
+        done ;;
+    agents)
+        $PY "$HERE/linux/agent-workload.py" --out "$OUT/agent-workload" ;;
+    cowbig)
+        $PY "$HERE/cow.py" --sizes "${PGX_COW_BIG:-1500,3000}" --methods clone --clones 3 --out "$OUT/cow-big"
+        $PY "$HERE/cow.py" --sizes 1500 --methods copy --clones 2 --out "$OUT/cow-big-copy" ;;
     scale-skipidle)
         $PY "$HERE/scale.py" --counts "${PGX_SCALE_COUNTS:-0,100,300,1000}" --active "" --long-idle-seconds 60 \
             --guc pgrust.autovacuum_skip_idle_databases=on --out "$OUT/scale-autovacuum-skipidle" ;;
