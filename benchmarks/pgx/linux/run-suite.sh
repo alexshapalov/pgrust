@@ -7,6 +7,7 @@
 # PGXBENCH_WORKDIR is where every scratch cluster lives, so it selects the
 # filesystem under test. Steps (default: all, in this order):
 #   cow memory regress baseline profile churn scale noisy ephemeral pool
+#   extra (not in the default list): limits multiruntime cpunoisy
 #
 # Sized for a small host by default (4 CPUs, 8 GB); override with the
 # PGX_* variables below. Everything runs at nice 5.
@@ -49,9 +50,15 @@ for step in "${STEPS[@]}"; do
         $PY "$HERE/noisy-neighbor.py" --label profile+session-limit --guc pgrust.session_memory_limit=256 \
             --scenarios baseline,memory,sort --out "$OUT/noisy-neighbor" ;;
     scale)
-        $PY "$HERE/scale.py" --counts "${PGX_SCALE_COUNTS:-0,100,300,1000}" --out "$OUT/scale"
+        $PY "$HERE/scale.py" --counts "${PGX_SCALE_COUNTS:-0,100,300,1000}" --active "${PGX_SCALE_ACTIVE:-20,100}" --out "$OUT/scale"
         $PY "$HERE/scale.py" --counts "${PGX_SCALE_COUNTS:-0,100,300,1000}" --active "" --long-idle-seconds 60 \
             --guc autovacuum=off --out "$OUT/scale-autovacuum-off" ;;
+    limits)
+        $PY "$HERE/linux/limits.py" --out "$OUT/limits" ;;
+    multiruntime)
+        $PY "$HERE/linux/multiruntime.py" --layouts "${PGX_LAYOUTS:-1x1000,2x500,4x250}" --out "$OUT/multiruntime" ;;
+    cpunoisy)
+        $PY "$HERE/linux/cpu-noisy.py" --levels "${PGX_NOISY_LEVELS:-0,1,2,4,6}" --out "$OUT/cpu-noisy" ;;
     pool)
         $PY "$HERE/warm-pool.py" --out "$OUT/warm-pool" ;;
     *) echo "unknown step $step"; exit 2 ;;
