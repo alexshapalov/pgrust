@@ -261,6 +261,7 @@ mod alloc_track {
 use antithesis_instrumentation as _;
 
 fn main() {
+    disable_transparent_huge_pages();
     // Antithesis harness builds: initialize the SDK before anything else so
     // assertion cataloging and lifecycle output are wired, then emit the
     // bootstrap reachability property from the one path every run executes.
@@ -287,6 +288,28 @@ fn main() {
                 std::process::exit(p.code);
             }
             std::panic::resume_unwind(payload);
+        }
+    }
+}
+
+/// Transparent huge pages off for the whole process on Linux, unless
+/// `PGRUST_ALLOW_THP=1`.
+///
+/// mimalloc (allow_thp defaults to on) marks its large aligned regions
+/// MADV_HUGEPAGE, so even on a host set to `madvise` an idle runtime faults
+/// in 2 MB pages for allocator arenas: measured on Linux x86_64, the PGX
+/// profile at idle is 83 MB PSS with them and 45 MB without, and a 2 MB page
+/// can only be returned to the system whole, which works against purging
+/// freed memory in a long-lived multi-database runtime. PR_SET_THP_DISABLE
+/// applies to every mapping of the process, including ones made before this
+/// call. PostgreSQL's own advice is explicit huge pages for shared memory,
+/// not THP; this does not affect `huge_pages`.
+fn disable_transparent_huge_pages() {
+    #[cfg(target_os = "linux")]
+    if std::env::var_os("PGRUST_ALLOW_THP").is_none_or(|v| v != "1") {
+        // SAFETY: prctl with integer arguments only.
+        unsafe {
+            libc::prctl(libc::PR_SET_THP_DISABLE, 1, 0, 0, 0);
         }
     }
 }
