@@ -14,7 +14,9 @@ symbols:
 Runs 3 warm-up cycles, asks the server for a dump of live allocations
 (SIGWINCH), runs 6 more cycles, dumps again, and prints the growth between
 the two dumps summed by call site, in bytes and blocks per database.
-Symbolication uses macOS `atos`. Output also in /tmp/leaktrace.json.
+Symbolication: macOS `atos`; Linux `addr2line`, with the load base read from
+/proc/<pid>/maps (the tracker reports slide 0 there). Output also in
+/tmp/leaktrace.json. Usage: alloc-trace.py [dbs per cycle] [measured cycles]
 """
 import sys, time, os, re, signal, subprocess, json
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -33,7 +35,30 @@ def cycle(tag):
         c = conn("tdb_tpl_app__%s_%d" % (tag, i)); c.query(churn.WORKLOAD); c.close()
     while admin.query("SELECT count(*) FROM pg_database WHERE datname LIKE 'tdb\\_%'")[0][0] != "0": time.sleep(0.5)
     time.sleep(1)
+BASE = [None]
+
+
+def load_base(pid):
+    """Start of the binary's offset-0 mapping (the PIE load bias)."""
+    real = os.path.realpath(BIN)
+    for line in open("/proc/%d/maps" % pid):
+        f = line.split()
+        if len(f) >= 6 and os.path.realpath(f[5]) == real and int(f[2], 16) == 0:
+            return int(f[0].split("-")[0], 16)
+    return 0
+
+
+def linux_symbols(addrs):
+    base = BASE[0] or 0
+    rel = [hex(max(int(a, 16) - base, 0)) for a in addrs]
+    out = subprocess.run(["addr2line", "-f", "-C", "-e", BIN] + rel, capture_output=True, text=True).stdout.splitlines()
+    names = out[0::2]
+    return dict(zip(addrs, [re.sub(r"::h[0-9a-f]{16}$", "", n) for n in names]))
+
+
 def dump():
+    if sys.platform != "darwin" and BASE[0] is None:
+        BASE[0] = load_base(srv.proc.pid)
     os.kill(srv.proc.pid, signal.SIGWINCH)
     time.sleep(0.5); admin.query("SELECT 1"); time.sleep(3)
     log = open(srv.log_path, errors="replace").read()
@@ -48,7 +73,7 @@ try:
     admin.query("SELECT pgrust_seal_template('tpl_app')")
     for k in range(3): cycle("w%d" % k); print("warm cycle", k, pb.memory_sample(srv.proc.pid)[pb.MEM_KEY]/1048576, flush=True)
     b1, by1, slide, d1 = dump(); print("dump1 blocks", b1, "bytes", by1, flush=True)
-    K = 6
+    K = int(sys.argv[2]) if len(sys.argv) > 2 else 6
     for k in range(K): cycle("m%d" % k); print("cycle", k, pb.memory_sample(srv.proc.pid)[pb.MEM_KEY]/1048576, flush=True)
     b2, by2, slide, d2 = dump(); print("dump2 blocks", b2, "bytes", by2, "delta per db: blocks %.1f bytes %.0f" % ((b2-b1)/(K*N), (by2-by1)/(K*N)), flush=True)
     growth = []
@@ -58,8 +83,11 @@ try:
     growth.sort(reverse=True)
     out = []
     alladdr = sorted({x for _, _, (t, bt), _ in growth for x in bt.split()})
-    symout = subprocess.run(["atos", "-o", BIN, "-s", hex(slide)] + alladdr, capture_output=True, text=True).stdout.splitlines()
-    symmap = dict(zip(alladdr, [re.sub(r"::h[0-9a-f]{16}.*$", "", re.sub(r" \(in postgres\).*$", "", x)) for x in symout]))
+    if sys.platform == "darwin":
+        symout = subprocess.run(["atos", "-o", BIN, "-s", hex(slide)] + alladdr, capture_output=True, text=True).stdout.splitlines()
+        symmap = dict(zip(alladdr, [re.sub(r"::h[0-9a-f]{16}.*$", "", re.sub(r" \(in postgres\).*$", "", x)) for x in symout]))
+    else:
+        symmap = linux_symbols(alladdr)
     skip = ("alloc_track", "alloc::", "hashbrown", "_RNv", "core::", "std::", "__rust", "_$LT$")
     import collections
     cat_b, cat_n = collections.Counter(), collections.Counter()
