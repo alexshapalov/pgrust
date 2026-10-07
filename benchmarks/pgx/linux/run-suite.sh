@@ -7,7 +7,8 @@
 # PGXBENCH_WORKDIR is where every scratch cluster lives, so it selects the
 # filesystem under test. Steps (default: all, in this order):
 #   cow memory regress baseline profile churn scale noisy ephemeral pool
-#   extra (not in the default list): limits multiruntime cpunoisy
+#   extra (not in the default list): limits multiruntime cpunoisy lifecycle mintbreak
+#   querybench analyze scale-skipidle churn-skipidle churn-avoff
 #
 # Sized for a small host by default (4 CPUs, 8 GB); override with the
 # PGX_* variables below. Everything runs at nice 5.
@@ -53,6 +54,22 @@ for step in "${STEPS[@]}"; do
         $PY "$HERE/scale.py" --counts "${PGX_SCALE_COUNTS:-0,100,300,1000}" --active "${PGX_SCALE_ACTIVE:-20,100}" --out "$OUT/scale"
         $PY "$HERE/scale.py" --counts "${PGX_SCALE_COUNTS:-0,100,300,1000}" --active "" --long-idle-seconds 60 \
             --guc autovacuum=off --out "$OUT/scale-autovacuum-off" ;;
+    lifecycle)
+        $PY "$HERE/linux/lifecycle.py" --n 100 --warmup 3 --batches 10 --out "$OUT/lifecycle"
+        $PY "$HERE/linux/lifecycle.py" --connections-only --n 100 --warmup 3 --batches 10 --out "$OUT/lifecycle" ;;
+    mintbreak)
+        $PY "$HERE/linux/mint-breakdown.py" --out "$OUT/mint-breakdown" ;;
+    querybench)
+        $PY "$HERE/linux/query-bench.py" --out "$OUT/query-bench" ;;
+    analyze)
+        $PY "$HERE/linux/analyze-policy.py" --out "$OUT/analyze-policy" ;;
+    scale-skipidle)
+        $PY "$HERE/scale.py" --counts "${PGX_SCALE_COUNTS:-0,100,300,1000}" --active "" --long-idle-seconds 60 \
+            --guc pgrust.autovacuum_skip_idle_databases=on --out "$OUT/scale-autovacuum-skipidle" ;;
+    churn-skipidle)
+        $PY "$HERE/churn.py" --cycles "${PGX_CHURN_CYCLES:-30}" --guc pgrust.autovacuum_skip_idle_databases=on --out "$OUT/churn-skipidle" ;;
+    churn-avoff)
+        $PY "$HERE/churn.py" --cycles "${PGX_CHURN_CYCLES:-30}" --guc autovacuum=off --out "$OUT/churn-autovacuum-off" ;;
     limits)
         $PY "$HERE/linux/limits.py" --out "$OUT/limits" ;;
     multiruntime)
@@ -60,7 +77,7 @@ for step in "${STEPS[@]}"; do
     cpunoisy)
         $PY "$HERE/linux/cpu-noisy.py" --levels "${PGX_NOISY_LEVELS:-0,1,2,4,6}" --out "$OUT/cpu-noisy" ;;
     pool)
-        $PY "$HERE/warm-pool.py" --out "$OUT/warm-pool" ;;
+        $PY "$HERE/warm-pool.py" --pool-sizes "${PGX_POOL_SIZES:-0,1,4,8,32}" --bursts "${PGX_BURSTS:-1,10,50,100}" --out "$OUT/warm-pool" ;;
     *) echo "unknown step $step"; exit 2 ;;
     esac
     echo "    exit=$?"
