@@ -49,6 +49,11 @@ def main():
     ap.add_argument("--levels", default="0,1,2,4,6")
     ap.add_argument("--seconds", type=float, default=30.0)
     ap.add_argument("--port", type=int, default=54480)
+    ap.add_argument("--same-db", action="store_true",
+                    help="all noisy clients in ONE database (one agent with many connections)")
+    ap.add_argument("--conn-limit", type=int, default=-1,
+                    help="ALTER DATABASE <noisy> CONNECTION LIMIT n (with --same-db); refused clients are counted")
+    ap.add_argument("--label", default="")
     args = ap.parse_args()
     gucs = ["max_connections=50", "statement_timeout=0"] + args.guc
     server_args = []
@@ -58,16 +63,19 @@ def main():
     srv = pb.Server(ws, args.port).launch()
     connect = lambda db: pb.PgConn(ws.sockdir, args.port, database=db, timeout=600)  # noqa: E731
     os.makedirs(args.out, exist_ok=True)
-    path = os.path.join(args.out, "cpu-noisy.json")
+    path = os.path.join(args.out, "cpu-noisy%s.json" % (("-" + args.label) if args.label else ""))
     doc = {"benchmark": "cpu-noisy", "git_commit": pb.git("rev-parse", "HEAD"), "settings": gucs,
+           "same_db": args.same_db, "conn_limit": args.conn_limit, "label": args.label,
            "cpus": os.cpu_count(), "noisy_sql": NOISY_SQL, "levels": []}
     levels = [int(x) for x in args.levels.split(",")]
     try:
         srv.wait_select1()
         admin = connect("postgres")
         admin.query("CREATE DATABASE quiet")
-        for i in range(max(levels)):
+        for i in range(1 if args.same_db else max(levels)):
             admin.query("CREATE DATABASE noisy%d" % i)
+        if args.same_db and args.conn_limit >= 0:
+            admin.query("ALTER DATABASE noisy0 CONNECTION LIMIT %d" % args.conn_limit)
         admin.close()
         c = connect("quiet")
         c.query(eph.template_sql(10, 200))
@@ -104,9 +112,15 @@ def main():
 
             noisy_err = []
 
+            refused = []
+
             def noisy(i):
                 try:
-                    c = connect("noisy%d" % i)
+                    try:
+                        c = connect("noisy0" if args.same_db else "noisy%d" % i)
+                    except Exception as e:  # noqa: BLE001 - connection limit
+                        refused.append(str(e)[:120])
+                        return
                     while not stop[0]:
                         c.query(NOISY_SQL)
                         noisy_done[0] += 1
@@ -135,15 +149,15 @@ def main():
                    "server_cpu_percent_of_one_core": round(((s1["cpu_user_ns_sum"] + s1["cpu_system_ns_sum"])
                                                             - (s0["cpu_user_ns_sum"] + s0["cpu_system_ns_sum"]))
                                                            / (args.seconds * 1e9) * 100, 1),
-                   "load1": round(load, 2), "noisy_queries_completed": noisy_done[0], "noisy_errors": noisy_err[:3],
+                   "load1": round(load, 2), "noisy_queries_completed": noisy_done[0], "noisy_errors": noisy_err[:3], "noisy_refused": len(refused),
                    "pss_mb": round((s1.get(pb.MEM_KEY) or 0) / 1048576.0, 1)}
             doc["levels"].append(row)
             with open(path, "w") as f:
                 json.dump(doc, f, indent=2)
                 f.write("\n")
             lq = row["quiet_latency_ms"] or {}
-            print("noisy=%d host cpu=%5.1f%% quiet p50=%s p95=%s p99=%s max=%s ms errors=%d newconn p50=%s" % (
-                n, row["host_cpu_busy_percent"], lq.get("p50"), lq.get("p95"), lq.get("p99"), lq.get("max"),
+            print("noisy=%d refused=%d host cpu=%5.1f%% quiet p50=%s p95=%s p99=%s max=%s ms errors=%d newconn p50=%s" % (
+                n, len(refused), row["host_cpu_busy_percent"], lq.get("p50"), lq.get("p95"), lq.get("p99"), lq.get("max"),
                 len(b_err), (row["new_connection_ms"] or {}).get("p50")), flush=True)
             time.sleep(5)
         print("wrote", path)

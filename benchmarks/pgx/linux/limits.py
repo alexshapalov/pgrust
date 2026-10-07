@@ -14,6 +14,14 @@
   failed session then answers SELECT 1, whether a bystander session and a
   brand-new connection still work, server alive, PANIC in the log, peak PSS.
 
+--mode workloads: one server with pgrust.session_memory_limit (default 256)
+  and work_mem/maintenance_work_mem set high, so memory-hungry operations
+  try to stay in memory. Each workload runs in database "heavy" (a 3M-row
+  table) while a bystander database runs SELECT 1 throughout. Per workload:
+  ok or the error's SQLSTATE and hint, time, peak PSS, whether the same
+  session answers SELECT 1 afterwards, server alive. No workload may
+  produce XX000 (internal error) or a PANIC.
+
 --mode cgroup: each server runs in its own transient systemd scope with a
   hard memory.max (--cgroup-mb) and no swap; the harness stays outside it, so
   an OOM kill can only hit the server. Needs passwordless sudo. Two cases:
@@ -29,6 +37,7 @@ Output: <out>/limits.json or <out>/cgroup.json.
 import argparse
 import subprocess
 import json
+import re
 import os
 import sys
 import threading
@@ -201,6 +210,115 @@ def mode_limits(args):
     return doc, "limits.json"
 
 
+HEAVY_SETUP = (
+    "CREATE TABLE big(id int, k int, t text, j jsonb);"
+    "INSERT INTO big SELECT g, g % 100000, md5(g::text), jsonb_build_object('n', g, 's', md5(g::text)) "
+    "FROM generate_series(1, 3000000) g;"
+    "CREATE TABLE big2 AS SELECT id, k, t FROM big;"
+    "ANALYZE big; ANALYZE big2;"
+)
+
+WORKLOADS = [
+    ("sort", "SELECT count(*) FROM (SELECT t FROM big ORDER BY t) s"),
+    ("hash_join", "SELECT count(*) FROM big a JOIN big2 b ON a.t = b.t"),
+    ("hash_aggregate", "SELECT count(*) FROM (SELECT t, count(*) FROM big GROUP BY t) s"),
+    ("cte", "WITH x AS MATERIALIZED (SELECT t, j FROM big) SELECT count(*) FROM x a JOIN x b USING (t)"),
+    ("json_aggregation", "SELECT length(json_agg(j)::text) FROM big"),
+    ("array_agg", "SELECT array_length(array_agg(t), 1) FROM big"),
+    ("copy_out", "COPY (SELECT * FROM big) TO '/dev/null'"),
+    ("copy_in", "CREATE TEMP TABLE ci(id int, k int, t text, j jsonb); COPY ci FROM '%COPYFILE%'; DROP TABLE ci"),
+    ("large_insert", "CREATE TABLE ins AS SELECT * FROM big WHERE false; INSERT INTO ins SELECT * FROM big; DROP TABLE ins"),
+    ("create_index", "CREATE INDEX big_t ON big(t); DROP INDEX big_t"),
+    ("migration_rewrite", "ALTER TABLE big2 ALTER COLUMN k TYPE bigint; ALTER TABLE big2 ALTER COLUMN k TYPE int"),
+    ("temp_spill", "SET work_mem = '256kB'; SELECT count(*) FROM (SELECT t FROM big ORDER BY t) s; RESET work_mem"),
+]
+
+
+def mode_workloads(args):
+    gucs = ["max_connections=20", "pgrust.session_memory_limit=%d" % args.session_mb,
+            "work_mem=2GB", "maintenance_work_mem=2GB", "temp_buffers=64MB"]
+    ws, srv = start_server(args, gucs, args.port + 20)
+    connect = lambda db: pb.PgConn(ws.sockdir, args.port + 20, database=db, timeout=1800)  # noqa: E731
+    pid = srv.proc.pid
+    doc = {"benchmark": "memory-limit-workloads", "git_commit": pb.git("rev-parse", "HEAD"), "settings": gucs,
+           "workloads": []}
+    copy_file = os.path.join(ws.root, "big.copy")
+    try:
+        admin = connect("postgres")
+        admin.query("CREATE DATABASE heavy")
+        admin.query("CREATE DATABASE bystander")
+        h = connect("heavy")
+        h.query(HEAVY_SETUP)
+        h.query("COPY big TO '%s'" % copy_file)
+        h.close()
+        stop = [False]
+        by_err, by_lat = [], []
+
+        def bystander():
+            c = connect("bystander")
+            while not stop[0]:
+                t0 = time.perf_counter()
+                try:
+                    c.query("SELECT 1")
+                    by_lat.append(time.perf_counter() - t0)
+                except Exception as e:  # noqa: BLE001
+                    by_err.append(str(e)[:160])
+                time.sleep(0.05)
+            c.close()
+        bt = threading.Thread(target=bystander, daemon=True)
+        bt.start()
+        for name, sql in WORKLOADS:
+            sql = sql.replace("%COPYFILE%", copy_file)
+            peak = Peak(pid)
+            peak.start()
+            c = connect("heavy")
+            t0 = time.perf_counter()
+            rec = {"workload": name}
+            try:
+                c.query(sql)
+                rec["ok"] = True
+            except Exception as e:  # noqa: BLE001
+                msg = str(e)
+                rec["ok"] = False
+                rec["sqlstate"] = (re.search(r"C([0-9A-Z]{5})", msg) or [None, None])[1]
+                rec["error"] = msg[:300]
+                rec["hint"] = (re.findall(r"reached pgrust\.\w+", msg) or [None])[0]
+            rec["seconds"] = round(time.perf_counter() - t0, 2)
+            try:
+                rec["select1_after"] = c.query("SELECT 1") == [["1"]]
+            except Exception as e:  # noqa: BLE001
+                rec["select1_after"] = False
+                rec["select1_error"] = str(e)[:200]
+            try:
+                c.close()
+            except Exception:  # noqa: BLE001
+                pass
+            peak.stop_flag = True
+            peak.join()
+            rec["peak_pss_mb"] = round(peak.peak / M, 1)
+            rec["server_alive"] = srv.proc.poll() is None
+            doc["workloads"].append(rec)
+            print("%-18s %-5s %-6s %6.2fs peak=%6.0f MB select1_after=%s %s" % (
+                name, "ok" if rec["ok"] else "FAIL", rec.get("sqlstate") or "", rec["seconds"], rec["peak_pss_mb"],
+                rec["select1_after"], rec.get("hint") or ""), flush=True)
+            if not rec["server_alive"]:
+                break
+        stop[0] = True
+        bt.join(timeout=10)
+        with open(srv.log_path, "rb") as f:
+            log = f.read().decode("utf-8", "replace")
+        doc["bystander"] = {"queries": len(by_lat), "errors": len(by_err), "error_examples": by_err[:3],
+                            "max_ms": round(max(by_lat) * 1e3, 1) if by_lat else None}
+        doc["panic_in_log"] = "PANIC" in log
+        doc["internal_errors"] = sum(1 for w in doc["workloads"] if w.get("sqlstate") == "XX000")
+        print("bystander errors=%d max=%s ms  internal_errors=%d panic=%s" % (
+            len(by_err), doc["bystander"]["max_ms"], doc["internal_errors"], doc["panic_in_log"]), flush=True)
+    finally:
+        srv.stop()
+        ws.cleanup()
+    return doc, "workloads.json"
+
+
 class ScopedServer(pb.Server):
     """A server started in its own transient systemd scope with a hard
     memory.max, so the cgroup OOM killer can only ever hit the server, never
@@ -313,7 +431,7 @@ def mode_cgroup(args):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out", required=True)
-    ap.add_argument("--mode", choices=["limits", "cgroup"], default="limits")
+    ap.add_argument("--mode", choices=["limits", "cgroup", "workloads"], default="limits")
     ap.add_argument("--binary", default=os.path.join(pb.REPO, "target", "release", "postgres"))
     ap.add_argument("--conf", default=os.path.join(pb.REPO, "configs", "pgx-ephemeral.conf"))
     ap.add_argument("--session-mb", type=int, default=256)
@@ -325,7 +443,7 @@ def main():
     ap.add_argument("--port", type=int, default=54440)
     args = ap.parse_args()
     os.makedirs(args.out, exist_ok=True)
-    doc, fname = (mode_limits if args.mode == "limits" else mode_cgroup)(args)
+    doc, fname = {"limits": mode_limits, "cgroup": mode_cgroup, "workloads": mode_workloads}[args.mode](args)
     path = os.path.join(args.out, fname)
     with open(path, "w") as f:
         json.dump(doc, f, indent=2)

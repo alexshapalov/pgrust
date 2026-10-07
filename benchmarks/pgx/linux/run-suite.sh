@@ -70,6 +70,11 @@ for step in "${STEPS[@]}"; do
         $PY "$HERE/churn.py" --cycles "${PGX_CHURN_CYCLES:-30}" --guc pgrust.autovacuum_skip_idle_databases=on --out "$OUT/churn-skipidle" ;;
     churn-avoff)
         $PY "$HERE/churn.py" --cycles "${PGX_CHURN_CYCLES:-30}" --guc autovacuum=off --out "$OUT/churn-autovacuum-off" ;;
+    workloads)
+        $PY "$HERE/linux/limits.py" --mode workloads --out "$OUT/limits" ;;
+    cpuagent)
+        $PY "$HERE/linux/cpu-noisy.py" --same-db --levels 0,1,4,8,16 --label one-agent --out "$OUT/cpu-noisy"
+        $PY "$HERE/linux/cpu-noisy.py" --same-db --conn-limit 2 --levels 0,1,4,8,16 --label one-agent-connlimit2 --out "$OUT/cpu-noisy" ;;
     limits)
         $PY "$HERE/linux/limits.py" --out "$OUT/limits" ;;
     multiruntime)
