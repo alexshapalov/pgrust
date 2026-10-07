@@ -75,12 +75,15 @@ def run(args, pool, mode):
                  for m in re.finditer(r'pgrust mint timing: db="([^"]+)"[^\n]*', log)}
         waits = {m.group(2): int(m.group(1)) for m in re.finditer(r'backend waited (\d+) us for "([^"]+)"', log)}
         for name, total in names:
-            r = {"total_ms": round(total, 2)}
+            r = {"client_total_ms": round(total, 2)}
             if name in waits:
                 r["backend_wait_ms"] = round(waits[name] / 1e3, 2)
                 r["connect_and_init_ms"] = round(total - waits[name] / 1e3, 2)
+            if mode == "reconnect":
+                out["requests"].append(r)
+                continue
             if name in mints:
-                r.update({k + "_ms": round(v / 1e3, 2) for k, v in mints[name].items()})
+                r.update({"mint_" + k + "_ms": round(v / 1e3, 2) for k, v in mints[name].items()})
             out["requests"].append(r)
         keys = sorted({k for r in out["requests"] for k in r})
         out["summary"] = {k: ms([r[k] for r in out["requests"] if k in r]) for k in keys}
