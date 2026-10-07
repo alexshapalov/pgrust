@@ -177,20 +177,73 @@ with Session(eng) as s, s.begin():
         o = Owner(email="o%d@x.io" % i)
         o.pets = [Pet(name="p%d_%d" % (i, k), data={"k": k}) for k in range(5)]
         s.add(o)
+from sqlalchemy.exc import IntegrityError
 with Session(eng) as s:
     n = s.scalar(select(func.count()).select_from(Pet).join(Owner).where(Pet.data["k"].astext == "3"))
     assert n == 300, n
+with Session(eng) as s:
     try:
         with s.begin():
             s.add(Owner(email="o1@x.io"))
-    except Exception:
+        raise SystemExit("expected a unique violation")
+    except IntegrityError:
         pass
-    with s.begin():
-        s.execute(text("ALTER TABLE pet ADD COLUMN status text DEFAULT 'new'"))
-        s.execute(text("CREATE INDEX pet_status ON pet(status)"))
+with eng.begin() as conn:
+    conn.execute(text("ALTER TABLE pet ADD COLUMN status text DEFAULT 'new'"))
+    conn.execute(text("CREATE INDEX pet_status ON pet(status)"))
+with Session(eng) as s:
     assert s.scalar(select(func.count()).select_from(Owner)) == 300
 Base.metadata.drop_all(eng)
 print("ok")
+'''
+
+PRISMA_SCHEMA = """
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model User {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  profile  Json     @default("{}")
+  posts    Post[]
+  created  DateTime @default(now())
+}
+model Post {
+  id        Int     @id @default(autoincrement())
+  title     String
+  published Boolean @default(false)
+  author    User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  Int
+  @@index([authorId, published])
+}
+"""
+
+PRISMA_CHANGE = PRISMA_SCHEMA.replace("  published Boolean @default(false)\n",
+                                      "  published Boolean @default(false)\n  views     Int     @default(0)\n")
+
+PRISMA_CLIENT = r'''
+const { PrismaClient } = require("@prisma/client");
+const p = new PrismaClient();
+(async () => {
+  for (let i = 0; i < 100; i++) {
+    await p.user.create({ data: { email: `u${i}@x.io`, profile: { i }, posts: { create: [{ title: "a" }, { title: "b", published: true }] } } });
+  }
+  const n = await p.post.count({ where: { published: true } });
+  if (n !== 100) throw new Error("count " + n);
+  await p.$transaction(async (tx) => {
+    const u = await tx.user.findUnique({ where: { email: "u7@x.io" }, include: { posts: true } });
+    await tx.post.updateMany({ where: { authorId: u.id }, data: { published: true } });
+  });
+  try { await p.user.create({ data: { email: "u1@x.io" } }); throw new Error("no unique violation"); }
+  catch (e) { if (e.code !== "P2002") throw e; }
+  const r = await p.$queryRaw`SELECT count(*)::int AS c FROM "User" WHERE (profile->>'i')::int < 10`;
+  if (r[0].c !== 10) throw new Error("raw " + JSON.stringify(r));
+  await p.$disconnect();
+})().catch(async (e) => { console.error(e); await p.$disconnect(); process.exit(1); });
 '''
 
 RAILS_SQL = [
@@ -309,6 +362,36 @@ def one_engine(args, label, engine_key, port):
                     if rc != 0:
                         rec.update(ok=False, failed_phase="run", output_tail=o[-1200:])
                     os.unlink(f.name)
+                elif wl == "prisma":
+                    pdir = tempfile.mkdtemp(prefix="prisma-")
+                    os.symlink(os.path.join(args.prisma_dir, "node_modules"), os.path.join(pdir, "node_modules"))
+                    os.makedirs(os.path.join(pdir, "prisma"))
+                    url = "postgresql://postgres@localhost:%d/%s?host=%s" % (port, db, ws.sockdir)
+                    penv = dict(env, DATABASE_URL=url, PRISMA_HIDE_UPDATE_MESSAGE="1", CHECKPOINT_DISABLE="1")
+                    npx = os.path.join(pdir, "node_modules", ".bin", "prisma")
+                    steps = [("migrate_init", PRISMA_SCHEMA, [npx, "migrate", "dev", "--name", "init", "--skip-generate"]),
+                             ("generate", None, [npx, "generate"]),
+                             ("client", None, ["node", "client.js"]),
+                             ("migrate_change", PRISMA_CHANGE, [npx, "migrate", "dev", "--name", "views", "--skip-generate"]),
+                             ("generate_again", None, [npx, "generate"]),
+                             ("client_again", None, ["node", "client.js"])]
+                    with open(os.path.join(pdir, "client.js"), "w") as f:
+                        f.write(PRISMA_CLIENT)
+                    for name, schema, cmd in steps:
+                        if schema is not None:
+                            with open(os.path.join(pdir, "prisma", "schema.prisma"), "w") as f:
+                                f.write(schema)
+                        if name.startswith("client"):
+                            # each client run starts from an empty table set
+                            cc = pb.PgConn(ws.sockdir, port, database=db)
+                            cc.query('TRUNCATE "User", "Post" CASCADE')
+                            cc.close()
+                        d, rc, o = run_cmd(cmd, pdir, penv)
+                        rec["phases"][name + "_s"] = round(d, 3)
+                        if rc != 0:
+                            rec.update(ok=False, failed_phase=name, output_tail=o[-1200:])
+                            break
+                    shutil.rmtree(pdir, ignore_errors=True)
                 elif wl == "sqlalchemy":
                     with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False) as f:
                         f.write(SQLALCHEMY_SCRIPT)
@@ -366,11 +449,13 @@ def main():
     ap.add_argument("--binary", default=os.path.join(pb.REPO, "target", "release", "postgres"))
     ap.add_argument("--conf", default=os.path.join(pb.REPO, "configs", "pgx-ephemeral.conf"))
     ap.add_argument("--engines", default="postgres,pgx")
-    ap.add_argument("--workloads", default="django,node_pg,sqlalchemy,rails_sql")
+    ap.add_argument("--workloads", default="django,node_pg,sqlalchemy,prisma,rails_sql")
     ap.add_argument("--repeats", type=int, default=3)
     ap.add_argument("--models", type=int, default=20)
     ap.add_argument("--tests", type=int, default=60)
     ap.add_argument("--port", type=int, default=54800)
+    ap.add_argument("--prisma-dir", default=os.path.expanduser("~/prisma-bench"),
+                    help="a directory with prisma and @prisma/client installed (npm)")
     args = ap.parse_args()
     os.makedirs(args.out, exist_ok=True)
     doc = {"benchmark": "agent-workload", "git_commit": pb.git("rev-parse", "HEAD"),
