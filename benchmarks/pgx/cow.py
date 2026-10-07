@@ -43,10 +43,44 @@ def zfs_dataset(path):
     return None
 
 
+def zpool_props(pool, *props):
+    out = subprocess.run(["zpool", "get", "-Hp", "-o", "value", ",".join(props), pool],
+                         capture_output=True, text=True).stdout.split()
+    return [int(x) if x.isdigit() else None for x in out]
+
+
+def zfs_quiesce(pool, timeout=120.0):
+    """Commit the open transaction group and wait until deferred frees are done.
+
+    Without this, space freed by earlier deletes (recycled WAL, dropped
+    databases) is returned to the pool at an unpredictable moment, and a
+    before/after difference can come out negative. `zpool sync` needs root;
+    without it this falls back to waiting for `freeing` to reach zero.
+    """
+    deadline = time.time() + timeout
+    while True:
+        subprocess.run(["sudo", "-n", "zpool", "sync", pool], capture_output=True)
+        freeing = zpool_props(pool, "freeing")[0]
+        if not freeing or time.time() > deadline:
+            break
+        time.sleep(1)
+    subprocess.run(["sudo", "-n", "zpool", "sync", pool], capture_output=True)
+
+
+def bclone(path):
+    """(bcloneused, bclonesaved) of the pool holding `path`, or (None, None)."""
+    ds = zfs_dataset(path)
+    if not ds:
+        return None, None
+    v = zpool_props(ds.split("/")[0], "bcloneused", "bclonesaved")
+    return (v + [None, None])[:2]
+
+
 def volume_used(path):
     """Bytes in use where `path` lives: the ZFS pool's allocation, else the volume's."""
     ds = zfs_dataset(path)
     if ds:
+        zfs_quiesce(ds.split("/")[0])
         # Pool-level ALLOC sees block cloning; per-dataset `used` charges a
         # cloned block to every dataset that references it.
         out = subprocess.run(["zpool", "list", "-Hp", "-o", "allocated", ds.split("/")[0]],
@@ -122,6 +156,7 @@ def one(args, method, target_mb):
 
         # clone
         before = r.physical()
+        bc_before = bclone(r.srv.datadir)
         clones = []
         for i in range(args.clones):
             t0 = time.perf_counter()
@@ -133,14 +168,20 @@ def one(args, method, target_mb):
             c.close()
             clones.append({"mint_to_select1_s": t1 - t0, "first_real_query_s": t2 - t1})
         after = r.physical()
+        bc_after = bclone(r.srv.datadir)
         out["clone"] = {"count": args.clones, "samples": clones,
+                        "bclone_used_delta_bytes": (bc_after[0] - bc_before[0]) if bc_before[0] is not None else None,
+                        "bclone_saved_per_clone_bytes": ((bc_after[1] - bc_before[1]) / args.clones
+                                                         if bc_before[1] is not None else None),
                         "mint_to_select1_ms_median": pb.percentile([x["mint_to_select1_s"] for x in clones], 50) * 1e3,
                         "first_real_query_ms_median": pb.percentile([x["first_real_query_s"] for x in clones], 50) * 1e3,
                         "logical_bytes_per_clone": size,
                         "physical_bytes_per_clone": (after - before) / args.clones}
-        print("%-5s %5d MB  mint p50=%.0f ms  physical/clone=%.1f MB  logical=%.0f MB" % (
+        bs = out["clone"]["bclone_saved_per_clone_bytes"]
+        print("%-5s %5d MB  mint p50=%.0f ms  physical/clone=%.1f MB  logical=%.0f MB  block-cloned/clone=%s MB" % (
             method, target_mb, out["clone"]["mint_to_select1_ms_median"],
-            out["clone"]["physical_bytes_per_clone"] / M, size / M), flush=True)
+            out["clone"]["physical_bytes_per_clone"] / M, size / M,
+            "%.1f" % (bs / M) if bs is not None else "n/a"), flush=True)
 
         # writes into clone c0
         w = r.conn(name("c0"))
