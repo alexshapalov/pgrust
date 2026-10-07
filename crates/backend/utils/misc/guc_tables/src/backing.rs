@@ -463,6 +463,14 @@ bool_var!(
     set_pgrust_ephemeral_db_prewarm,
     true
 );
+// Autovacuum launcher: pass over databases with no writes since their last
+// worker visit (autovacuum launcher.rs). PGC_SIGHUP.
+bool_var!(
+    B_pgrust_autovacuum_skip_idle_databases,
+    pgrust_autovacuum_skip_idle_databases,
+    set_pgrust_autovacuum_skip_idle_databases,
+    false
+);
 bool_var!(
     B_integer_datetimes,
     integer_datetimes,

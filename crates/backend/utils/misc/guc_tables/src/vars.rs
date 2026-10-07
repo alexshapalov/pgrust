@@ -406,6 +406,8 @@ pub static pgrust_ephemeral_db_wal_log_threshold: GucIntVar = GucSlot::new("pgru
 // mints (relcache init file + warm catalog pages), off the waiter critical
 // path. PGC_SIGHUP, read at each enqueue/dispatch site.
 pub static pgrust_ephemeral_db_prewarm: GucBoolVar = GucSlot::new("pgrust_ephemeral_db_prewarm");
+pub static pgrust_autovacuum_skip_idle_databases: GucBoolVar =
+    GucSlot::new("pgrust_autovacuum_skip_idle_databases");
 // pgrust-only (env-to-guc train, no C symbol): the per-arm runtime pool DOP
 // force-overrides + the Gather read-fairness stride. Registered from the
 // deferred pool-GUC recipe (docs/design/jit-parallel-defaults.md §3). Each is

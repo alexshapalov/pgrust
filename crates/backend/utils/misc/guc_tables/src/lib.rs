@@ -345,6 +345,10 @@ fn install_guc_tables_owned_vars() {
         get: backing::pgrust_ephemeral_db_prewarm,
         set: backing::set_pgrust_ephemeral_db_prewarm,
     });
+    vars::pgrust_autovacuum_skip_idle_databases.install(GucVarAccessors {
+        get: backing::pgrust_autovacuum_skip_idle_databases,
+        set: backing::set_pgrust_autovacuum_skip_idle_databases,
+    });
     vars::pgrust_runtime_scan_pool.install(GucVarAccessors {
         get: backing::pgrust_runtime_scan_pool,
         set: backing::set_pgrust_runtime_scan_pool,

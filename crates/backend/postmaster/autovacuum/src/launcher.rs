@@ -46,6 +46,11 @@ thread_local! {
     // C DatabaseList (launcher-private DatabaseListCxt): head first = most
     // distant adl_next_worker; the tail (last) is the soonest.
     static DATABASE_LIST: RefCell<Vec<AvlDbase>> = const { RefCell::new(Vec::new()) };
+    // pgrust.autovacuum_skip_idle_databases: tuples inserted+updated+deleted
+    // per database at the last worker visit (launcher thread only).
+    static LAST_VISIT_MODS: RefCell<std::collections::HashMap<Oid, i64>> =
+        RefCell::new(std::collections::HashMap::new());
+    static SKIPPED_IDLE: Cell<u64> = const { Cell::new(0) };
     static GOT_SIGUSR2: Cell<bool> = const { Cell::new(false) };
 }
 
@@ -532,9 +537,35 @@ fn get_database_list() -> PgResult<Vec<AvwDbase>> {
     Ok(dblist)
 }
 
-fn do_start_worker() -> PgResult<Oid> {
+/// Outcome of one launcher decision.
+enum StartOutcome {
+    /// A worker was asked for this database.
+    Launched(Oid),
+    /// This database was due but has had no inserts, updates or deletes
+    /// since its last worker visit: visit recorded, no worker started.
+    SkippedIdle(Oid),
+    None,
+}
+
+/// pgrust.autovacuum_skip_idle_databases (pgrust-only, default off).
+///
+/// A worker's per-table decisions (relation_needs_vacanalyze) change only
+/// when rows are inserted, updated or deleted, or when xid/multixact age
+/// crosses the freeze limits. The launcher handles the second case before
+/// this check (wraparound-forced databases are never skipped). So a database
+/// whose tuples_inserted + tuples_updated + tuples_deleted is unchanged since
+/// the last worker visit cannot have new work, and a worker launch for it
+/// is pure overhead: a thread, a connection, a catalog load. With thousands
+/// of mostly idle ephemeral databases that overhead was most of the
+/// runtime's idle CPU. Every database still gets its first visit, and any
+/// later write makes it eligible again.
+fn database_mod_count(entry: &pgstat::database::PgStat_StatDBEntry) -> i64 {
+    entry.tuples_inserted + entry.tuples_updated + entry.tuples_deleted
+}
+
+fn do_start_worker() -> PgResult<StartOutcome> {
     if !shmem::av_worker_available() {
-        return Ok(InvalidOid);
+        return Ok(StartOutcome::None);
     }
 
     let dblist = get_database_list()?;
@@ -616,6 +647,25 @@ fn do_start_worker() -> PgResult<Oid> {
 
     let mut retval = InvalidOid;
     if let Some(avdb) = avdb {
+        if !for_xid_wrap && !for_multi_wrap && skip_idle_databases() {
+            if let Some(entry) = pgstat::pgstat_fetch_stat_dbentry(avdb.adw_datid) {
+                let mods = database_mod_count(&entry);
+                let unchanged = LAST_VISIT_MODS.with_borrow(|m| m.get(&avdb.adw_datid) == Some(&mods));
+                if unchanged {
+                    SKIPPED_IDLE.set(SKIPPED_IDLE.get() + 1);
+                    return Ok(StartOutcome::SkippedIdle(avdb.adw_datid));
+                }
+                LAST_VISIT_MODS.with_borrow_mut(|m| {
+                    // Forget dropped databases (cheap: the list is in hand).
+                    if m.len() > dblist.len() * 2 + 64 {
+                        let live: std::collections::HashSet<Oid> =
+                            dblist.iter().map(|d| d.adw_datid).collect();
+                        m.retain(|k, _| live.contains(k));
+                    }
+                    m.insert(avdb.adw_datid, mods);
+                });
+            }
+        }
         {
             let mut l = shmem::av_lock();
             debug_assert!(!l.free_workers.is_empty());
@@ -634,11 +684,26 @@ fn do_start_worker() -> PgResult<Oid> {
         rebuild_database_list(InvalidOid)?;
     }
 
-    Ok(retval)
+    Ok(if OidIsValid(retval) { StartOutcome::Launched(retval) } else { StartOutcome::None })
+}
+
+fn skip_idle_databases() -> bool {
+    guc_tables::vars::pgrust_autovacuum_skip_idle_databases.read()
+}
+
+/// Databases passed over by pgrust.autovacuum_skip_idle_databases since the
+/// launcher started (launcher thread).
+pub fn skipped_idle_databases() -> u64 {
+    SKIPPED_IDLE.get()
 }
 
 fn launch_worker(now: TimestampTz) -> PgResult<()> {
-    let dbid = do_start_worker()?;
+    // A skipped idle database is scheduled exactly as if a worker had
+    // visited it, so the launcher keeps its cadence instead of retrying it.
+    let dbid = match do_start_worker()? {
+        StartOutcome::Launched(d) | StartOutcome::SkippedIdle(d) => d,
+        StartOutcome::None => InvalidOid,
+    };
     if OidIsValid(dbid) {
         let new_next = now + (autovacuum_naptime() as i64 * 1000) * 1000;
         let found = DATABASE_LIST.with_borrow_mut(|l| {
