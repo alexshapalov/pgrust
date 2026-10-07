@@ -217,9 +217,15 @@ class ScopedServer(pb.Server):
         argv = eng.argv(self.datadir, self.ws.sockdir, self.port)
         if eng.stack_limit:
             argv = ["/bin/sh", "-c", 'ulimit -s %d; exec "$0" "$@"' % (eng.stack_limit // 1024)] + argv
-        argv = ["sudo", "-E", "systemd-run", "--scope", "--quiet", "--unit=" + self.unit,
+        # sudo on Ubuntu 26.04 (sudo-rs) ignores -E: hand the server's
+        # environment to systemd-run explicitly.
+        setenv = []
+        for k in sorted(set(eng.env) | {"PATH", "HOME"}):
+            if k in env:
+                setenv.append("--setenv=%s=%s" % (k, env[k]))
+        argv = ["sudo", "-n", "systemd-run", "--scope", "--quiet", "--unit=" + self.unit,
                 "-p", "MemoryMax=%dM" % self.memory_max_mb, "-p", "MemorySwapMax=0",
-                "--uid=%d" % os.getuid(), "--gid=%d" % os.getgid(), "--"] + argv
+                "--uid=%d" % os.getuid(), "--gid=%d" % os.getgid()] + setenv + ["--"] + argv
         self.log = open(self.log_path, "wb")
         self.t_launch = time.perf_counter()
         self.proc = subprocess.Popen(argv, env=env, stdout=self.log, stderr=subprocess.STDOUT)
