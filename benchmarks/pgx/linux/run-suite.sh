@@ -84,8 +84,11 @@ for step in "${STEPS[@]}"; do
     workloads)
         $PY "$HERE/linux/limits.py" --mode workloads --out "$OUT/limits" ;;
     cpuagent)
-        $PY "$HERE/linux/cpu-noisy.py" --same-db --levels 0,1,4,8,16 --label one-agent --out "$OUT/cpu-noisy"
-        $PY "$HERE/linux/cpu-noisy.py" --same-db --conn-limit 2 --levels 0,1,4,8,16 --label one-agent-connlimit2 --out "$OUT/cpu-noisy" ;;
+        $PY "$HERE/linux/cpu-noisy.py" --same-db --workload agent --levels 0,1,4,8,16 --label one-agent-mix --out "$OUT/cpu-noisy"
+        for lim in ${PGX_CONN_LIMITS:-1 2 5 10 20 50}; do
+            $PY "$HERE/linux/cpu-noisy.py" --same-db --workload agent --conn-limit $lim --levels 50 --seconds 20 \
+                --label one-agent-50conns-limit$lim --out "$OUT/cpu-noisy"
+        done ;;
     limits)
         $PY "$HERE/linux/limits.py" --out "$OUT/limits" ;;
     multiruntime)

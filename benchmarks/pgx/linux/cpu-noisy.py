@@ -26,6 +26,19 @@ import ephemeral as eph  # noqa: E402
 NOISY_SQL = "SELECT sum((g::bigint * g) % 7) FROM generate_series(1, 20000000) g"
 B_QUERY = "SELECT count(*) FROM t1 WHERE account_id < 50"
 
+# An agent's test-suite / migration traffic instead of a pure CPU loop: each
+# noisy client cycles through these against its own scratch tables.
+AGENT_MIX = [
+    "CREATE TABLE IF NOT EXISTS fx_%(c)s(id bigserial PRIMARY KEY, a int, s text, j jsonb)",
+    "INSERT INTO fx_%(c)s(a, s, j) SELECT g, md5(g::text), jsonb_build_object('g', g, 'h', md5(g::text)) FROM generate_series(1, 20000) g",
+    "CREATE INDEX IF NOT EXISTS fx_%(c)s_s ON fx_%(c)s(s)",
+    "SELECT count(*), sum(a) FROM fx_%(c)s x JOIN fx_%(c)s y USING (a) WHERE x.j->>'g' LIKE '1%%'",
+    "SELECT j->>'h', count(*) FROM fx_%(c)s GROUP BY 1 ORDER BY 2 DESC LIMIT 10",
+    "ALTER TABLE fx_%(c)s ADD COLUMN IF NOT EXISTS extra int DEFAULT 0",
+    "UPDATE fx_%(c)s SET extra = a %% 7 WHERE a %% 3 = 0",
+    "DROP TABLE fx_%(c)s",
+]
+
 
 def cpu_times():
     with open("/proc/stat") as f:
@@ -54,8 +67,10 @@ def main():
     ap.add_argument("--conn-limit", type=int, default=-1,
                     help="ALTER DATABASE <noisy> CONNECTION LIMIT n (with --same-db); refused clients are counted")
     ap.add_argument("--label", default="")
+    ap.add_argument("--workload", choices=["cpu", "agent"], default="cpu",
+                    help="noisy clients run a CPU-bound query (cpu) or an agent test/migration mix (agent)")
     args = ap.parse_args()
-    gucs = ["max_connections=50", "statement_timeout=0"] + args.guc
+    gucs = ["max_connections=80", "statement_timeout=0"] + args.guc
     server_args = []
     for g in gucs:
         server_args += ["-c", g]
@@ -64,7 +79,7 @@ def main():
     connect = lambda db: pb.PgConn(ws.sockdir, args.port, database=db, timeout=600)  # noqa: E731
     os.makedirs(args.out, exist_ok=True)
     path = os.path.join(args.out, "cpu-noisy%s.json" % (("-" + args.label) if args.label else ""))
-    doc = {"benchmark": "cpu-noisy", "git_commit": pb.git("rev-parse", "HEAD"), "settings": gucs,
+    doc = {"benchmark": "cpu-noisy", "git_commit": pb.git("rev-parse", "HEAD"), "settings": gucs, "workload": args.workload,
            "same_db": args.same_db, "conn_limit": args.conn_limit, "label": args.label,
            "cpus": os.cpu_count(), "noisy_sql": NOISY_SQL, "levels": []}
     levels = [int(x) for x in args.levels.split(",")]
@@ -121,8 +136,13 @@ def main():
                     except Exception as e:  # noqa: BLE001 - connection limit
                         refused.append(str(e)[:120])
                         return
+                    k = 0
                     while not stop[0]:
-                        c.query(NOISY_SQL)
+                        if args.workload == "agent":
+                            c.query(AGENT_MIX[k % len(AGENT_MIX)] % {"c": "c%d" % i})
+                            k += 1
+                        else:
+                            c.query(NOISY_SQL)
                         noisy_done[0] += 1
                     c.close()
                 except Exception as e:  # noqa: BLE001 - a dead noisy client invalidates the level
