@@ -138,6 +138,21 @@ fn new_static_snapshot(mcx: Mcx<'static>) -> Snapshot {
 fn init_state(slot: &mut Option<ManuallyDrop<SnapMgrState>>) {
     let cx: &'static MemoryContext = ::mcx::session_root("SnapMgr");
     let mcx = cx.mcx();
+    // Session teardown drops the state (State phase: after portals and their
+    // snapshot references are gone, before the SnapMgr root's arena is
+    // released in the Roots phase). The three static snapshots and every
+    // registered/active entry are Rc's on the global heap, so without this
+    // each backend thread left ~1 KB behind (alloc trace, linux-churn.md).
+    ::mcx::register_session_cleanup(Box::new(|| {
+        STATE.with(|cell| {
+            // SAFETY: teardown runs on the owning thread with no with_state
+            // frame live (session cleanups run from the thread top).
+            let taken = unsafe { (*cell.get()).take() };
+            if let Some(st) = taken {
+                drop(ManuallyDrop::into_inner(st));
+            }
+        });
+    }));
     *slot = Some(ManuallyDrop::new(SnapMgrState {
         mcx,
         current_data: new_static_snapshot(mcx),
