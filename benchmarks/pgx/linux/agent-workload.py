@@ -27,7 +27,7 @@ each workload runs --repeats times, each in a fresh database:
 Per run: phase timings, pass/fail with the failing output, the runtime's
 peak PSS during the run, and the ZFS pool allocation delta. Output:
 <out>/agent-workload.json. Requires python3-django, python3-psycopg,
-nodejs and node-pg (Debian/Ubuntu packages).
+nodejs, node-pg and python3-sqlalchemy (Debian/Ubuntu packages).
 """
 
 import argparse
@@ -151,6 +151,48 @@ const { Client } = require('pg');
 })().catch(e => { console.error(e); process.exit(1); });
 '''
 
+SQLALCHEMY_SCRIPT = r'''
+import os, sys
+from sqlalchemy import create_engine, ForeignKey, String, Integer, select, func, text
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, Session
+from sqlalchemy.dialects.postgresql import JSONB
+url = "postgresql+psycopg://postgres@/%s?host=%s&port=%s" % (os.environ["BENCH_DB"], os.environ["BENCH_HOST"], os.environ["BENCH_PORT"])
+eng = create_engine(url)
+class Base(DeclarativeBase): pass
+class Owner(Base):
+    __tablename__ = "owner"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str] = mapped_column(String(200), unique=True)
+    pets = relationship("Pet", back_populates="owner", cascade="all, delete-orphan")
+class Pet(Base):
+    __tablename__ = "pet"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    owner_id: Mapped[int] = mapped_column(ForeignKey("owner.id"), index=True)
+    name: Mapped[str] = mapped_column(String(100))
+    data = mapped_column(JSONB, default=dict)
+    owner = relationship("Owner", back_populates="pets")
+Base.metadata.create_all(eng)
+with Session(eng) as s, s.begin():
+    for i in range(300):
+        o = Owner(email="o%d@x.io" % i)
+        o.pets = [Pet(name="p%d_%d" % (i, k), data={"k": k}) for k in range(5)]
+        s.add(o)
+with Session(eng) as s:
+    n = s.scalar(select(func.count()).select_from(Pet).join(Owner).where(Pet.data["k"].astext == "3"))
+    assert n == 300, n
+    try:
+        with s.begin():
+            s.add(Owner(email="o1@x.io"))
+    except Exception:
+        pass
+    with s.begin():
+        s.execute(text("ALTER TABLE pet ADD COLUMN status text DEFAULT 'new'"))
+        s.execute(text("CREATE INDEX pet_status ON pet(status)"))
+    assert s.scalar(select(func.count()).select_from(Owner)) == 300
+Base.metadata.drop_all(eng)
+print("ok")
+'''
+
 RAILS_SQL = [
     "SELECT pg_try_advisory_lock(7123456789)",
     'CREATE TABLE IF NOT EXISTS "schema_migrations" ("version" character varying NOT NULL PRIMARY KEY)',
@@ -267,6 +309,14 @@ def one_engine(args, label, engine_key, port):
                     if rc != 0:
                         rec.update(ok=False, failed_phase="run", output_tail=o[-1200:])
                     os.unlink(f.name)
+                elif wl == "sqlalchemy":
+                    with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False) as f:
+                        f.write(SQLALCHEMY_SCRIPT)
+                    d, rc, o = run_cmd([sys.executable, f.name], "/tmp", env)
+                    rec["phases"]["run_s"] = round(d, 3)
+                    if rc != 0:
+                        rec.update(ok=False, failed_phase="run", output_tail=o[-1200:])
+                    os.unlink(f.name)
                 elif wl == "rails_sql":
                     c = pb.PgConn(ws.sockdir, port, database=db, timeout=600)
                     t1 = time.perf_counter()
@@ -316,7 +366,7 @@ def main():
     ap.add_argument("--binary", default=os.path.join(pb.REPO, "target", "release", "postgres"))
     ap.add_argument("--conf", default=os.path.join(pb.REPO, "configs", "pgx-ephemeral.conf"))
     ap.add_argument("--engines", default="postgres,pgx")
-    ap.add_argument("--workloads", default="django,node_pg,rails_sql")
+    ap.add_argument("--workloads", default="django,node_pg,sqlalchemy,rails_sql")
     ap.add_argument("--repeats", type=int, default=3)
     ap.add_argument("--models", type=int, default=20)
     ap.add_argument("--tests", type=int, default=60)
