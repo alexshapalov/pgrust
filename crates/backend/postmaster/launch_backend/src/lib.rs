@@ -329,7 +329,13 @@ pub fn join_announced_child(pid: pid_t) {
             );
         }
     }
+    let owner = handle.thread().id();
+    // join returns (Ok, or Err after a panic unwound) only once the thread
+    // has finished, thread-local destructors included.
     let _ = handle.join();
+    // SAFETY: the thread has finished; its retired session-root shells are
+    // unreachable (mcx::retired_roots).
+    unsafe { mcx::reclaim_retired_session_roots(owner) };
 }
 
 // Fork-inherited postmaster globals, applied to the fresh thread's TLS first;

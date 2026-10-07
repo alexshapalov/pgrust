@@ -1301,6 +1301,11 @@ pub fn session_root_from(ctx: MemoryContext) -> &'static MemoryContext {
 pub fn session_root_mut(ctx: MemoryContext) -> &'static mut MemoryContext {
     let raw: *mut MemoryContext = alloc::boxed::Box::into_raw(alloc::boxed::Box::new(ctx));
     let addr = raw as usize;
+    // Owner recorded now, on the owning thread in ordinary execution (the
+    // cleanup below may run late in teardown, where thread::current() is
+    // not guaranteed to be available).
+    #[cfg(feature = "std")]
+    let owner = std::thread::current().id();
     // Roots phase: the arena dies only after every Portals/State cleanup has
     // dropped the object graphs whose allocations live in it (C: memory dies
     // at process exit, after all exit callbacks).
@@ -1316,11 +1321,89 @@ pub fn session_root_mut(ctx: MemoryContext) -> &'static mut MemoryContext {
             // access fails closed via `check_live`.
             let shell = unsafe { &mut *(addr as *mut MemoryContext) };
             shell.retire_session_root();
+            // The shell outlives the session but not the thread: once the
+            // owning thread has been joined it is freed (see
+            // `reclaim_retired_session_roots`).
+            #[cfg(feature = "std")]
+            retired_roots::bury(owner, addr);
         }),
     );
     // SAFETY: heap allocation; retired-but-never-freed by the closure above,
     // so the reference is valid for the process lifetime.
     unsafe { &mut *raw }
+}
+
+/// Retired `session_root*` shells, filed by owning thread until that thread
+/// has been joined.
+///
+/// Why freeing after the join is sound: a shell is reachable only through
+/// the `&'static MemoryContext` / `Mcx<'static>` handles handed out on its
+/// owning thread. `MemoryContext` is `!Sync`, so those handles cannot be
+/// sent to another thread in safe code, and no `unsafe impl Send/Sync` type
+/// in the server carries one (the cross-thread caches hold global-heap
+/// copies, never context handles; audited for docs/pgx/lifecycle-memory.md).
+/// After `JoinHandle::join` returns, the owning thread has finished,
+/// thread-local destructors included, so no code that could hold a handle
+/// is left. The join is also the happens-before edge for the non-atomic
+/// accounting cells the drop touches. Until the join, nothing changes: the
+/// shell stays retired and poisoned in place, exactly as before, so a late
+/// TLS destructor on the dying thread still finds a valid (poisoned) shell.
+///
+/// Threads that are never joined through the reaper keep their shells for
+/// the life of the process, as all threads did before.
+#[cfg(feature = "std")]
+mod retired_roots {
+    use core::sync::atomic::{AtomicUsize, Ordering::Relaxed};
+    use std::collections::HashMap;
+    use std::sync::Mutex;
+    use std::thread::ThreadId;
+
+    static BURIED: Mutex<Option<HashMap<ThreadId, alloc::vec::Vec<usize>>>> = Mutex::new(None);
+    pub(super) static PENDING: AtomicUsize = AtomicUsize::new(0);
+    pub(super) static RECLAIMED: AtomicUsize = AtomicUsize::new(0);
+
+    pub(super) fn bury(owner: ThreadId, addr: usize) {
+        let mut g = BURIED.lock().unwrap_or_else(|e| e.into_inner());
+        g.get_or_insert_with(HashMap::new).entry(owner).or_default().push(addr);
+        PENDING.fetch_add(1, Relaxed);
+    }
+
+    pub(super) fn take(owner: ThreadId) -> alloc::vec::Vec<usize> {
+        let mut g = BURIED.lock().unwrap_or_else(|e| e.into_inner());
+        g.as_mut().and_then(|m| m.remove(&owner)).unwrap_or_default()
+    }
+}
+
+/// Free the retired `session_root*` shells of a thread that has been joined.
+///
+/// # Safety
+/// `owner` must be the id of a thread whose `JoinHandle::join` has returned
+/// on the calling thread (or that is otherwise known to have finished,
+/// thread-local destructors included). Returns how many shells were freed.
+#[cfg(feature = "std")]
+pub unsafe fn reclaim_retired_session_roots(owner: std::thread::ThreadId) -> usize {
+    let shells = retired_roots::take(owner);
+    let n = shells.len();
+    for addr in shells {
+        // SAFETY: `addr` came from Box::into_raw in session_root_mut and was
+        // retired (arena released) on its owning thread, which the caller
+        // guarantees has finished; nothing else can reach it (see
+        // `retired_roots`). Dropping runs MemoryContext's Drop on an empty
+        // arena and releases the shell and its accounting node.
+        unsafe { drop(alloc::boxed::Box::from_raw(addr as *mut MemoryContext)) };
+    }
+    retired_roots::PENDING.fetch_sub(n, core::sync::atomic::Ordering::Relaxed);
+    retired_roots::RECLAIMED.fetch_add(n, core::sync::atomic::Ordering::Relaxed);
+    n
+}
+
+/// (retired shells waiting for their thread's join, shells freed so far).
+#[cfg(feature = "std")]
+pub fn retired_session_root_counts() -> (usize, usize) {
+    (
+        retired_roots::PENDING.load(core::sync::atomic::Ordering::Relaxed),
+        retired_roots::RECLAIMED.load(core::sync::atomic::Ordering::Relaxed),
+    )
 }
 
 // Allocator-retention release hook (mimalloc mi_collect shape); installed by

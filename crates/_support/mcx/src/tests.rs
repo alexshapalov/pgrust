@@ -1945,3 +1945,42 @@ fn limits_refuse_only_enforced_threads_and_name_the_ceiling() {
 
     limits::configure(0, 0, 0);
 }
+
+// A retired session-root shell is kept until its thread has been joined,
+// then freed by reclaim_retired_session_roots (docs/pgx/lifecycle-memory.md).
+#[cfg(feature = "std")]
+#[test]
+fn retired_session_roots_are_reclaimed_after_join() {
+    use std::cell::RefCell;
+    std::thread_local! {
+        static QUEUED: RefCell<alloc::vec::Vec<SessionCleanup>> = const { RefCell::new(alloc::vec::Vec::new()) };
+    }
+    fn sink(_phase: SessionCleanupPhase, f: SessionCleanup) {
+        QUEUED.with(|q| q.borrow_mut().push(f));
+    }
+    set_session_cleanup_sink(sink);
+    let (pending0, reclaimed0) = retired_session_root_counts();
+    let h = std::thread::spawn(|| {
+        let a = session_root("reclaim-test-a");
+        let b = session_root_mut(MemoryContext::new_bump("reclaim-test-b"));
+        let v: PgVec<u8> = vec_with_capacity_in(a.mcx(), 128).unwrap();
+        drop(v);
+        let _ = b.mcx();
+        // Session teardown on the owning thread: retire both roots.
+        let cleanups = QUEUED.with(|q| core::mem::take(&mut *q.borrow_mut()));
+        for f in cleanups.into_iter().rev() {
+            f();
+        }
+        // Retired but not yet freed: the handles are still valid shells.
+        assert_eq!(a.stats().arena_footprint, 0);
+    });
+    let owner = h.thread().id();
+    h.join().unwrap();
+    // Other tests may retire roots concurrently; count only this thread's.
+    let freed = unsafe { reclaim_retired_session_roots(owner) };
+    assert_eq!(freed, 2);
+    assert_eq!(unsafe { reclaim_retired_session_roots(owner) }, 0, "second reclaim finds nothing");
+    let (_pending1, reclaimed1) = retired_session_root_counts();
+    assert!(reclaimed1 >= reclaimed0 + 2);
+    let _ = pending0;
+}
