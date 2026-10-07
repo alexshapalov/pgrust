@@ -14,8 +14,9 @@
   failed session then answers SELECT 1, whether a bystander session and a
   brand-new connection still work, server alive, PANIC in the log, peak PSS.
 
---mode cgroup: run inside a cgroup with a hard memory.max (the caller starts
-  it with systemd-run -p MemoryMax=...). Two cases:
+--mode cgroup: each server runs in its own transient systemd scope with a
+  hard memory.max (--cgroup-mb) and no swap; the harness stays outside it, so
+  an OOM kill can only hit the server. Needs passwordless sudo. Two cases:
   limited   pgrust.runtime_memory_limit set below the cgroup: the 1.2 GB query
             must fail with the out-of-memory error and the cgroup must record
             no OOM kill
@@ -26,6 +27,7 @@ Output: <out>/limits.json or <out>/cgroup.json.
 """
 
 import argparse
+import subprocess
 import json
 import os
 import sys
@@ -48,12 +50,6 @@ def mem_available_mb():
             if line.startswith("MemAvailable:"):
                 return int(line.split()[1]) / 1024.0
     return None
-
-
-def own_cgroup():
-    with open("/proc/self/cgroup") as f:
-        path = f.read().strip().split("::", 1)[-1]
-    return "/sys/fs/cgroup" + path
 
 
 def cgroup_events(cg):
@@ -205,42 +201,100 @@ def mode_limits(args):
     return doc, "limits.json"
 
 
+class ScopedServer(pb.Server):
+    """A server started in its own transient systemd scope with a hard
+    memory.max, so the cgroup OOM killer can only ever hit the server, never
+    this harness. Needs passwordless sudo."""
+
+    def __init__(self, ws, port, unit, memory_max_mb):
+        super().__init__(ws, port)
+        self.unit, self.memory_max_mb = unit, memory_max_mb
+        self.cg = "/sys/fs/cgroup/system.slice/%s.scope" % unit
+
+    def launch(self):
+        eng = self.ws.engine
+        env = dict(os.environ, **eng.env)
+        argv = eng.argv(self.datadir, self.ws.sockdir, self.port)
+        if eng.stack_limit:
+            argv = ["/bin/sh", "-c", 'ulimit -s %d; exec "$0" "$@"' % (eng.stack_limit // 1024)] + argv
+        argv = ["sudo", "-E", "systemd-run", "--scope", "--quiet", "--unit=" + self.unit,
+                "-p", "MemoryMax=%dM" % self.memory_max_mb, "-p", "MemorySwapMax=0",
+                "--uid=%d" % os.getuid(), "--gid=%d" % os.getgid(), "--"] + argv
+        self.log = open(self.log_path, "wb")
+        self.t_launch = time.perf_counter()
+        self.proc = subprocess.Popen(argv, env=env, stdout=self.log, stderr=subprocess.STDOUT)
+        return self
+
+
+class CgroupWatch(threading.Thread):
+    """Keep the last memory.events / memory.peak seen: the scope (and its
+    files) disappears as soon as the killed server exits."""
+
+    def __init__(self, cg):
+        super().__init__(daemon=True)
+        self.cg, self.stop_flag, self.events, self.peak = cg, False, {}, None
+
+    def run(self):
+        while not self.stop_flag:
+            ev = cgroup_events(self.cg)
+            if ev:
+                self.events = ev
+            pk = cgroup_read(self.cg, "memory.peak")
+            if pk and pk.isdigit():
+                self.peak = int(pk)
+            time.sleep(0.1)
+
+
 def mode_cgroup(args):
-    cg = own_cgroup()
-    doc = {"benchmark": "cgroup-backstop", "git_commit": pb.git("rev-parse", "HEAD"), "cgroup": cg,
-           "memory.max": cgroup_read(cg, "memory.max"), "memory.swap.max": cgroup_read(cg, "memory.swap.max"),
-           "cases": []}
-    if doc["memory.max"] in (None, "max"):
-        sys.exit("not inside a cgroup with memory.max set; start with systemd-run -p MemoryMax=...")
+    doc = {"benchmark": "cgroup-backstop", "git_commit": pb.git("rev-parse", "HEAD"),
+           "memory_max_mb": args.cgroup_mb, "cases": []}
+    path = os.path.join(args.out, "cgroup.json")
     for i, (name, gucs) in enumerate([
             ("limited", ["max_connections=50", "pgrust.runtime_memory_limit=%d" % args.cgroup_runtime_mb]),
             ("unlimited", ["max_connections=50"])]):
-        ev0 = cgroup_events(cg)
+        server_args = []
+        for g in gucs:
+            server_args += ["-c", g]
+        ws = pb.Workspace(pb.Engine("pgrust", args.binary, server_args, args.conf))
+        unit = "pgx-cgroup-%s-%d" % (name, int(time.time()))
+        port = args.port + 10 + i
+        srv = ScopedServer(ws, port, unit, args.cgroup_mb).launch()
         host0 = mem_available_mb()
-        ws, srv = start_server(args, gucs, args.port + 10 + i)
-        connect = lambda db: pb.PgConn(ws.sockdir, args.port + 10 + i, database=db, timeout=600)  # noqa: E731
-        peak = Peak(srv.proc.pid)
-        peak.start()
+        srv.wait_select1()
+        watch = CgroupWatch(srv.cg)
+        watch.start()
+        connect = lambda db: pb.PgConn(ws.sockdir, port, database=db, timeout=600)  # noqa: E731
         results = []
         run_session(connect, "postgres", 30_000_000, results)
-        time.sleep(1)
-        peak.stop_flag = True
-        peak.join()
+        time.sleep(1.5)
+        watch.stop_flag = True
+        watch.join()
         rc = srv.proc.poll()
-        ev1 = cgroup_events(cg)
+        try:
+            c = connect("postgres")
+            after_ok = c.query("SELECT 1") == [["1"]]
+            c.close()
+        except Exception:  # noqa: BLE001
+            after_ok = False
+        kern = subprocess.run(["sudo", "-n", "journalctl", "-k", "--no-pager", "--since", "-2min"],
+                              capture_output=True, text=True).stdout
+        killed = [l for l in kern.splitlines() if unit in l or "Killed process" in l]
         with open(srv.log_path, "rb") as f:
             log = f.read().decode("utf-8", "replace")
-        row = {"case": name, "settings": gucs, "session": results[0], "peak_pss_mb": round(peak.peak / M, 1),
-               "server_alive": rc is None, "server_exit": rc,
-               "oom_kill_delta": ev1.get("oom_kill", 0) - ev0.get("oom_kill", 0),
-               "memory_max_events_delta": ev1.get("max", 0) - ev0.get("max", 0),
-               "host_mem_available_mb_before": round(host0 or 0), "host_mem_available_mb_after": round(mem_available_mb() or 0),
-               "cgroup_memory_peak": cgroup_read(cg, "memory.peak"),
-               "panic_in_log": "PANIC" in log, "log_tail": log[-600:]}
+        row = {"case": name, "settings": gucs, "session": results[0],
+               "server_alive_after": rc is None and after_ok, "server_exit": rc,
+               "oom_kill_events": watch.events.get("oom_kill", 0), "memory_max_hits": watch.events.get("max", 0),
+               "cgroup_memory_peak_mb": round(watch.peak / M, 1) if watch.peak else None,
+               "host_mem_available_mb_before": round(host0), "host_mem_available_mb_after": round(mem_available_mb()),
+               "kernel_log": killed[-3:], "panic_in_log": "PANIC" in log, "log_tail": log[-400:]}
         doc["cases"].append(row)
-        print("%-9s session ok=%s alive=%s exit=%s oom_kills=%d peak=%.0f MB host avail %s->%s MB" % (
-            name, results[0].get("ok"), row["server_alive"], rc, row["oom_kill_delta"], row["peak_pss_mb"],
-            row["host_mem_available_mb_before"], row["host_mem_available_mb_after"]), flush=True)
+        with open(path, "w") as f:
+            json.dump(doc, f, indent=2)
+            f.write("\n")
+        print("%-9s session ok=%s server alive=%s exit=%s oom_kills=%s cgroup peak=%s MB host avail %s->%s MB" % (
+            name, results[0].get("ok"), row["server_alive_after"], rc, row["oom_kill_events"],
+            row["cgroup_memory_peak_mb"], row["host_mem_available_mb_before"], row["host_mem_available_mb_after"]),
+            flush=True)
         try:
             srv.stop()
         except Exception:  # noqa: BLE001
@@ -260,6 +314,7 @@ def main():
     ap.add_argument("--database-mb", type=int, default=512)
     ap.add_argument("--runtime-mb", type=int, default=2048)
     ap.add_argument("--cgroup-runtime-mb", type=int, default=700)
+    ap.add_argument("--cgroup-mb", type=int, default=1024, help="memory.max of the server's scope in --mode cgroup")
     ap.add_argument("--min-available-mb", type=int, default=3500)
     ap.add_argument("--port", type=int, default=54440)
     args = ap.parse_args()
