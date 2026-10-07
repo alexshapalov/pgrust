@@ -224,7 +224,20 @@ pub fn mint_on_connect(dbname: &str) -> PgResult<bool> {
         PostEnsure::Posted(gen) | PostEnsure::Joined(gen) => {
             // Mint latency must not be tick-bound.
             registry::wake_janitor();
-            wait_for_mint(dbname, gen, my_procno)
+            if mint_timing_enabled() {
+                let t0 = std::time::Instant::now();
+                let r = wait_for_mint(dbname, gen, my_procno);
+                let _ = log_report(
+                    LOG,
+                    format!(
+                        "pgrust mint timing: backend waited {} us for \"{dbname}\"",
+                        t0.elapsed().as_micros()
+                    ),
+                );
+                r
+            } else {
+                wait_for_mint(dbname, gen, my_procno)
+            }
         }
     }
 }
@@ -1509,7 +1522,35 @@ fn template_unsealed_error(template: &str, name: &str) -> Box<PgError> {
 /// database's oid — the warm-pool replenisher registers it), Ok(None) =
 /// already existed (idempotent success). On Err the transaction is left
 /// for the caller's contain() to abort.
+/// `PGRUST_MINT_TIMING=1`: log a per-stage timing line for every serial
+/// mint (janitor side) and every mint wait (connecting backend). Read once.
+pub(crate) fn mint_timing_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var_os("PGRUST_MINT_TIMING").is_some_and(|v| v == "1"))
+}
+
 pub(crate) fn mint_one(p: &registry::PendingEnsure) -> PgResult<Option<Oid>> {
+    let t0 = std::time::Instant::now();
+    let r = mint_one_inner(p);
+    if mint_timing_enabled() {
+        if let Ok(Some(_)) = &r {
+            let [ck1, copy, ck2] = dbcommands::last_file_copy_timing_us();
+            let total = t0.elapsed().as_micros() as u64;
+            let _ = log_report(
+                LOG,
+                format!(
+                    "pgrust mint timing: db=\"{}\" total_us={total} pre_checkpoint_us={ck1} \
+                     copy_us={copy} post_checkpoint_us={ck2} other_us={}",
+                    p.name,
+                    total.saturating_sub(ck1 + copy + ck2)
+                ),
+            );
+        }
+    }
+    r
+}
+
+fn mint_one_inner(p: &registry::PendingEnsure) -> PgResult<Option<Oid>> {
     let cx = mcx::MemoryContext::new("pgrust janitor mint");
     xact::StartTransactionCommand()?;
     let mcx = cx.mcx();

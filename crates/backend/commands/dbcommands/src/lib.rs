@@ -35,6 +35,7 @@ pub use createdb::{
 };
 pub use walcopy::count_swept_relations;
 pub(crate) use dropdb::name_key;
+pub use createdb::last_file_copy_timing_us;
 pub use dropdb::{dropdb, dropdb_skip_checkpoint};
 
 #[track_caller]

@@ -238,11 +238,13 @@ fn CreateDatabaseUsingFileCopy(
         CHECKPOINT_FLUSH_ALL, CHECKPOINT_FORCE, CHECKPOINT_IMMEDIATE, CHECKPOINT_WAIT,
     };
 
+    let t0 = std::time::Instant::now();
     if request_checkpoints && !init_small::globals::IsBinaryUpgrade() {
         checkpointer::RequestCheckpoint(
             CHECKPOINT_IMMEDIATE | CHECKPOINT_FORCE | CHECKPOINT_WAIT | CHECKPOINT_FLUSH_ALL,
         )?;
     }
+    let t1 = std::time::Instant::now();
 
     let rel = table::table_open(mcx, TableSpaceRelationId, AccessShareLock)?;
     let mut scan = genam::systable_beginscan(mcx, &rel, InvalidOid, false, None, &[])?;
@@ -270,13 +272,34 @@ fn CreateDatabaseUsingFileCopy(
     }
     genam::systable_endscan(mcx, scan)?;
     rel.close(AccessShareLock)?;
+    let t2 = std::time::Instant::now();
 
     // Checkpoint before commit so committed FILE_COPY creates never need
     // ordinary crash-recovery replay (dbcommands.c's #1/#2 scenarios).
     if request_checkpoints && !init_small::globals::IsBinaryUpgrade() {
         checkpointer::RequestCheckpoint(CHECKPOINT_IMMEDIATE | CHECKPOINT_FORCE | CHECKPOINT_WAIT)?;
     }
+    let t3 = std::time::Instant::now();
+    LAST_FILE_COPY_TIMING_US.with(|c| {
+        c.set([
+            (t1 - t0).as_micros() as u64,
+            (t2 - t1).as_micros() as u64,
+            (t3 - t2).as_micros() as u64,
+        ])
+    });
     Ok(())
+}
+
+thread_local! {
+    // Microseconds of the last inline FILE_COPY on this thread: pre-checkpoint,
+    // directory copy (clone or copy), post-checkpoint. Read by the
+    // ephemeral-db janitor's mint timing log (PGRUST_MINT_TIMING=1).
+    static LAST_FILE_COPY_TIMING_US: core::cell::Cell<[u64; 3]> = const { core::cell::Cell::new([0; 3]) };
+}
+
+/// See `LAST_FILE_COPY_TIMING_US`.
+pub fn last_file_copy_timing_us() -> [u64; 3] {
+    LAST_FILE_COPY_TIMING_US.with(core::cell::Cell::get)
 }
 
 /// The wal_log arm of createdb_failure_cleanup, callable AFTER the failed
