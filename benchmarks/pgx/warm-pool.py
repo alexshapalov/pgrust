@@ -3,8 +3,11 @@
 
 For each pool size: wait until the janitor has that many spares ready, then
 fire bursts of simultaneous mint-on-connect requests (default 1, 10, 50, 100)
-and record per-request latency, how many requests were pool misses (slower
-than --miss-ms), and how long the janitor takes to refill the pool.
+and record per-request latency, the burst's drain time (first request sent to
+last SELECT 1 answered), the true pool hit rate (a request was served by a
+spare if its database's OID existed before the burst started), how many
+requests were slower than --miss-ms, and how long the janitor takes to refill
+the pool.
 
 Output: <out>/warm-pool.json.
 """
@@ -32,6 +35,7 @@ def main():
     ap.add_argument("--miss-ms", type=float, default=30.0)
     ap.add_argument("--refill-timeout", type=float, default=120.0)
     ap.add_argument("--port", type=int, default=54420)
+    ap.add_argument("--max-connections", type=int, default=0, help="default: largest burst + 30")
     args = ap.parse_args()
     os.makedirs(args.out, exist_ok=True)
     path = os.path.join(args.out, "warm-pool.json")
@@ -41,7 +45,7 @@ def main():
     for pool in [int(x) for x in args.pool_sizes.split(",")]:
         gucs = ["pgrust.ephemeral_db_prefix=" + eph.PREFIX, "pgrust.ephemeral_db_mint_roles=postgres",
                 "pgrust.ephemeral_db_grace=86400", "pgrust.ephemeral_db_pool_size=%d" % pool,
-                "max_connections=130"] + args.guc
+                "max_connections=%d" % (args.max_connections or max(130, max(int(x) for x in args.bursts.split(",")) + 30))] + args.guc
         server_args = []
         for g in gucs:
             server_args += ["-c", g]
@@ -75,6 +79,8 @@ def main():
             seq = 0
             for burst in [int(x) for x in args.bursts.split(",")]:
                 ready = spares()
+                max_oid = int(admin.query("SELECT max(oid::int8) FROM pg_database")[0][0])
+                hit = [None] * burst
                 lat = [None] * burst
                 errors = []
                 gate = threading.Event()
@@ -86,6 +92,7 @@ def main():
                         c = conn("%s%s__b%d" % (eph.PREFIX, eph.TEMPLATE, base + i))
                         c.query("SELECT 1")
                         lat[i] = time.perf_counter() - t0
+                        hit[i] = int(c.query("SELECT oid::int8 FROM pg_database WHERE datname = current_database()")[0][0]) <= max_oid
                         c.close()
                     except Exception as e:  # noqa: BLE001 - recorded
                         errors.append(str(e)[:160])
@@ -103,13 +110,15 @@ def main():
                 row = {"burst": burst, "spares_ready_before": ready, "errors": len(errors), "error_examples": errors[:2],
                        "wall_ms": round(wall * 1e3, 1),
                        "latency_ms": {k: round(v * 1e3, 1) for k, v in pb.summarize(ok).items()} if ok else None,
-                       "pool_misses": sum(1 for x in ok if x * 1e3 > args.miss_ms),
+                       "pool_hits": sum(1 for h in hit if h), "pool_misses_true": sum(1 for h in hit if h is False),
+                       "pool_hit_rate": round(sum(1 for h in hit if h) / burst, 3),
+                       "slower_than_miss_ms": sum(1 for x in ok if x * 1e3 > args.miss_ms),
                        "refill_s": None if refill is None else round(refill, 2),
                        "latencies_ms_sorted": sorted(round(x * 1e3, 1) for x in ok)}
                 entry["bursts"].append(row)
                 l = row["latency_ms"] or {}
-                print("pool=%-3d burst=%-4d ready=%-3d p50=%s p95=%s p99=%s ms  misses=%d  errors=%d  refill=%s s" % (
-                    pool, burst, ready, l.get("p50"), l.get("p95"), l.get("p99"), row["pool_misses"], len(errors),
+                print("pool=%-3d burst=%-4d ready=%-3d p50=%s p95=%s p99=%s ms  drain=%s ms  hits=%d/%d  errors=%d  refill=%s s" % (
+                    pool, burst, ready, l.get("p50"), l.get("p95"), l.get("p99"), row["wall_ms"], row["pool_hits"], burst, len(errors),
                     row["refill_s"]), flush=True)
             doc["pools"].append(entry)
             with open(path, "w") as f:
