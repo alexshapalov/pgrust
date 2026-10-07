@@ -54,7 +54,8 @@ const MAX_CONNECTIONS_BOOT_VAL: usize = 100;
 /// of shmem tables sizing themselves from MaxConnections at allocation.
 /// Overflow (`PostEnsure::TableFull`) is therefore an invariant
 /// violation — a janitor defect such as leaked entries — and mint.rs
-/// words its FATAL accordingly.
+/// words its FATAL accordingly. Only Pending entries count (post_ensure):
+/// resolved ones lingering for the fresh-mint shield are not waiters.
 pub fn ensure_capacity() -> usize {
     let max_conn = if guc_tables::vars::MaxConnections.installed() {
         guc_tables::vars::MaxConnections.read().max(1) as usize
@@ -619,8 +620,15 @@ pub fn post_ensure(
                 };
             }
         }
+        // Capacity counts PENDING entries only: each has a connecting backend
+        // parked on it, so max_connections bounds them. Resolved entries
+        // lingering through ENSURE_LINGER_NS have no waiter and are bounded
+        // by mint throughput x the linger instead; counting them let two
+        // back-to-back bursts (250 then 500 at ~50 mints/s) overflow a table
+        // sized for 530 connections and FATAL the late arrivals.
         let cap = ensure_capacity();
-        if r.ensures.len() >= cap {
+        let pending = r.ensures.iter().filter(|e| matches!(e.outcome, EnsureOutcome::Pending)).count();
+        if pending >= cap {
             return PostEnsure::TableFull { cap };
         }
         let gen = r.next_ensure_gen;
@@ -1552,6 +1560,30 @@ mod tests {
         }
         gc_ensures(u64::MAX);
         assert_eq!(pending_ensures().len(), 0);
+
+        // Resolved entries still lingering (inside ENSURE_LINGER_NS, waiters
+        // gone) do not count against the capacity: a burst right after a
+        // burst must not be refused (warm-pool bursts 250 then 500).
+        let mut done = Vec::new();
+        for i in 0..cap {
+            match post(&format!("tv_e_linger_{i}"), 11, &[], 0) {
+                PostEnsure::Posted(g) => done.push(g),
+                _ => panic!("linger fill {i} refused"),
+            }
+        }
+        for &g in &done {
+            for w in complete_ensure(g, Ok(()), now) {
+                remove_ensure_waiter(g, w);
+            }
+        }
+        gc_ensures(now + 1); // inside the linger window: every entry kept
+        let PostEnsure::Posted(after) = post("tv_e_after_burst", 12, &[], 0) else {
+            panic!("a lingering-resolved table refused a new mint");
+        };
+        for w in complete_ensure(after, Ok(()), now) {
+            remove_ensure_waiter(after, w);
+        }
+        gc_ensures(u64::MAX);
 
         set_janitor_proc(None);
     }
