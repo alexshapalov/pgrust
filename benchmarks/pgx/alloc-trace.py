@@ -7,6 +7,7 @@ symbols:
   CARGO_PROFILE_RELEASE_STRIP=false CARGO_PROFILE_RELEASE_DEBUG=line-tables-only \\
   CARGO_PROFILE_RELEASE_DEBUG_ASSERTIONS=true CARGO_PROFILE_RELEASE_LTO=off \\
   CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16 \\
+  RUSTFLAGS="-C force-frame-pointers=yes" \\
     cargo build --release --locked --bin postgres --target-dir target-track
 
   alloc-trace.py [databases per cycle, default 50]

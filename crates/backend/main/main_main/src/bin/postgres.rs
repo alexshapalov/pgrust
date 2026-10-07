@@ -110,15 +110,69 @@ mod alloc_track {
         n
     }
 
-    #[cfg(not(target_arch = "aarch64"))]
+    // x86_64 frame-pointer walk: needs RUSTFLAGS="-C force-frame-pointers=yes"
+    // for the tracker build (std frames without one keep rbp intact and are
+    // simply skipped). Same [fp]=prev fp, [fp+8]=return address layout.
+    #[cfg(target_arch = "x86_64")]
+    unsafe fn backtrace_fp(buf: &mut [usize; BT_DEPTH]) -> usize {
+        let mut fp: usize;
+        core::arch::asm!("mov {}, rbp", out(reg) fp);
+        let mut n = 0;
+        let mut prev = 0usize;
+        while n < BT_DEPTH
+            && fp > prev
+            && fp % 8 == 0
+            && (prev == 0 || fp - prev < (64 << 20))
+        {
+            let ra = *((fp + 8) as *const usize);
+            if ra < 0x1_0000 {
+                break;
+            }
+            buf[n] = ra;
+            n += 1;
+            prev = fp;
+            fp = *(fp as *const usize);
+        }
+        n
+    }
+
+    #[cfg(not(any(target_arch = "aarch64", target_arch = "x86_64")))]
     unsafe fn backtrace_fp(_buf: &mut [usize; BT_DEPTH]) -> usize {
         0
+    }
+
+    // The hooks run inside every allocation, including the ones made between
+    // a failing system call and the caller's errno read (formatting a path,
+    // say). The LIVE mutex can leave EAGAIN behind from a contended futex,
+    // which turned ENOENT ("this fork does not exist") into a hard error
+    // under the tracker. Every hook leaves errno as it found it.
+    struct ErrnoGuard(i32);
+    impl ErrnoGuard {
+        #[inline]
+        fn save() -> Self {
+            ErrnoGuard(std::io::Error::last_os_error().raw_os_error().unwrap_or(0))
+        }
+    }
+    impl Drop for ErrnoGuard {
+        #[inline]
+        fn drop(&mut self) {
+            // SAFETY: the thread's own errno slot.
+            #[cfg(target_os = "linux")]
+            unsafe {
+                *libc::__errno_location() = self.0;
+            }
+            #[cfg(target_os = "macos")]
+            unsafe {
+                *libc::__error() = self.0;
+            }
+        }
     }
 
     fn record_alloc(p: *mut u8, l: Layout) {
         if p.is_null() || !ENABLED.load(Relaxed) {
             return;
         }
+        let _errno = ErrnoGuard::save();
         IN_HOOK.with(|h| {
             if h.get() {
                 return;
@@ -145,6 +199,7 @@ mod alloc_track {
         if p.is_null() || !ENABLED.load(Relaxed) {
             return;
         }
+        let _errno = ErrnoGuard::save();
         IN_HOOK.with(|h| {
             if h.get() {
                 return;
