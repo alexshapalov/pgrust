@@ -339,7 +339,9 @@ def memory_sample(root_pid):
     for key in ("rss_bytes", "phys_footprint_bytes", "pss_bytes", "cpu_user_ns",
                 "cpu_system_ns", "idle_wakeups", "disk_read_bytes", "disk_written_bytes"):
         if procs and key in procs[0]:
-            sample[key + "_sum"] = sum(p[key] for p in procs)
+            # .get: a child process of a multi-process server can exit
+            # between the tree walk and its /proc read (partial sample).
+            sample[key + "_sum"] = sum(p.get(key, 0) for p in procs)
     return sample
 
 
