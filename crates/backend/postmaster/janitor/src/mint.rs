@@ -726,8 +726,20 @@ fn service_serial(entries: &[registry::PendingEnsure]) -> PgResult<()> {
 /// same tick.
 fn service_batch(to_mint: &[registry::PendingEnsure]) -> PgResult<()> {
     let mut created: Vec<CreatedDb> = Vec::new();
+    let batch_t0 = std::time::Instant::now();
     match mint_batch(to_mint, &mut created) {
         Ok(outcomes) => {
+            // Every member of a batch waits for the whole batch.
+            let batch_us = batch_t0.elapsed().as_micros() as u64;
+            for (p, o) in to_mint.iter().zip(outcomes.iter()) {
+                match o {
+                    BatchOutcome::Minted { .. } => crate::counters::add_cold(p.spare, batch_us),
+                    BatchOutcome::Refused(_) => {
+                        crate::counters::MINT_FAILURES.fetch_add(1, core::sync::atomic::Ordering::Relaxed);
+                    }
+                    _ => {}
+                }
+            }
             let now = pg_clock::mono_ns();
             // The batch witness line (race-suite storm phase), BEFORE any
             // completion/wake: a woken waiter finishes its connect fast
@@ -1532,6 +1544,13 @@ pub(crate) fn mint_timing_enabled() -> bool {
 pub(crate) fn mint_one(p: &registry::PendingEnsure) -> PgResult<Option<Oid>> {
     let t0 = std::time::Instant::now();
     let r = mint_one_inner(p);
+    match &r {
+        Ok(Some(_)) => crate::counters::add_cold(p.spare, t0.elapsed().as_micros() as u64),
+        Err(_) => {
+            crate::counters::MINT_FAILURES.fetch_add(1, core::sync::atomic::Ordering::Relaxed);
+        }
+        Ok(None) => {}
+    }
     if mint_timing_enabled() {
         if let Ok(Some(_)) = &r {
             let [ck1, copy, ck2] = dbcommands::last_file_copy_timing_us();

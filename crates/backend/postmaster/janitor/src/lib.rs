@@ -178,3 +178,36 @@ pub fn init_seams() {
     guc_tables::hooks::check_pgrust_ephemeral_db_mint_roles
         .install(mint::check_ephemeral_db_mint_roles);
 }
+
+/// Process-wide mint counters since start, for `pgrust_runtime_status()`.
+/// Written by the janitor thread, read by any backend; relaxed atomics.
+pub(crate) mod counters {
+    use core::sync::atomic::{AtomicU64, Ordering::Relaxed};
+
+    /// Requests served by renaming a warm spare (pool hits).
+    pub static POOL_HANDOUTS: AtomicU64 = AtomicU64::new(0);
+    /// Requests served by a cold clone (pool misses or no pool).
+    pub static COLD_MINTS: AtomicU64 = AtomicU64::new(0);
+    /// Spares minted to refill the warm pool.
+    pub static SPARES_MINTED: AtomicU64 = AtomicU64::new(0);
+    /// Mint requests that ended in an error.
+    pub static MINT_FAILURES: AtomicU64 = AtomicU64::new(0);
+    /// Sum and max of janitor-side cold-mint time, microseconds (requests only).
+    pub static COLD_MINT_US_TOTAL: AtomicU64 = AtomicU64::new(0);
+    pub static COLD_MINT_US_MAX: AtomicU64 = AtomicU64::new(0);
+
+    pub fn add_cold(spare: bool, us: u64) {
+        if spare {
+            SPARES_MINTED.fetch_add(1, Relaxed);
+        } else {
+            COLD_MINTS.fetch_add(1, Relaxed);
+            COLD_MINT_US_TOTAL.fetch_add(us, Relaxed);
+            COLD_MINT_US_MAX.fetch_max(us, Relaxed);
+        }
+    }
+
+    pub fn get(c: &AtomicU64) -> u64 {
+        c.load(Relaxed)
+    }
+}
+

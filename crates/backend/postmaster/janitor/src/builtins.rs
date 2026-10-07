@@ -216,6 +216,7 @@ pub fn fc_pgrust_runtime_status(
     let (vm_rss_kb, threads) = proc_status();
     let pss_kb = proc_pss_kb();
     let (retired_pending, retired_reclaimed) = mcx::retired_session_root_counts();
+    let cold = crate::counters::get(&crate::counters::COLD_MINTS);
     let json = format!(
         concat!(
             "{{\"pid\":{pid},",
@@ -224,7 +225,9 @@ pub fn fc_pgrust_runtime_status(
             "\"retired_session_roots_pending\":{rp},\"retired_session_roots_reclaimed\":{rr}}},",
             "\"threads\":{thr},\"connections\":{conn},",
             "\"databases\":{{\"total\":{dbt},\"ephemeral\":{eph},\"spares\":{spr},\"pinned\":{pin}}},",
-            "\"janitor\":{{\"prefix\":\"{pfx}\",\"pool_size\":{pool},\"pending_mints\":{pend}}}}}"
+            "\"janitor\":{{\"prefix\":\"{pfx}\",\"pool_size\":{pool},\"pending_mints\":{pend},",
+            "\"connection_limit\":{cl},\"pool_handouts\":{ph},\"cold_mints\":{cm},\"spares_minted\":{sm},",
+            "\"mint_failures\":{mf},\"cold_mint_ms_mean\":{cmean},\"cold_mint_ms_max\":{cmax}}}}}"
         ),
         pid = std::process::id(),
         rss = vm_rss_kb.map_or("null".into(), |k| (k * 1024).to_string()),
@@ -244,6 +247,17 @@ pub fn fc_pgrust_runtime_status(
         pfx = prefix.replace('\\', "\\\\").replace('"', "\\\""),
         pool = crate::ephemeral_db_pool_size(),
         pend = registry::pending_ensure_count(),
+        cl = crate::ephemeral_db_connection_limit(),
+        ph = crate::counters::get(&crate::counters::POOL_HANDOUTS),
+        cm = cold,
+        sm = crate::counters::get(&crate::counters::SPARES_MINTED),
+        mf = crate::counters::get(&crate::counters::MINT_FAILURES),
+        cmean = if cold > 0 {
+            format!("{:.1}", crate::counters::get(&crate::counters::COLD_MINT_US_TOTAL) as f64 / cold as f64 / 1000.0)
+        } else {
+            "null".to_string()
+        },
+        cmax = format!("{:.1}", crate::counters::get(&crate::counters::COLD_MINT_US_MAX) as f64 / 1000.0),
     );
     Ok(types_fmgr::varlena_result(varlena::cstring_to_text(fcinfo.result_mcx(), json.as_bytes())?))
 }

@@ -117,6 +117,7 @@ pub(crate) fn service_handouts(batch: Vec<PendingEnsure>) -> PgResult<Vec<Pendin
                 // reap-exposed (and reap cannot interleave anyway: it runs
                 // later in this same single-threaded tick).
                 registry::remove_spare(&spare.name);
+                crate::counters::POOL_HANDOUTS.fetch_add(1, core::sync::atomic::Ordering::Relaxed);
                 let waiters = registry::complete_ensure(p.gen, Ok(()), pg_clock::mono_ns());
                 // The handout witness line (race-suite pool phase greps the
                 // spare->name pair and the ms figure), written BEFORE the
