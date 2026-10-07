@@ -211,6 +211,9 @@ def mode_limits(args):
 
 
 HEAVY_SETUP = (
+    # The server runs work_mem=2GB so the workloads try to stay in memory;
+    # building the data under the same session limit would itself be refused.
+    "SET work_mem = '64MB';"
     "CREATE TABLE big(id int, k int, t text, j jsonb);"
     "INSERT INTO big SELECT g, g % 100000, md5(g::text), jsonb_build_object('n', g, 's', md5(g::text)) "
     "FROM generate_series(1, 3000000) g;"
