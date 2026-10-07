@@ -2528,7 +2528,7 @@ impl<'m> TuplesortData<'m> {
                     datum1 = self.abbrev_datum1(datum1);
                 }
                 if self.memtuples.len() >= self.memtuples.capacity() - 1 {
-                    self.grow_memtuples();
+                    self.grow_memtuples()?;
                     debug_assert!(self.memtuples.len() < self.memtuples.capacity());
                 }
                 let len = self.memtuples.len();
@@ -2812,12 +2812,12 @@ impl<'m> TuplesortData<'m> {
 
     /// `grow_memtuples`; chunk space approximated as capacity * sizeof(SortTuple).
     #[inline(never)]
-    fn grow_memtuples(&mut self) -> bool {
+    fn grow_memtuples(&mut self) -> PgResult<bool> {
         let memtupsize = self.memtuples.capacity();
         let mem_now_used = self.allowed_mem - self.avail_mem;
 
         if !self.grow_memtuples {
-            return false;
+            return Ok(false);
         }
 
         let newmemtupsize = if mem_now_used <= self.avail_mem {
@@ -2843,7 +2843,7 @@ impl<'m> TuplesortData<'m> {
                 < ((newmemtupsize - memtupsize) * mem::size_of::<SortTuple>()) as i64
         {
             self.grow_memtuples = false;
-            return false;
+            return Ok(false);
         }
 
         self.avail_mem += memtuples_space(memtupsize);
@@ -2851,11 +2851,17 @@ impl<'m> TuplesortData<'m> {
         // MaxAllocSize (1GB), so this must bypass the allocator's palloc
         // ceiling via the explicit huge entry point.
         let add = newmemtupsize - self.memtuples.len();
-        ::mcx::vec_reserve_huge(&mut self.memtuples, add)
-            .expect("grow_memtuples: huge memtuples repalloc failed");
+        // A refused allocation (a memory limit, or the system out of memory)
+        // is the ordinary out-of-memory ERROR, not a panic: undo the
+        // accounting above and let the caller's statement fail.
+        if let Err(e) = ::mcx::vec_reserve_huge(&mut self.memtuples, add) {
+            self.avail_mem -= memtuples_space(memtupsize);
+            self.grow_memtuples = false;
+            return Err(e);
+        }
         self.avail_mem -= memtuples_space(self.memtuples.capacity());
         debug_assert!(!self.lackmem());
-        true
+        Ok(true)
     }
 
     #[inline]

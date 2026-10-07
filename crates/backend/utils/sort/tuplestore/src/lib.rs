@@ -708,7 +708,7 @@ impl<'m> TuplestoreData<'m> {
                     }
                 }
                 if self.memtuples.len() >= self.memtuples.capacity() - 1 {
-                    self.grow_memtuples();
+                    self.grow_memtuples()?;
                     debug_assert!(self.memtuples.len() < self.memtuples.capacity());
                 }
                 self.memtuples.push(tuple);
@@ -887,12 +887,12 @@ impl<'m> TuplestoreData<'m> {
         Ok(())
     }
 
-    fn grow_memtuples(&mut self) -> bool {
+    fn grow_memtuples(&mut self) -> PgResult<bool> {
         let memtupsize = self.memtuples.capacity();
         let mem_now_used = self.allowed_mem - self.avail_mem;
 
         if !self.grow_memtuples {
-            return false;
+            return Ok(false);
         }
 
         let newmemtupsize = if mem_now_used <= self.avail_mem {
@@ -913,7 +913,7 @@ impl<'m> TuplestoreData<'m> {
             || self.avail_mem < ((newmemtupsize - memtupsize) * PTR_SIZE) as i64
         {
             self.grow_memtuples = false;
-            return false;
+            return Ok(false);
         }
 
         self.avail_mem += aset_chunk_space(memtupsize * PTR_SIZE);
@@ -921,11 +921,17 @@ impl<'m> TuplestoreData<'m> {
         // MaxAllocSize (1GB), so this must bypass the allocator's palloc
         // ceiling via the explicit huge entry point.
         let add = newmemtupsize - self.memtuples.len();
-        ::mcx::vec_reserve_huge(&mut self.memtuples, add)
-            .expect("grow_memtuples: huge memtuples repalloc failed");
+        // A refused allocation (a memory limit, or the system out of memory)
+        // is the ordinary out-of-memory ERROR, not a panic: undo the
+        // accounting above and let the caller's statement fail.
+        if let Err(e) = ::mcx::vec_reserve_huge(&mut self.memtuples, add) {
+            self.avail_mem -= aset_chunk_space(memtupsize * PTR_SIZE);
+            self.grow_memtuples = false;
+            return Err(e);
+        }
         self.avail_mem -= aset_chunk_space(self.memtuples.capacity() * PTR_SIZE);
         assert!(self.avail_mem >= 0, "unexpected out-of-memory situation in tuplestore");
-        true
+        Ok(true)
     }
 
     /// `tuplestore_updatemax`. C DIVERGENCE: a BufFileSize failure (fstat on
