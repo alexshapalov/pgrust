@@ -1,0 +1,603 @@
+{
+  "benchmark": "memory-breakdown",
+  "git_commit": "999a78bafff1897148a7c788f6a7e7e6fc63856e",
+  "settle_s": 15.0,
+  "transparent_hugepage": {
+    "enabled": "madvise",
+    "defrag": "madvise"
+  },
+  "page_size": 4096,
+  "rows": [
+    {
+      "threads": 1,
+      "rss_bytes": 33366016,
+      "rss_anon_bytes": 2260992,
+      "rss_file_bytes": 17342464,
+      "rss_shmem_bytes": 13762560,
+      "swap_bytes": 0,
+      "virtual_bytes": 233373696,
+      "pss_bytes": 18229248,
+      "pss_anon_bytes": 493568,
+      "pss_file_bytes": 5089280,
+      "pss_shmem_bytes": 12645376,
+      "private_dirty_bytes": 12275712,
+      "anon_huge_pages_bytes": 0,
+      "by_mapping": {
+        "other files and libraries": {
+          "pss_bytes": 15468544,
+          "mappings": 163
+        },
+        "server binary (text+data)": {
+          "pss_bytes": 2373632,
+          "mappings": 5
+        },
+        "[heap] (brk)": {
+          "pss_bytes": 204800,
+          "mappings": 1
+        },
+        "anonymous, mapping < 1 MB": {
+          "pss_bytes": 75776,
+          "mappings": 18
+        },
+        "main thread stack": {
+          "pss_bytes": 17408,
+          "mappings": 1
+        },
+        "[vvar]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vvar_vclock]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vdso]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vsyscall]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        }
+      },
+      "cgroup_memory_current_bytes": 38178816,
+      "label": "PostgreSQL 18 (stock)"
+    },
+    {
+      "threads": 30,
+      "rss_bytes": 88924160,
+      "rss_anon_bytes": 54845440,
+      "rss_file_bytes": 34078720,
+      "rss_shmem_bytes": 0,
+      "swap_bytes": 0,
+      "virtual_bytes": 10064019456,
+      "pss_bytes": 85030912,
+      "pss_anon_bytes": 54845440,
+      "pss_file_bytes": 30185472,
+      "pss_shmem_bytes": 0,
+      "private_dirty_bytes": 54845440,
+      "anon_huge_pages_bytes": 4194304,
+      "by_mapping": {
+        "[anon:mimalloc]": {
+          "pss_bytes": 43220992,
+          "mappings": 2
+        },
+        "server binary (text+data)": {
+          "pss_bytes": 31019008,
+          "mappings": 4
+        },
+        "anonymous, mapping >= 64 MB": {
+          "pss_bytes": 7438336,
+          "mappings": 15
+        },
+        "other files and libraries": {
+          "pss_bytes": 2176000,
+          "mappings": 215
+        },
+        "anonymous, mapping < 1 MB": {
+          "pss_bytes": 1056768,
+          "mappings": 120
+        },
+        "main thread stack": {
+          "pss_bytes": 61440,
+          "mappings": 1
+        },
+        "[heap] (brk)": {
+          "pss_bytes": 49152,
+          "mappings": 1
+        },
+        "anonymous, mapping 1-64 MB": {
+          "pss_bytes": 0,
+          "mappings": 30
+        },
+        "[vvar]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vvar_vclock]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vdso]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vsyscall]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        }
+      },
+      "cgroup_memory_current_bytes": 71806976,
+      "label": "PgRust defaults"
+    },
+    {
+      "threads": 14,
+      "rss_bytes": 77713408,
+      "rss_anon_bytes": 43466752,
+      "rss_file_bytes": 34246656,
+      "rss_shmem_bytes": 0,
+      "swap_bytes": 0,
+      "virtual_bytes": 4923703296,
+      "pss_bytes": 73819136,
+      "pss_anon_bytes": 43466752,
+      "pss_file_bytes": 30352384,
+      "pss_shmem_bytes": 0,
+      "private_dirty_bytes": 43466752,
+      "anon_huge_pages_bytes": 4194304,
+      "by_mapping": {
+        "[anon:mimalloc]": {
+          "pss_bytes": 36241408,
+          "mappings": 3
+        },
+        "server binary (text+data)": {
+          "pss_bytes": 31182848,
+          "mappings": 4
+        },
+        "anonymous, mapping >= 64 MB": {
+          "pss_bytes": 2949120,
+          "mappings": 6
+        },
+        "other files and libraries": {
+          "pss_bytes": 2179072,
+          "mappings": 215
+        },
+        "anonymous, mapping < 1 MB": {
+          "pss_bytes": 925696,
+          "mappings": 68
+        },
+        "anonymous, mapping 1-64 MB": {
+          "pss_bytes": 229376,
+          "mappings": 15
+        },
+        "main thread stack": {
+          "pss_bytes": 57344,
+          "mappings": 1
+        },
+        "[heap] (brk)": {
+          "pss_bytes": 45056,
+          "mappings": 1
+        },
+        "[vvar]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vvar_vclock]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vdso]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vsyscall]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        }
+      },
+      "cgroup_memory_current_bytes": 59494400,
+      "label": "+ max_parallel_workers=0"
+    },
+    {
+      "threads": 8,
+      "rss_bytes": 73658368,
+      "rss_anon_bytes": 39354368,
+      "rss_file_bytes": 34304000,
+      "rss_shmem_bytes": 0,
+      "swap_bytes": 0,
+      "virtual_bytes": 2995961856,
+      "pss_bytes": 69762048,
+      "pss_anon_bytes": 39354368,
+      "pss_file_bytes": 30407680,
+      "pss_shmem_bytes": 0,
+      "private_dirty_bytes": 39354368,
+      "anon_huge_pages_bytes": 4194304,
+      "by_mapping": {
+        "[anon:mimalloc]": {
+          "pss_bytes": 33787904,
+          "mappings": 3
+        },
+        "server binary (text+data)": {
+          "pss_bytes": 31318016,
+          "mappings": 4
+        },
+        "other files and libraries": {
+          "pss_bytes": 2196480,
+          "mappings": 215
+        },
+        "anonymous, mapping >= 64 MB": {
+          "pss_bytes": 1581056,
+          "mappings": 3
+        },
+        "anonymous, mapping < 1 MB": {
+          "pss_bytes": 774144,
+          "mappings": 39
+        },
+        "main thread stack": {
+          "pss_bytes": 53248,
+          "mappings": 1
+        },
+        "[heap] (brk)": {
+          "pss_bytes": 40960,
+          "mappings": 1
+        },
+        "anonymous, mapping 1-64 MB": {
+          "pss_bytes": 0,
+          "mappings": 8
+        },
+        "[vvar]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vvar_vclock]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vdso]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vsyscall]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        }
+      },
+      "cgroup_memory_current_bytes": 54996992,
+      "label": "+ pgrust.runtime=off"
+    },
+    {
+      "threads": 8,
+      "rss_bytes": 61460480,
+      "rss_anon_bytes": 26710016,
+      "rss_file_bytes": 34750464,
+      "rss_shmem_bytes": 0,
+      "swap_bytes": 0,
+      "virtual_bytes": 2995896320,
+      "pss_bytes": 57577472,
+      "pss_anon_bytes": 26710016,
+      "pss_file_bytes": 30867456,
+      "pss_shmem_bytes": 0,
+      "private_dirty_bytes": 26710016,
+      "anon_huge_pages_bytes": 4194304,
+      "by_mapping": {
+        "server binary (text+data)": {
+          "pss_bytes": 31793152,
+          "mappings": 4
+        },
+        "[anon:mimalloc]": {
+          "pss_bytes": 21139456,
+          "mappings": 2
+        },
+        "other files and libraries": {
+          "pss_bytes": 2181120,
+          "mappings": 215
+        },
+        "anonymous, mapping >= 64 MB": {
+          "pss_bytes": 1589248,
+          "mappings": 4
+        },
+        "anonymous, mapping < 1 MB": {
+          "pss_bytes": 536576,
+          "mappings": 42
+        },
+        "anonymous, mapping 1-64 MB": {
+          "pss_bytes": 229376,
+          "mappings": 9
+        },
+        "main thread stack": {
+          "pss_bytes": 57344,
+          "mappings": 1
+        },
+        "[heap] (brk)": {
+          "pss_bytes": 40960,
+          "mappings": 1
+        },
+        "[vvar]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vvar_vclock]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vdso]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vsyscall]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        }
+      },
+      "cgroup_memory_current_bytes": 42434560,
+      "label": "+ shared_buffers=16MB"
+    },
+    {
+      "threads": 8,
+      "rss_bytes": 60731392,
+      "rss_anon_bytes": 25956352,
+      "rss_file_bytes": 34775040,
+      "rss_shmem_bytes": 0,
+      "swap_bytes": 0,
+      "virtual_bytes": 2995896320,
+      "pss_bytes": 56822784,
+      "pss_anon_bytes": 25956352,
+      "pss_file_bytes": 30866432,
+      "pss_shmem_bytes": 0,
+      "private_dirty_bytes": 25956352,
+      "anon_huge_pages_bytes": 4194304,
+      "by_mapping": {
+        "server binary (text+data)": {
+          "pss_bytes": 31793152,
+          "mappings": 4
+        },
+        "[anon:mimalloc]": {
+          "pss_bytes": 20389888,
+          "mappings": 3
+        },
+        "other files and libraries": {
+          "pss_bytes": 2181120,
+          "mappings": 215
+        },
+        "anonymous, mapping >= 64 MB": {
+          "pss_bytes": 1581056,
+          "mappings": 4
+        },
+        "anonymous, mapping < 1 MB": {
+          "pss_bytes": 774144,
+          "mappings": 42
+        },
+        "main thread stack": {
+          "pss_bytes": 53248,
+          "mappings": 1
+        },
+        "[heap] (brk)": {
+          "pss_bytes": 40960,
+          "mappings": 1
+        },
+        "anonymous, mapping 1-64 MB": {
+          "pss_bytes": 0,
+          "mappings": 8
+        },
+        "[vvar]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vvar_vclock]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vdso]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vsyscall]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        }
+      },
+      "cgroup_memory_current_bytes": 41627648,
+      "label": "+ wal_buffers=64kB"
+    },
+    {
+      "threads": 8,
+      "rss_bytes": 56074240,
+      "rss_anon_bytes": 22138880,
+      "rss_file_bytes": 33935360,
+      "rss_shmem_bytes": 0,
+      "swap_bytes": 0,
+      "virtual_bytes": 2995896320,
+      "pss_bytes": 52197376,
+      "pss_anon_bytes": 22138880,
+      "pss_file_bytes": 30058496,
+      "pss_shmem_bytes": 0,
+      "private_dirty_bytes": 22138880,
+      "anon_huge_pages_bytes": 4194304,
+      "by_mapping": {
+        "server binary (text+data)": {
+          "pss_bytes": 30986240,
+          "mappings": 4
+        },
+        "[anon:mimalloc]": {
+          "pss_bytes": 16568320,
+          "mappings": 3
+        },
+        "other files and libraries": {
+          "pss_bytes": 2181120,
+          "mappings": 215
+        },
+        "anonymous, mapping >= 64 MB": {
+          "pss_bytes": 1351680,
+          "mappings": 4
+        },
+        "anonymous, mapping < 1 MB": {
+          "pss_bytes": 774144,
+          "mappings": 43
+        },
+        "anonymous, mapping 1-64 MB": {
+          "pss_bytes": 229376,
+          "mappings": 9
+        },
+        "main thread stack": {
+          "pss_bytes": 57344,
+          "mappings": 1
+        },
+        "[heap] (brk)": {
+          "pss_bytes": 40960,
+          "mappings": 1
+        },
+        "[vvar]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vvar_vclock]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vdso]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vsyscall]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        }
+      },
+      "cgroup_memory_current_bytes": 37629952,
+      "label": "+ max_connections=20"
+    },
+    {
+      "threads": 7,
+      "rss_bytes": 54898688,
+      "rss_anon_bytes": 21221376,
+      "rss_file_bytes": 33677312,
+      "rss_shmem_bytes": 0,
+      "swap_bytes": 0,
+      "virtual_bytes": 2674622464,
+      "pss_bytes": 51006464,
+      "pss_anon_bytes": 21221376,
+      "pss_file_bytes": 29785088,
+      "pss_shmem_bytes": 0,
+      "private_dirty_bytes": 21221376,
+      "anon_huge_pages_bytes": 4194304,
+      "by_mapping": {
+        "server binary (text+data)": {
+          "pss_bytes": 30728192,
+          "mappings": 4
+        },
+        "[anon:mimalloc]": {
+          "pss_bytes": 15925248,
+          "mappings": 2
+        },
+        "other files and libraries": {
+          "pss_bytes": 2165760,
+          "mappings": 215
+        },
+        "anonymous, mapping >= 64 MB": {
+          "pss_bytes": 1318912,
+          "mappings": 3
+        },
+        "anonymous, mapping < 1 MB": {
+          "pss_bytes": 528384,
+          "mappings": 37
+        },
+        "anonymous, mapping 1-64 MB": {
+          "pss_bytes": 229376,
+          "mappings": 8
+        },
+        "main thread stack": {
+          "pss_bytes": 61440,
+          "mappings": 1
+        },
+        "[heap] (brk)": {
+          "pss_bytes": 40960,
+          "mappings": 1
+        },
+        "[vvar]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vvar_vclock]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vdso]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vsyscall]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        }
+      },
+      "cgroup_memory_current_bytes": 36728832,
+      "label": "+ replication off"
+    },
+    {
+      "threads": 7,
+      "rss_bytes": 54800384,
+      "rss_anon_bytes": 20848640,
+      "rss_file_bytes": 33951744,
+      "rss_shmem_bytes": 0,
+      "swap_bytes": 0,
+      "virtual_bytes": 2674622464,
+      "pss_bytes": 50912256,
+      "pss_anon_bytes": 20848640,
+      "pss_file_bytes": 30063616,
+      "pss_shmem_bytes": 0,
+      "private_dirty_bytes": 20848640,
+      "anon_huge_pages_bytes": 4194304,
+      "by_mapping": {
+        "server binary (text+data)": {
+          "pss_bytes": 30982144,
+          "mappings": 4
+        },
+        "[anon:mimalloc]": {
+          "pss_bytes": 15556608,
+          "mappings": 3
+        },
+        "other files and libraries": {
+          "pss_bytes": 2190336,
+          "mappings": 215
+        },
+        "anonymous, mapping >= 64 MB": {
+          "pss_bytes": 1081344,
+          "mappings": 3
+        },
+        "anonymous, mapping < 1 MB": {
+          "pss_bytes": 765952,
+          "mappings": 40
+        },
+        "anonymous, mapping 1-64 MB": {
+          "pss_bytes": 229376,
+          "mappings": 8
+        },
+        "main thread stack": {
+          "pss_bytes": 57344,
+          "mappings": 1
+        },
+        "[heap] (brk)": {
+          "pss_bytes": 40960,
+          "mappings": 1
+        },
+        "[vvar]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vvar_vclock]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vdso]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        },
+        "[vsyscall]": {
+          "pss_bytes": 0,
+          "mappings": 1
+        }
+      },
+      "cgroup_memory_current_bytes": 36560896,
+      "label": "PGX profile (configs/pgx-ephemeral.conf)"
+    }
+  ]
+}

@@ -1,0 +1,177 @@
+{
+  "benchmark": "lifecycle",
+  "git_commit": "999a78bafff1897148a7c788f6a7e7e6fc63856e",
+  "settings": [
+    "max_connections=120"
+  ],
+  "conf": "/home/ubuntu/pgrust/configs/pgx-ephemeral.conf",
+  "n": 100,
+  "connections_only": true,
+  "label": "",
+  "batches": [
+    {
+      "batch": 0,
+      "warmup": true,
+      "stage_pss_bytes": {
+        "before": 91732992,
+        "connect": 207382528,
+        "workload": 248640512,
+        "disconnect": 118257664
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    },
+    {
+      "batch": 1,
+      "warmup": true,
+      "stage_pss_bytes": {
+        "before": 118261760,
+        "connect": 208328704,
+        "workload": 248330240,
+        "disconnect": 109381632
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    },
+    {
+      "batch": 2,
+      "warmup": true,
+      "stage_pss_bytes": {
+        "before": 109375488,
+        "connect": 208250880,
+        "workload": 248125440,
+        "disconnect": 184199168
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    },
+    {
+      "batch": 3,
+      "warmup": false,
+      "stage_pss_bytes": {
+        "before": 184199168,
+        "connect": 208250880,
+        "workload": 248236032,
+        "disconnect": 123045888
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    },
+    {
+      "batch": 4,
+      "warmup": false,
+      "stage_pss_bytes": {
+        "before": 123045888,
+        "connect": 209143808,
+        "workload": 248190976,
+        "disconnect": 102746112
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    },
+    {
+      "batch": 5,
+      "warmup": false,
+      "stage_pss_bytes": {
+        "before": 102739968,
+        "connect": 207888384,
+        "workload": 248155136,
+        "disconnect": 184171520
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    },
+    {
+      "batch": 6,
+      "warmup": false,
+      "stage_pss_bytes": {
+        "before": 184172544,
+        "connect": 207952896,
+        "workload": 247720960,
+        "disconnect": 102731776
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    },
+    {
+      "batch": 7,
+      "warmup": false,
+      "stage_pss_bytes": {
+        "before": 102731776,
+        "connect": 209796096,
+        "workload": 249482240,
+        "disconnect": 156935168
+      },
+      "threads_connected": 108,
+      "threads_after": 9
+    },
+    {
+      "batch": 8,
+      "warmup": false,
+      "stage_pss_bytes": {
+        "before": 103579648,
+        "connect": 210508800,
+        "workload": 250125312,
+        "disconnect": 189791232
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    },
+    {
+      "batch": 9,
+      "warmup": false,
+      "stage_pss_bytes": {
+        "before": 103214080,
+        "connect": 210492416,
+        "workload": 250093568,
+        "disconnect": 150925312
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    },
+    {
+      "batch": 10,
+      "warmup": false,
+      "stage_pss_bytes": {
+        "before": 150925312,
+        "connect": 210223104,
+        "workload": 249786368,
+        "disconnect": 113586176
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    },
+    {
+      "batch": 11,
+      "warmup": false,
+      "stage_pss_bytes": {
+        "before": 113582080,
+        "connect": 210202624,
+        "workload": 250707968,
+        "disconnect": 139320320
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    },
+    {
+      "batch": 12,
+      "warmup": false,
+      "stage_pss_bytes": {
+        "before": 139324416,
+        "connect": 211106816,
+        "workload": 250671104,
+        "disconnect": 103477248
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    }
+  ],
+  "start_pss_bytes": 91718656,
+  "retained_bytes_per_batch": -579323.3454545455,
+  "retained_bytes_per_lifecycle": -5793.233454545454,
+  "stage_delta_bytes_per_db": {
+    "connect": 788050.944,
+    "workload": 397603.84,
+    "disconnect": -1126438.912
+  }
+}

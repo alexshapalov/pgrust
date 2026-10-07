@@ -69,7 +69,7 @@ its shells are freed. Why that is safe:
 
 Tested by a unit test (shell freed exactly once after join, second reclaim
 finds nothing), the full `mcx` suite (122), and the regression suite
-(REGRESS_PENDING).
+(219/231 byte-exact, the same 12 plan-only differences, on `999a78baff`).
 
 ### 2. Snapshot manager state — fixed
 

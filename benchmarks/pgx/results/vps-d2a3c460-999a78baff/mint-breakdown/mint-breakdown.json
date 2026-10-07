@@ -1,0 +1,946 @@
+{
+  "benchmark": "mint-breakdown",
+  "git_commit": "999a78bafff1897148a7c788f6a7e7e6fc63856e",
+  "template": {
+    "tables": 50,
+    "rows": 200
+  },
+  "runs": [
+    {
+      "mode": "cold",
+      "pool": 0,
+      "requests": [
+        {
+          "client_total_ms": 85.98,
+          "backend_wait_ms": 72.33,
+          "connect_and_init_ms": 13.65,
+          "mint_total_ms": 72.14,
+          "mint_pre_checkpoint_ms": 1.07,
+          "mint_copy_ms": 69.1,
+          "mint_post_checkpoint_ms": 1.44,
+          "mint_other_ms": 0.52
+        },
+        {
+          "client_total_ms": 86.43,
+          "backend_wait_ms": 69.32,
+          "connect_and_init_ms": 17.11,
+          "mint_total_ms": 69.08,
+          "mint_pre_checkpoint_ms": 0.92,
+          "mint_copy_ms": 66.65,
+          "mint_post_checkpoint_ms": 1.01,
+          "mint_other_ms": 0.5
+        },
+        {
+          "client_total_ms": 72.84,
+          "backend_wait_ms": 54.26,
+          "connect_and_init_ms": 18.58,
+          "mint_total_ms": 54.06,
+          "mint_pre_checkpoint_ms": 1.16,
+          "mint_copy_ms": 50.86,
+          "mint_post_checkpoint_ms": 1.61,
+          "mint_other_ms": 0.42
+        },
+        {
+          "client_total_ms": 73.58,
+          "backend_wait_ms": 55.81,
+          "connect_and_init_ms": 17.77,
+          "mint_total_ms": 55.64,
+          "mint_pre_checkpoint_ms": 1.09,
+          "mint_copy_ms": 52.99,
+          "mint_post_checkpoint_ms": 1.14,
+          "mint_other_ms": 0.41
+        },
+        {
+          "client_total_ms": 73.52,
+          "backend_wait_ms": 56.74,
+          "connect_and_init_ms": 16.78,
+          "mint_total_ms": 56.54,
+          "mint_pre_checkpoint_ms": 1.05,
+          "mint_copy_ms": 53.96,
+          "mint_post_checkpoint_ms": 1.17,
+          "mint_other_ms": 0.36
+        },
+        {
+          "client_total_ms": 74.1,
+          "backend_wait_ms": 57.28,
+          "connect_and_init_ms": 16.83,
+          "mint_total_ms": 57.03,
+          "mint_pre_checkpoint_ms": 1.1,
+          "mint_copy_ms": 54.55,
+          "mint_post_checkpoint_ms": 0.93,
+          "mint_other_ms": 0.46
+        },
+        {
+          "client_total_ms": 81.97,
+          "backend_wait_ms": 66.85,
+          "connect_and_init_ms": 15.12,
+          "mint_total_ms": 66.69,
+          "mint_pre_checkpoint_ms": 0.9,
+          "mint_copy_ms": 64.77,
+          "mint_post_checkpoint_ms": 0.69,
+          "mint_other_ms": 0.33
+        },
+        {
+          "client_total_ms": 76.26,
+          "backend_wait_ms": 59.81,
+          "connect_and_init_ms": 16.45,
+          "mint_total_ms": 59.67,
+          "mint_pre_checkpoint_ms": 0.94,
+          "mint_copy_ms": 57.35,
+          "mint_post_checkpoint_ms": 1.01,
+          "mint_other_ms": 0.37
+        },
+        {
+          "client_total_ms": 72.47,
+          "backend_wait_ms": 56.12,
+          "connect_and_init_ms": 16.35,
+          "mint_total_ms": 55.94,
+          "mint_pre_checkpoint_ms": 1.08,
+          "mint_copy_ms": 53.76,
+          "mint_post_checkpoint_ms": 0.73,
+          "mint_other_ms": 0.37
+        },
+        {
+          "client_total_ms": 78.53,
+          "backend_wait_ms": 59.86,
+          "connect_and_init_ms": 18.67,
+          "mint_total_ms": 59.67,
+          "mint_pre_checkpoint_ms": 0.92,
+          "mint_copy_ms": 57.55,
+          "mint_post_checkpoint_ms": 0.71,
+          "mint_other_ms": 0.48
+        },
+        {
+          "client_total_ms": 72.56,
+          "backend_wait_ms": 57.18,
+          "connect_and_init_ms": 15.37,
+          "mint_total_ms": 57.05,
+          "mint_pre_checkpoint_ms": 0.79,
+          "mint_copy_ms": 55.14,
+          "mint_post_checkpoint_ms": 0.73,
+          "mint_other_ms": 0.39
+        },
+        {
+          "client_total_ms": 87.35,
+          "backend_wait_ms": 70.03,
+          "connect_and_init_ms": 17.32,
+          "mint_total_ms": 69.83,
+          "mint_pre_checkpoint_ms": 1.4,
+          "mint_copy_ms": 67.39,
+          "mint_post_checkpoint_ms": 0.72,
+          "mint_other_ms": 0.33
+        },
+        {
+          "client_total_ms": 97.48,
+          "backend_wait_ms": 73.44,
+          "connect_and_init_ms": 24.04,
+          "mint_total_ms": 73.09,
+          "mint_pre_checkpoint_ms": 0.85,
+          "mint_copy_ms": 70.48,
+          "mint_post_checkpoint_ms": 1.43,
+          "mint_other_ms": 0.33
+        },
+        {
+          "client_total_ms": 81.08,
+          "backend_wait_ms": 65.97,
+          "connect_and_init_ms": 15.11,
+          "mint_total_ms": 65.75,
+          "mint_pre_checkpoint_ms": 1.24,
+          "mint_copy_ms": 63.06,
+          "mint_post_checkpoint_ms": 0.94,
+          "mint_other_ms": 0.51
+        },
+        {
+          "client_total_ms": 94.39,
+          "backend_wait_ms": 79.69,
+          "connect_and_init_ms": 14.7,
+          "mint_total_ms": 79.57,
+          "mint_pre_checkpoint_ms": 0.77,
+          "mint_copy_ms": 77.53,
+          "mint_post_checkpoint_ms": 0.77,
+          "mint_other_ms": 0.5
+        },
+        {
+          "client_total_ms": 104.15,
+          "backend_wait_ms": 89.17,
+          "connect_and_init_ms": 14.98,
+          "mint_total_ms": 89.06,
+          "mint_pre_checkpoint_ms": 0.94,
+          "mint_copy_ms": 86.61,
+          "mint_post_checkpoint_ms": 1.04,
+          "mint_other_ms": 0.47
+        },
+        {
+          "client_total_ms": 72.99,
+          "backend_wait_ms": 56.64,
+          "connect_and_init_ms": 16.35,
+          "mint_total_ms": 56.51,
+          "mint_pre_checkpoint_ms": 1.41,
+          "mint_copy_ms": 53.87,
+          "mint_post_checkpoint_ms": 0.8,
+          "mint_other_ms": 0.44
+        },
+        {
+          "client_total_ms": 71.42,
+          "backend_wait_ms": 57.24,
+          "connect_and_init_ms": 14.18,
+          "mint_total_ms": 57.14,
+          "mint_pre_checkpoint_ms": 0.77,
+          "mint_copy_ms": 55.37,
+          "mint_post_checkpoint_ms": 0.69,
+          "mint_other_ms": 0.31
+        },
+        {
+          "client_total_ms": 72.42,
+          "backend_wait_ms": 54.5,
+          "connect_and_init_ms": 17.92,
+          "mint_total_ms": 54.39,
+          "mint_pre_checkpoint_ms": 0.75,
+          "mint_copy_ms": 52.37,
+          "mint_post_checkpoint_ms": 0.94,
+          "mint_other_ms": 0.32
+        },
+        {
+          "client_total_ms": 88.91,
+          "backend_wait_ms": 71.79,
+          "connect_and_init_ms": 17.12,
+          "mint_total_ms": 71.56,
+          "mint_pre_checkpoint_ms": 1.28,
+          "mint_copy_ms": 69.09,
+          "mint_post_checkpoint_ms": 0.76,
+          "mint_other_ms": 0.43
+        },
+        {
+          "client_total_ms": 82.9,
+          "backend_wait_ms": 67.88,
+          "connect_and_init_ms": 15.02,
+          "mint_total_ms": 67.59,
+          "mint_pre_checkpoint_ms": 0.83,
+          "mint_copy_ms": 65.59,
+          "mint_post_checkpoint_ms": 0.76,
+          "mint_other_ms": 0.42
+        },
+        {
+          "client_total_ms": 84.81,
+          "backend_wait_ms": 66.8,
+          "connect_and_init_ms": 18.01,
+          "mint_total_ms": 66.67,
+          "mint_pre_checkpoint_ms": 0.93,
+          "mint_copy_ms": 64.49,
+          "mint_post_checkpoint_ms": 0.93,
+          "mint_other_ms": 0.32
+        },
+        {
+          "client_total_ms": 89.91,
+          "backend_wait_ms": 74.4,
+          "connect_and_init_ms": 15.51,
+          "mint_total_ms": 74.28,
+          "mint_pre_checkpoint_ms": 0.86,
+          "mint_copy_ms": 71.98,
+          "mint_post_checkpoint_ms": 0.94,
+          "mint_other_ms": 0.5
+        },
+        {
+          "client_total_ms": 77.21,
+          "backend_wait_ms": 61.0,
+          "connect_and_init_ms": 16.21,
+          "mint_total_ms": 60.85,
+          "mint_pre_checkpoint_ms": 1.02,
+          "mint_copy_ms": 58.72,
+          "mint_post_checkpoint_ms": 0.67,
+          "mint_other_ms": 0.44
+        },
+        {
+          "client_total_ms": 74.02,
+          "backend_wait_ms": 59.45,
+          "connect_and_init_ms": 14.57,
+          "mint_total_ms": 59.34,
+          "mint_pre_checkpoint_ms": 0.86,
+          "mint_copy_ms": 57.42,
+          "mint_post_checkpoint_ms": 0.76,
+          "mint_other_ms": 0.29
+        },
+        {
+          "client_total_ms": 86.54,
+          "backend_wait_ms": 71.37,
+          "connect_and_init_ms": 15.17,
+          "mint_total_ms": 71.14,
+          "mint_pre_checkpoint_ms": 0.95,
+          "mint_copy_ms": 68.96,
+          "mint_post_checkpoint_ms": 0.78,
+          "mint_other_ms": 0.46
+        },
+        {
+          "client_total_ms": 71.75,
+          "backend_wait_ms": 58.29,
+          "connect_and_init_ms": 13.46,
+          "mint_total_ms": 58.18,
+          "mint_pre_checkpoint_ms": 0.92,
+          "mint_copy_ms": 56.25,
+          "mint_post_checkpoint_ms": 0.7,
+          "mint_other_ms": 0.31
+        },
+        {
+          "client_total_ms": 73.88,
+          "backend_wait_ms": 59.75,
+          "connect_and_init_ms": 14.13,
+          "mint_total_ms": 59.58,
+          "mint_pre_checkpoint_ms": 0.91,
+          "mint_copy_ms": 57.29,
+          "mint_post_checkpoint_ms": 0.82,
+          "mint_other_ms": 0.56
+        },
+        {
+          "client_total_ms": 68.59,
+          "backend_wait_ms": 53.72,
+          "connect_and_init_ms": 14.86,
+          "mint_total_ms": 53.5,
+          "mint_pre_checkpoint_ms": 0.82,
+          "mint_copy_ms": 51.56,
+          "mint_post_checkpoint_ms": 0.73,
+          "mint_other_ms": 0.39
+        },
+        {
+          "client_total_ms": 78.19,
+          "backend_wait_ms": 63.09,
+          "connect_and_init_ms": 15.09,
+          "mint_total_ms": 62.93,
+          "mint_pre_checkpoint_ms": 0.86,
+          "mint_copy_ms": 61.14,
+          "mint_post_checkpoint_ms": 0.64,
+          "mint_other_ms": 0.3
+        },
+        {
+          "client_total_ms": 73.11,
+          "backend_wait_ms": 56.0,
+          "connect_and_init_ms": 17.11,
+          "mint_total_ms": 55.9,
+          "mint_pre_checkpoint_ms": 0.91,
+          "mint_copy_ms": 53.64,
+          "mint_post_checkpoint_ms": 0.99,
+          "mint_other_ms": 0.35
+        },
+        {
+          "client_total_ms": 69.61,
+          "backend_wait_ms": 56.27,
+          "connect_and_init_ms": 13.34,
+          "mint_total_ms": 56.15,
+          "mint_pre_checkpoint_ms": 0.85,
+          "mint_copy_ms": 54.29,
+          "mint_post_checkpoint_ms": 0.69,
+          "mint_other_ms": 0.33
+        },
+        {
+          "client_total_ms": 70.77,
+          "backend_wait_ms": 56.63,
+          "connect_and_init_ms": 14.14,
+          "mint_total_ms": 56.5,
+          "mint_pre_checkpoint_ms": 0.94,
+          "mint_copy_ms": 54.55,
+          "mint_post_checkpoint_ms": 0.65,
+          "mint_other_ms": 0.36
+        },
+        {
+          "client_total_ms": 71.3,
+          "backend_wait_ms": 53.1,
+          "connect_and_init_ms": 18.2,
+          "mint_total_ms": 52.98,
+          "mint_pre_checkpoint_ms": 1.06,
+          "mint_copy_ms": 50.91,
+          "mint_post_checkpoint_ms": 0.71,
+          "mint_other_ms": 0.3
+        },
+        {
+          "client_total_ms": 69.93,
+          "backend_wait_ms": 55.03,
+          "connect_and_init_ms": 14.9,
+          "mint_total_ms": 54.91,
+          "mint_pre_checkpoint_ms": 1.0,
+          "mint_copy_ms": 52.79,
+          "mint_post_checkpoint_ms": 0.65,
+          "mint_other_ms": 0.47
+        },
+        {
+          "client_total_ms": 82.01,
+          "backend_wait_ms": 67.77,
+          "connect_and_init_ms": 14.24,
+          "mint_total_ms": 67.59,
+          "mint_pre_checkpoint_ms": 0.96,
+          "mint_copy_ms": 65.44,
+          "mint_post_checkpoint_ms": 0.69,
+          "mint_other_ms": 0.51
+        },
+        {
+          "client_total_ms": 70.91,
+          "backend_wait_ms": 55.56,
+          "connect_and_init_ms": 15.35,
+          "mint_total_ms": 55.41,
+          "mint_pre_checkpoint_ms": 0.74,
+          "mint_copy_ms": 53.58,
+          "mint_post_checkpoint_ms": 0.71,
+          "mint_other_ms": 0.39
+        },
+        {
+          "client_total_ms": 77.56,
+          "backend_wait_ms": 63.54,
+          "connect_and_init_ms": 14.02,
+          "mint_total_ms": 63.41,
+          "mint_pre_checkpoint_ms": 0.85,
+          "mint_copy_ms": 60.97,
+          "mint_post_checkpoint_ms": 1.26,
+          "mint_other_ms": 0.33
+        },
+        {
+          "client_total_ms": 72.66,
+          "backend_wait_ms": 58.08,
+          "connect_and_init_ms": 14.58,
+          "mint_total_ms": 57.97,
+          "mint_pre_checkpoint_ms": 0.96,
+          "mint_copy_ms": 55.85,
+          "mint_post_checkpoint_ms": 0.77,
+          "mint_other_ms": 0.38
+        },
+        {
+          "client_total_ms": 72.96,
+          "backend_wait_ms": 54.6,
+          "connect_and_init_ms": 18.36,
+          "mint_total_ms": 54.41,
+          "mint_pre_checkpoint_ms": 1.1,
+          "mint_copy_ms": 52.31,
+          "mint_post_checkpoint_ms": 0.71,
+          "mint_other_ms": 0.29
+        }
+      ],
+      "summary": {
+        "backend_wait_ms": {
+          "min": 53.1,
+          "p50": 59.6,
+          "p95": 74.66,
+          "p99": 85.47,
+          "max": 89.17,
+          "mean": 62.41
+        },
+        "client_total_ms": {
+          "min": 68.59,
+          "p50": 74.06,
+          "p95": 94.54,
+          "p99": 101.55,
+          "max": 104.15,
+          "mean": 78.43
+        },
+        "connect_and_init_ms": {
+          "min": 13.34,
+          "p50": 15.36,
+          "p95": 18.58,
+          "p99": 21.95,
+          "max": 24.04,
+          "mean": 16.02
+        },
+        "mint_copy_ms": {
+          "min": 50.86,
+          "p50": 57.32,
+          "p95": 72.26,
+          "p99": 83.07,
+          "max": 86.61,
+          "mean": 60.0
+        },
+        "mint_other_ms": {
+          "min": 0.29,
+          "p50": 0.39,
+          "p95": 0.51,
+          "p99": 0.54,
+          "max": 0.56,
+          "mean": 0.4
+        },
+        "mint_post_checkpoint_ms": {
+          "min": 0.64,
+          "p50": 0.77,
+          "p95": 1.43,
+          "p99": 1.54,
+          "max": 1.61,
+          "mean": 0.87
+        },
+        "mint_pre_checkpoint_ms": {
+          "min": 0.74,
+          "p50": 0.94,
+          "p95": 1.29,
+          "p99": 1.41,
+          "max": 1.41,
+          "mean": 0.97
+        },
+        "mint_total_ms": {
+          "min": 52.98,
+          "p50": 59.46,
+          "p95": 74.54,
+          "p99": 85.36,
+          "max": 89.06,
+          "mean": 62.24
+        }
+      }
+    },
+    {
+      "mode": "warm",
+      "pool": 8,
+      "requests": [
+        {
+          "client_total_ms": 6.75,
+          "backend_wait_ms": 0.4,
+          "connect_and_init_ms": 6.35
+        },
+        {
+          "client_total_ms": 6.12,
+          "backend_wait_ms": 0.31,
+          "connect_and_init_ms": 5.81
+        },
+        {
+          "client_total_ms": 6.22,
+          "backend_wait_ms": 0.0,
+          "connect_and_init_ms": 6.22
+        },
+        {
+          "client_total_ms": 6.0,
+          "backend_wait_ms": 0.35,
+          "connect_and_init_ms": 5.64
+        },
+        {
+          "client_total_ms": 5.46,
+          "backend_wait_ms": 0.42,
+          "connect_and_init_ms": 5.04
+        },
+        {
+          "client_total_ms": 5.73,
+          "backend_wait_ms": 0.46,
+          "connect_and_init_ms": 5.27
+        },
+        {
+          "client_total_ms": 7.26,
+          "backend_wait_ms": 0.35,
+          "connect_and_init_ms": 6.91
+        },
+        {
+          "client_total_ms": 7.16,
+          "backend_wait_ms": 0.54,
+          "connect_and_init_ms": 6.62
+        },
+        {
+          "client_total_ms": 7.29,
+          "backend_wait_ms": 0.5,
+          "connect_and_init_ms": 6.79
+        },
+        {
+          "client_total_ms": 6.45,
+          "backend_wait_ms": 0.0,
+          "connect_and_init_ms": 6.45
+        },
+        {
+          "client_total_ms": 6.21,
+          "backend_wait_ms": 0.36,
+          "connect_and_init_ms": 5.84
+        },
+        {
+          "client_total_ms": 5.79,
+          "backend_wait_ms": 0.38,
+          "connect_and_init_ms": 5.41
+        },
+        {
+          "client_total_ms": 5.53,
+          "backend_wait_ms": 0.33,
+          "connect_and_init_ms": 5.2
+        },
+        {
+          "client_total_ms": 5.94,
+          "backend_wait_ms": 0.41,
+          "connect_and_init_ms": 5.53
+        },
+        {
+          "client_total_ms": 5.73,
+          "backend_wait_ms": 0.0,
+          "connect_and_init_ms": 5.73
+        },
+        {
+          "client_total_ms": 8.52,
+          "backend_wait_ms": 0.43,
+          "connect_and_init_ms": 8.09
+        },
+        {
+          "client_total_ms": 5.39,
+          "backend_wait_ms": 0.5,
+          "connect_and_init_ms": 4.89
+        },
+        {
+          "client_total_ms": 4.85,
+          "backend_wait_ms": 0.0,
+          "connect_and_init_ms": 4.85
+        },
+        {
+          "client_total_ms": 6.16,
+          "backend_wait_ms": 0.59,
+          "connect_and_init_ms": 5.58
+        },
+        {
+          "client_total_ms": 6.08,
+          "backend_wait_ms": 0.48,
+          "connect_and_init_ms": 5.59
+        },
+        {
+          "client_total_ms": 9.75,
+          "backend_wait_ms": 0.45,
+          "connect_and_init_ms": 9.31
+        },
+        {
+          "client_total_ms": 5.95,
+          "backend_wait_ms": 0.51,
+          "connect_and_init_ms": 5.45
+        },
+        {
+          "client_total_ms": 7.03,
+          "backend_wait_ms": 0.47,
+          "connect_and_init_ms": 6.56
+        },
+        {
+          "client_total_ms": 5.48,
+          "backend_wait_ms": 0.0,
+          "connect_and_init_ms": 5.48
+        },
+        {
+          "client_total_ms": 6.56,
+          "backend_wait_ms": 0.68,
+          "connect_and_init_ms": 5.87
+        },
+        {
+          "client_total_ms": 6.54,
+          "backend_wait_ms": 0.59,
+          "connect_and_init_ms": 5.94
+        },
+        {
+          "client_total_ms": 5.84,
+          "backend_wait_ms": 0.54,
+          "connect_and_init_ms": 5.3
+        },
+        {
+          "client_total_ms": 6.13,
+          "backend_wait_ms": 0.37,
+          "connect_and_init_ms": 5.77
+        },
+        {
+          "client_total_ms": 7.42,
+          "backend_wait_ms": 0.37,
+          "connect_and_init_ms": 7.05
+        },
+        {
+          "client_total_ms": 6.38,
+          "backend_wait_ms": 0.31,
+          "connect_and_init_ms": 6.06
+        },
+        {
+          "client_total_ms": 5.9,
+          "backend_wait_ms": 0.53,
+          "connect_and_init_ms": 5.37
+        },
+        {
+          "client_total_ms": 6.04,
+          "backend_wait_ms": 0.41,
+          "connect_and_init_ms": 5.63
+        },
+        {
+          "client_total_ms": 6.58,
+          "backend_wait_ms": 0.52,
+          "connect_and_init_ms": 6.05
+        },
+        {
+          "client_total_ms": 5.93,
+          "backend_wait_ms": 0.37,
+          "connect_and_init_ms": 5.56
+        },
+        {
+          "client_total_ms": 8.03,
+          "backend_wait_ms": 0.52,
+          "connect_and_init_ms": 7.5
+        },
+        {
+          "client_total_ms": 8.83,
+          "backend_wait_ms": 0.42,
+          "connect_and_init_ms": 8.4
+        },
+        {
+          "client_total_ms": 7.26,
+          "backend_wait_ms": 0.59,
+          "connect_and_init_ms": 6.67
+        },
+        {
+          "client_total_ms": 8.4,
+          "backend_wait_ms": 0.58,
+          "connect_and_init_ms": 7.81
+        },
+        {
+          "client_total_ms": 6.15,
+          "backend_wait_ms": 0.59,
+          "connect_and_init_ms": 5.55
+        },
+        {
+          "client_total_ms": 6.15,
+          "backend_wait_ms": 0.36,
+          "connect_and_init_ms": 5.79
+        }
+      ],
+      "summary": {
+        "backend_wait_ms": {
+          "min": 0.0,
+          "p50": 0.42,
+          "p95": 0.59,
+          "p99": 0.64,
+          "max": 0.68,
+          "mean": 0.4
+        },
+        "client_total_ms": {
+          "min": 4.85,
+          "p50": 6.16,
+          "p95": 8.54,
+          "p99": 9.39,
+          "max": 9.75,
+          "mean": 6.52
+        },
+        "connect_and_init_ms": {
+          "min": 4.85,
+          "p50": 5.8,
+          "p95": 8.11,
+          "p99": 8.96,
+          "max": 9.31,
+          "mean": 6.12
+        }
+      }
+    },
+    {
+      "mode": "reconnect",
+      "pool": 0,
+      "requests": [
+        {
+          "client_total_ms": 3.61,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.26
+        },
+        {
+          "client_total_ms": 4.34,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -118.53
+        },
+        {
+          "client_total_ms": 4.79,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -118.09
+        },
+        {
+          "client_total_ms": 3.56,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.31
+        },
+        {
+          "client_total_ms": 4.27,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -118.6
+        },
+        {
+          "client_total_ms": 7.44,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -115.43
+        },
+        {
+          "client_total_ms": 3.48,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.39
+        },
+        {
+          "client_total_ms": 4.18,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -118.69
+        },
+        {
+          "client_total_ms": 3.82,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.05
+        },
+        {
+          "client_total_ms": 4.03,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -118.84
+        },
+        {
+          "client_total_ms": 3.68,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.19
+        },
+        {
+          "client_total_ms": 3.34,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.53
+        },
+        {
+          "client_total_ms": 4.66,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -118.21
+        },
+        {
+          "client_total_ms": 3.42,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.45
+        },
+        {
+          "client_total_ms": 3.37,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.5
+        },
+        {
+          "client_total_ms": 3.63,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.24
+        },
+        {
+          "client_total_ms": 3.99,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -118.88
+        },
+        {
+          "client_total_ms": 3.52,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.35
+        },
+        {
+          "client_total_ms": 3.86,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.01
+        },
+        {
+          "client_total_ms": 3.57,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.3
+        },
+        {
+          "client_total_ms": 3.82,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.06
+        },
+        {
+          "client_total_ms": 3.97,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -118.9
+        },
+        {
+          "client_total_ms": 3.52,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.35
+        },
+        {
+          "client_total_ms": 3.86,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.01
+        },
+        {
+          "client_total_ms": 3.79,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.08
+        },
+        {
+          "client_total_ms": 3.72,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.15
+        },
+        {
+          "client_total_ms": 3.68,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.19
+        },
+        {
+          "client_total_ms": 5.13,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -117.75
+        },
+        {
+          "client_total_ms": 4.44,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -118.43
+        },
+        {
+          "client_total_ms": 3.34,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.53
+        },
+        {
+          "client_total_ms": 3.74,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.14
+        },
+        {
+          "client_total_ms": 4.32,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -118.55
+        },
+        {
+          "client_total_ms": 3.68,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.19
+        },
+        {
+          "client_total_ms": 3.95,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -118.92
+        },
+        {
+          "client_total_ms": 3.38,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.49
+        },
+        {
+          "client_total_ms": 3.49,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.38
+        },
+        {
+          "client_total_ms": 3.62,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.25
+        },
+        {
+          "client_total_ms": 4.27,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -118.6
+        },
+        {
+          "client_total_ms": 3.4,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -119.47
+        },
+        {
+          "client_total_ms": 4.15,
+          "backend_wait_ms": 122.87,
+          "connect_and_init_ms": -118.72
+        }
+      ],
+      "summary": {
+        "backend_wait_ms": {
+          "min": 122.87,
+          "p50": 122.87,
+          "p95": 122.87,
+          "p99": 122.87,
+          "max": 122.87,
+          "mean": 122.87
+        },
+        "client_total_ms": {
+          "min": 3.34,
+          "p50": 3.77,
+          "p95": 4.81,
+          "p99": 6.54,
+          "max": 7.44,
+          "mean": 3.95
+        },
+        "connect_and_init_ms": {
+          "min": -119.53,
+          "p50": -119.11,
+          "p95": -118.07,
+          "p99": -116.33,
+          "max": -115.43,
+          "mean": -118.93
+        }
+      }
+    }
+  ]
+}

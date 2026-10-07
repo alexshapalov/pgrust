@@ -1,0 +1,205 @@
+{
+  "benchmark": "lifecycle",
+  "git_commit": "999a78bafff1897148a7c788f6a7e7e6fc63856e",
+  "settings": [
+    "max_connections=120"
+  ],
+  "conf": "/home/ubuntu/pgrust/configs/pgx-ephemeral.conf",
+  "n": 100,
+  "connections_only": false,
+  "label": "",
+  "batches": [
+    {
+      "batch": 0,
+      "warmup": true,
+      "stage_pss_bytes": {
+        "before": 91232256,
+        "create": 96998400,
+        "connect": 312521728,
+        "workload": 438858752,
+        "disconnect": 239653888,
+        "drop": 157719552
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    },
+    {
+      "batch": 1,
+      "warmup": true,
+      "stage_pss_bytes": {
+        "before": 157717504,
+        "create": 162629632,
+        "connect": 340226048,
+        "workload": 414489600,
+        "disconnect": 240589824,
+        "drop": 195516416
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    },
+    {
+      "batch": 2,
+      "warmup": true,
+      "stage_pss_bytes": {
+        "before": 162725888,
+        "create": 169234432,
+        "connect": 350560256,
+        "workload": 416313344,
+        "disconnect": 242446336,
+        "drop": 172339200
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    },
+    {
+      "batch": 3,
+      "warmup": false,
+      "stage_pss_bytes": {
+        "before": 172334080,
+        "create": 173977600,
+        "connect": 349948928,
+        "workload": 416940032,
+        "disconnect": 243982336,
+        "drop": 171336704
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    },
+    {
+      "batch": 4,
+      "warmup": false,
+      "stage_pss_bytes": {
+        "before": 171335680,
+        "create": 175570944,
+        "connect": 351674368,
+        "workload": 419454976,
+        "disconnect": 245415936,
+        "drop": 184250368
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    },
+    {
+      "batch": 5,
+      "warmup": false,
+      "stage_pss_bytes": {
+        "before": 184248320,
+        "create": 176769024,
+        "connect": 352567296,
+        "workload": 421283840,
+        "disconnect": 247871488,
+        "drop": 190346240
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    },
+    {
+      "batch": 6,
+      "warmup": false,
+      "stage_pss_bytes": {
+        "before": 190346240,
+        "create": 175117312,
+        "connect": 356317184,
+        "workload": 420799488,
+        "disconnect": 366547968,
+        "drop": 189120512
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    },
+    {
+      "batch": 7,
+      "warmup": false,
+      "stage_pss_bytes": {
+        "before": 189122560,
+        "create": 176619520,
+        "connect": 357008384,
+        "workload": 422024192,
+        "disconnect": 287728640,
+        "drop": 180543488
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    },
+    {
+      "batch": 8,
+      "warmup": false,
+      "stage_pss_bytes": {
+        "before": 180543488,
+        "create": 179646464,
+        "connect": 355098624,
+        "workload": 423743488,
+        "disconnect": 250265600,
+        "drop": 190283776
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    },
+    {
+      "batch": 9,
+      "warmup": false,
+      "stage_pss_bytes": {
+        "before": 190290944,
+        "create": 181180416,
+        "connect": 354783232,
+        "workload": 423370752,
+        "disconnect": 250499072,
+        "drop": 175435776
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    },
+    {
+      "batch": 10,
+      "warmup": false,
+      "stage_pss_bytes": {
+        "before": 175443968,
+        "create": 181522432,
+        "connect": 356044800,
+        "workload": 424747008,
+        "disconnect": 250728448,
+        "drop": 191188992
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    },
+    {
+      "batch": 11,
+      "warmup": false,
+      "stage_pss_bytes": {
+        "before": 191187968,
+        "create": 181729280,
+        "connect": 356122624,
+        "workload": 424112128,
+        "disconnect": 251105280,
+        "drop": 202387456
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    },
+    {
+      "batch": 12,
+      "warmup": false,
+      "stage_pss_bytes": {
+        "before": 175005696,
+        "create": 179255296,
+        "connect": 359473152,
+        "workload": 424873984,
+        "disconnect": 250720256,
+        "drop": 189140992
+      },
+      "threads_connected": 108,
+      "threads_after": 8
+    }
+  ],
+  "start_pss_bytes": 91229184,
+  "retained_bytes_per_batch": 1576351.8060606061,
+  "retained_bytes_per_lifecycle": 15763.518060606062,
+  "stage_delta_bytes_per_db": {
+    "create": -38470.656,
+    "connect": 1767650.304,
+    "workload": 672311.296,
+    "disconnect": -1576484.864,
+    "drop": -780830.72
+  }
+}

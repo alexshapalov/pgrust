@@ -1,0 +1,402 @@
+=== mintbreak  20:23:09
+cold      pool=0  backend_wait p50=59.6  client_total p50=74.06  connect_and_init p50=15.36  mint_copy p50=57.32  mint_other p50=0.39  mint_post_checkpoint p50=0.77  mint_pre_checkpoint p50=0.94  mint_total p50=59.46
+warm      pool=8  backend_wait p50=0.42  client_total p50=6.16  connect_and_init p50=5.8
+reconnect pool=0  backend_wait p50=122.87  client_total p50=3.77  connect_and_init p50=-119.11
+    exit=0
+=== lifecycle  20:24:34
+batch  0 (warm-up)  before=87.0  create=92.5  connect=298.0  workload=418.5  disconnect=228.6  drop=150.4
+batch  1 (warm-up)  before=150.4  create=155.1  connect=324.5  workload=395.3  disconnect=229.4  drop=186.5
+batch  2 (warm-up)  before=155.2  create=161.4  connect=334.3  workload=397.0  disconnect=231.2  drop=164.4
+batch  3  before=164.4  create=165.9  connect=333.7  workload=397.6  disconnect=232.7  drop=163.4
+batch  4  before=163.4  create=167.4  connect=335.4  workload=400.0  disconnect=234.0  drop=175.7
+batch  5  before=175.7  create=168.6  connect=336.2  workload=401.8  disconnect=236.4  drop=181.5
+batch  6  before=181.5  create=167.0  connect=339.8  workload=401.3  disconnect=349.6  drop=180.4
+batch  7  before=180.4  create=168.4  connect=340.5  workload=402.5  disconnect=274.4  drop=172.2
+batch  8  before=172.2  create=171.3  connect=338.6  workload=404.1  disconnect=238.7  drop=181.5
+batch  9  before=181.5  create=172.8  connect=338.3  workload=403.8  disconnect=238.9  drop=167.3
+batch 10  before=167.3  create=173.1  connect=339.6  workload=405.1  disconnect=239.1  drop=182.3
+batch 11  before=182.3  create=173.3  connect=339.6  workload=404.5  disconnect=239.5  drop=193.0
+batch 12  before=166.9  create=171.0  connect=342.8  workload=405.2  disconnect=239.1  drop=180.4
+retained per lifecycle: 15764 bytes  (per batch of 100: 1539.4 KB)
+stage deltas per db: {'create': -38471, 'connect': 1767650, 'workload': 672311, 'disconnect': -1576485, 'drop': -780831}
+wrote /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-999a78baff/lifecycle/lifecycle.json
+batch  0 (warm-up)  before=87.5  connect=197.8  workload=237.1  disconnect=112.8
+batch  1 (warm-up)  before=112.8  connect=198.7  workload=236.8  disconnect=104.3
+batch  2 (warm-up)  before=104.3  connect=198.6  workload=236.6  disconnect=175.7
+batch  3  before=175.7  connect=198.6  workload=236.7  disconnect=117.3
+batch  4  before=117.3  connect=199.5  workload=236.7  disconnect=98.0
+batch  5  before=98.0  connect=198.3  workload=236.7  disconnect=175.6
+batch  6  before=175.6  connect=198.3  workload=236.2  disconnect=98.0
+batch  7  before=98.0  connect=200.1  workload=237.9  disconnect=149.7
+batch  8  before=98.8  connect=200.8  workload=238.5  disconnect=181.0
+batch  9  before=98.4  connect=200.7  workload=238.5  disconnect=143.9
+batch 10  before=143.9  connect=200.5  workload=238.2  disconnect=108.3
+batch 11  before=108.3  connect=200.5  workload=239.1  disconnect=132.9
+batch 12  before=132.9  connect=201.3  workload=239.1  disconnect=98.7
+retained per lifecycle: -5793 bytes  (per batch of 100: -565.7 KB)
+stage deltas per db: {'connect': 788051, 'workload': 397604, 'disconnect': -1126439}
+wrote /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-999a78baff/lifecycle/lifecycle-connections.json
+    exit=0
+=== memory  20:39:24
+MB; transparent huge pages: {'enabled': 'madvise', 'defrag': 'madvise'}
+PostgreSQL 18 (stock)              pss=  17.4  anon=   0.5 file=  4.9 shmem= 12.1  rss=  31.8  thp=  0.0  threads=1
+PgRust defaults                    pss=  81.1  anon=  52.3 file= 28.8 shmem=  0.0  rss=  84.8  thp=  4.0  threads=30
++ max_parallel_workers=0           pss=  70.4  anon=  41.5 file= 28.9 shmem=  0.0  rss=  74.1  thp=  4.0  threads=14
++ pgrust.runtime=off               pss=  66.5  anon=  37.5 file= 29.0 shmem=  0.0  rss=  70.2  thp=  4.0  threads=8
++ shared_buffers=16MB              pss=  54.9  anon=  25.5 file= 29.4 shmem=  0.0  rss=  58.6  thp=  4.0  threads=8
++ wal_buffers=64kB                 pss=  54.2  anon=  24.8 file= 29.4 shmem=  0.0  rss=  57.9  thp=  4.0  threads=8
++ max_connections=20               pss=  49.8  anon=  21.1 file= 28.7 shmem=  0.0  rss=  53.5  thp=  4.0  threads=8
++ replication off                  pss=  48.6  anon=  20.2 file= 28.4 shmem=  0.0  rss=  52.4  thp=  4.0  threads=7
+PGX profile (configs/pgx-ephemeral.conf) pss=  48.6  anon=  19.9 file= 28.7 shmem=  0.0  rss=  52.3  thp=  4.0  threads=7
+
+PgRust defaults, PSS by mapping kind:
+     41.2 MB     2 mappings  [anon:mimalloc]
+     29.6 MB     4 mappings  server binary (text+data)
+      7.1 MB    15 mappings  anonymous, mapping >= 64 MB
+      2.1 MB   215 mappings  other files and libraries
+      1.0 MB   120 mappings  anonymous, mapping < 1 MB
+
+PGX profile, PSS by mapping kind:
+     29.5 MB     4 mappings  server binary (text+data)
+     14.8 MB     3 mappings  [anon:mimalloc]
+      2.1 MB   215 mappings  other files and libraries
+      1.0 MB     3 mappings  anonymous, mapping >= 64 MB
+      0.7 MB    40 mappings  anonymous, mapping < 1 MB
+MB; transparent huge pages: {'enabled': 'madvise', 'defrag': 'madvise'}
+PostgreSQL 18 (stock)              pss=  17.1  anon=   0.5 file=  4.5 shmem= 12.1  rss=  31.7  thp=  0.0  threads=1
+PgRust defaults                    pss=  77.8  anon=  49.2 file= 28.6 shmem=  0.0  rss=  81.5  thp=  0.0  threads=30
++ max_parallel_workers=0           pss=  67.0  anon=  38.2 file= 28.8 shmem=  0.0  rss=  70.7  thp=  0.0  threads=14
++ pgrust.runtime=off               pss=  62.5  anon=  33.6 file= 28.9 shmem=  0.0  rss=  66.2  thp=  0.0  threads=8
++ shared_buffers=16MB              pss=  51.4  anon=  22.2 file= 29.2 shmem=  0.0  rss=  55.1  thp=  0.0  threads=8
++ wal_buffers=64kB                 pss=  49.9  anon=  21.4 file= 28.4 shmem=  0.0  rss=  53.6  thp=  0.0  threads=8
++ max_connections=20               pss=  46.9  anon=  17.9 file= 29.0 shmem=  0.0  rss=  50.7  thp=  0.0  threads=8
++ replication off                  pss=  46.2  anon=  16.8 file= 29.4 shmem=  0.0  rss=  49.9  thp=  0.0  threads=7
+PGX profile (configs/pgx-ephemeral.conf) pss=  45.5  anon=  16.7 file= 28.8 shmem=  0.0  rss=  49.2  thp=  0.0  threads=7
+
+PgRust defaults, PSS by mapping kind:
+     38.1 MB     3 mappings  [anon:mimalloc]
+     29.4 MB     4 mappings  server binary (text+data)
+      7.3 MB    14 mappings  anonymous, mapping >= 64 MB
+      2.1 MB   215 mappings  other files and libraries
+      0.8 MB   119 mappings  anonymous, mapping < 1 MB
+
+PGX profile, PSS by mapping kind:
+     29.7 MB     4 mappings  server binary (text+data)
+     11.7 MB     3 mappings  [anon:mimalloc]
+      2.1 MB   215 mappings  other files and libraries
+      1.0 MB     3 mappings  anonymous, mapping >= 64 MB
+      0.7 MB    37 mappings  anonymous, mapping < 1 MB
+    exit=0
+=== scale  20:44:23
+n=0     footprint=86 MB threads=8 fds=163  idle cpu mean=0.100% last-minute=0.100%  busy={}
+n=100   footprint=143 MB threads=8 fds=46  idle cpu mean=1.098% last-minute=1.098%  busy={'pg:autovacuum l': 0.003, 'postgres': 0.002, 'pg:bgwriter': 0.001}
+n=300   footprint=250 MB threads=8 fds=49  idle cpu mean=3.477% last-minute=3.477%  busy={'pg:autovacuum l': 0.004, 'postgres': 0.002, 'pg:memwatchdog': 0.001, 'pg:bgworker': 0.001}
+n=500   footprint=363 MB threads=8 fds=44  idle cpu mean=5.787% last-minute=5.787%  busy={'pg:autovacuum l': 0.008, 'postgres': 0.004, 'pg:bgworker': 0.001}
+n=1000  footprint=640 MB threads=8 fds=41  idle cpu mean=6.659% last-minute=6.316%  busy={'pg:autovacuum l': 0.016, 'postgres': 0.004, 'pg:bgworker': 0.002}
+active 5 of 1000: p50=0.62 p99=1.63 ms errors=0 footprint=648 MB cpu=31%
+active 20 of 1000: p50=0.66 p99=2.5 ms errors=0 footprint=673 MB cpu=100%
+active 50 of 1000: p50=1.76 p99=13.51 ms errors=0 footprint=723 MB cpu=213%
+active 100 of 1000: p50=19.21 p99=52.21 ms errors=0 footprint=808 MB cpu=196%
+wrote /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-999a78baff/scale/scale.json
+n=0     footprint=87 MB threads=7 fds=155  idle cpu mean=0.083% last-minute=0.083%  busy={}
+n=100   footprint=136 MB threads=7 fds=36  idle cpu mean=0.133% last-minute=0.133%  busy={}
+n=300   footprint=231 MB threads=7 fds=36  idle cpu mean=0.133% last-minute=0.133%  busy={}
+n=500   footprint=335 MB threads=7 fds=36  idle cpu mean=0.166% last-minute=0.166%  busy={'pg:bgworker': 0.001}
+n=1000  footprint=590 MB threads=7 fds=36  idle cpu mean=0.233% last-minute=0.233%  busy={'pg:memwatchdog': 0.001, 'pg:bgworker': 0.001}
+wrote /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-999a78baff/scale-autovacuum-off/scale.json
+    exit=0
+=== scale-skipidle  21:08:51
+n=0     footprint=86 MB threads=8 fds=173  idle cpu mean=0.100% last-minute=0.100%  busy={}
+n=100   footprint=144 MB threads=8 fds=42  idle cpu mean=0.915% last-minute=0.915%  busy={'postgres': 0.001, 'pg:bgwriter': 0.001, 'pg:memwatchdog': 0.001, 'pg:autovacuum l': 0.001, 'pg:bgworker': 0.001}
+n=300   footprint=255 MB threads=8 fds=40  idle cpu mean=1.480% last-minute=1.480%  busy={'pg:autovacuum l': 0.003, 'postgres': 0.001, 'pg:bgworker': 0.001}
+n=500   footprint=372 MB threads=8 fds=37  idle cpu mean=0.915% last-minute=0.915%  busy={'pg:autovacuum l': 0.006, 'pg:bgworker': 0.001}
+n=1000  footprint=662 MB threads=8 fds=37  idle cpu mean=2.160% last-minute=2.160%  busy={'pg:autovacuum l': 0.016, 'pg:bgworker': 0.001}
+wrote /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-999a78baff/scale-autovacuum-skipidle/scale.json
+    exit=0
+=== churn  21:18:14
+before: 84.1 MB
+cycle   1  footprint=123.9 MB rss=127.8 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle   2  footprint=125.8 MB rss=129.9 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle   3  footprint=132.7 MB rss=136.8 MB threads=9 fds=38 dbs=0 disk=73 MB  (17s + 9s)
+cycle   4  footprint=138.2 MB rss=142.2 MB threads=9 fds=38 dbs=0 disk=73 MB  (17s + 9s)
+cycle   5  footprint=144.8 MB rss=148.8 MB threads=9 fds=37 dbs=0 disk=73 MB  (18s + 8s)
+cycle   6  footprint=146.0 MB rss=150.2 MB threads=9 fds=37 dbs=0 disk=73 MB  (17s + 9s)
+cycle   7  footprint=143.2 MB rss=147.2 MB threads=9 fds=38 dbs=0 disk=73 MB  (18s + 9s)
+cycle   8  footprint=146.6 MB rss=150.6 MB threads=9 fds=38 dbs=0 disk=73 MB  (18s + 9s)
+cycle   9  footprint=147.6 MB rss=151.6 MB threads=9 fds=38 dbs=0 disk=73 MB  (17s + 9s)
+cycle  10  footprint=148.1 MB rss=152.1 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  11  footprint=148.5 MB rss=152.5 MB threads=9 fds=38 dbs=0 disk=73 MB  (20s + 8s)
+cycle  12  footprint=146.1 MB rss=150.1 MB threads=9 fds=37 dbs=0 disk=73 MB  (18s + 8s)
+cycle  13  footprint=149.5 MB rss=153.5 MB threads=9 fds=38 dbs=0 disk=73 MB  (18s + 8s)
+cycle  14  footprint=145.4 MB rss=149.4 MB threads=9 fds=38 dbs=0 disk=73 MB  (20s + 8s)
+cycle  15  footprint=147.6 MB rss=151.5 MB threads=9 fds=38 dbs=0 disk=73 MB  (20s + 8s)
+cycle  16  footprint=148.8 MB rss=152.7 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  17  footprint=150.1 MB rss=154.0 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  18  footprint=149.2 MB rss=153.1 MB threads=9 fds=38 dbs=0 disk=73 MB  (20s + 8s)
+cycle  19  footprint=147.9 MB rss=151.8 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  20  footprint=149.8 MB rss=153.7 MB threads=9 fds=38 dbs=0 disk=73 MB  (20s + 8s)
+cycle  21  footprint=150.1 MB rss=153.9 MB threads=9 fds=38 dbs=0 disk=73 MB  (20s + 8s)
+cycle  22  footprint=151.7 MB rss=155.6 MB threads=9 fds=38 dbs=0 disk=73 MB  (20s + 8s)
+cycle  23  footprint=150.9 MB rss=154.8 MB threads=9 fds=38 dbs=0 disk=73 MB  (18s + 8s)
+cycle  24  footprint=151.1 MB rss=155.0 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  25  footprint=148.8 MB rss=152.7 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  26  footprint=148.3 MB rss=152.2 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  27  footprint=151.9 MB rss=155.8 MB threads=9 fds=37 dbs=0 disk=73 MB  (18s + 8s)
+cycle  28  footprint=151.2 MB rss=155.0 MB threads=9 fds=37 dbs=0 disk=73 MB  (18s + 8s)
+cycle  29  footprint=151.4 MB rss=155.3 MB threads=9 fds=37 dbs=0 disk=73 MB  (18s + 8s)
+cycle  30  footprint=151.5 MB rss=155.4 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  31  footprint=149.1 MB rss=153.0 MB threads=9 fds=38 dbs=0 disk=73 MB  (20s + 8s)
+cycle  32  footprint=151.9 MB rss=155.8 MB threads=9 fds=39 dbs=0 disk=73 MB  (17s + 9s)
+cycle  33  footprint=150.9 MB rss=154.7 MB threads=9 fds=38 dbs=0 disk=73 MB  (17s + 8s)
+cycle  34  footprint=152.3 MB rss=156.1 MB threads=9 fds=38 dbs=0 disk=73 MB  (18s + 8s)
+cycle  35  footprint=153.5 MB rss=157.4 MB threads=9 fds=37 dbs=0 disk=73 MB  (18s + 8s)
+cycle  36  footprint=154.3 MB rss=158.1 MB threads=9 fds=37 dbs=0 disk=73 MB  (21s + 9s)
+cycle  37  footprint=152.2 MB rss=156.1 MB threads=9 fds=37 dbs=0 disk=73 MB  (17s + 9s)
+cycle  38  footprint=152.3 MB rss=156.1 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  39  footprint=150.1 MB rss=154.0 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 10s)
+cycle  40  footprint=153.0 MB rss=156.8 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  41  footprint=147.6 MB rss=151.5 MB threads=9 fds=45 dbs=0 disk=73 MB  (20s + 8s)
+cycle  42  footprint=149.9 MB rss=153.7 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  43  footprint=152.5 MB rss=156.4 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  44  footprint=153.2 MB rss=157.1 MB threads=9 fds=38 dbs=0 disk=73 MB  (20s + 8s)
+cycle  45  footprint=155.5 MB rss=159.4 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  46  footprint=154.3 MB rss=158.2 MB threads=9 fds=37 dbs=0 disk=73 MB  (18s + 8s)
+cycle  47  footprint=152.0 MB rss=155.9 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  48  footprint=153.6 MB rss=157.5 MB threads=9 fds=37 dbs=0 disk=73 MB  (17s + 8s)
+cycle  49  footprint=155.3 MB rss=159.1 MB threads=9 fds=37 dbs=0 disk=73 MB  (18s + 8s)
+cycle  50  footprint=155.0 MB rss=158.9 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  51  footprint=155.8 MB rss=159.6 MB threads=9 fds=37 dbs=0 disk=73 MB  (18s + 8s)
+cycle  52  footprint=155.8 MB rss=159.7 MB threads=9 fds=37 dbs=0 disk=73 MB  (18s + 8s)
+cycle  53  footprint=154.0 MB rss=157.9 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  54  footprint=155.5 MB rss=159.3 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  55  footprint=154.3 MB rss=158.1 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  56  footprint=157.5 MB rss=161.4 MB threads=9 fds=37 dbs=0 disk=73 MB  (18s + 9s)
+cycle  57  footprint=157.5 MB rss=161.3 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  58  footprint=157.2 MB rss=161.1 MB threads=9 fds=38 dbs=0 disk=73 MB  (20s + 8s)
+cycle  59  footprint=157.6 MB rss=161.5 MB threads=9 fds=38 dbs=0 disk=73 MB  (20s + 8s)
+cycle  60  footprint=155.1 MB rss=159.0 MB threads=9 fds=38 dbs=0 disk=73 MB  (20s + 8s)
+cycle  61  footprint=156.9 MB rss=160.8 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  62  footprint=154.6 MB rss=158.5 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  63  footprint=155.2 MB rss=159.1 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  64  footprint=157.9 MB rss=161.8 MB threads=9 fds=38 dbs=0 disk=73 MB  (20s + 8s)
+cycle  65  footprint=158.6 MB rss=162.5 MB threads=9 fds=37 dbs=0 disk=73 MB  (17s + 8s)
+cycle  66  footprint=154.3 MB rss=158.1 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  67  footprint=157.4 MB rss=161.3 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  68  footprint=157.8 MB rss=161.7 MB threads=9 fds=37 dbs=0 disk=73 MB  (18s + 9s)
+cycle  69  footprint=156.6 MB rss=160.5 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  70  footprint=157.3 MB rss=161.2 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  71  footprint=158.0 MB rss=161.9 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  72  footprint=158.8 MB rss=162.7 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  73  footprint=158.8 MB rss=162.7 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  74  footprint=158.4 MB rss=162.2 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  75  footprint=156.4 MB rss=160.3 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  76  footprint=157.8 MB rss=161.6 MB threads=9 fds=38 dbs=0 disk=73 MB  (17s + 9s)
+cycle  77  footprint=159.5 MB rss=163.4 MB threads=9 fds=38 dbs=0 disk=73 MB  (19s + 8s)
+cycle  78  footprint=158.9 MB rss=162.8 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  79  footprint=155.8 MB rss=159.7 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  80  footprint=158.7 MB rss=162.5 MB threads=9 fds=38 dbs=0 disk=73 MB  (19s + 8s)
+cycle  81  footprint=156.1 MB rss=160.0 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  82  footprint=158.1 MB rss=161.9 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  83  footprint=157.0 MB rss=160.9 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  84  footprint=157.0 MB rss=160.9 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  85  footprint=156.4 MB rss=160.3 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  86  footprint=158.6 MB rss=162.5 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  87  footprint=158.8 MB rss=162.7 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  88  footprint=159.6 MB rss=163.4 MB threads=9 fds=38 dbs=0 disk=73 MB  (19s + 8s)
+cycle  89  footprint=161.1 MB rss=165.0 MB threads=9 fds=38 dbs=0 disk=73 MB  (18s + 9s)
+cycle  90  footprint=160.3 MB rss=164.1 MB threads=9 fds=37 dbs=0 disk=73 MB  (17s + 8s)
+cycle  91  footprint=158.8 MB rss=162.7 MB threads=9 fds=38 dbs=0 disk=73 MB  (20s + 8s)
+cycle  92  footprint=159.2 MB rss=163.1 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  93  footprint=160.1 MB rss=164.0 MB threads=9 fds=37 dbs=0 disk=73 MB  (18s + 8s)
+cycle  94  footprint=157.3 MB rss=161.2 MB threads=9 fds=37 dbs=0 disk=73 MB  (18s + 8s)
+cycle  95  footprint=160.3 MB rss=164.2 MB threads=9 fds=37 dbs=0 disk=73 MB  (17s + 8s)
+cycle  96  footprint=156.7 MB rss=160.6 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  97  footprint=156.3 MB rss=160.1 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  98  footprint=159.7 MB rss=163.6 MB threads=9 fds=37 dbs=0 disk=73 MB  (18s + 8s)
+cycle  99  footprint=158.2 MB rss=162.0 MB threads=9 fds=37 dbs=0 disk=73 MB  (18s + 8s)
+cycle 100  footprint=154.9 MB rss=158.8 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+wrote /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-999a78baff/churn/churn.json
+    exit=0
+=== churn-skipidle  22:05:07
+before: 83.8 MB
+cycle   1  footprint=124.2 MB rss=128.1 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle   2  footprint=126.5 MB rss=130.4 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle   3  footprint=137.4 MB rss=141.3 MB threads=9 fds=39 dbs=0 disk=73 MB  (20s + 8s)
+cycle   4  footprint=142.1 MB rss=145.9 MB threads=9 fds=38 dbs=0 disk=73 MB  (18s + 8s)
+cycle   5  footprint=141.7 MB rss=145.6 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle   6  footprint=143.9 MB rss=147.8 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle   7  footprint=143.3 MB rss=147.1 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle   8  footprint=146.8 MB rss=150.7 MB threads=9 fds=38 dbs=0 disk=73 MB  (20s + 8s)
+cycle   9  footprint=148.8 MB rss=152.7 MB threads=9 fds=38 dbs=0 disk=73 MB  (18s + 8s)
+cycle  10  footprint=148.5 MB rss=152.4 MB threads=9 fds=38 dbs=0 disk=73 MB  (20s + 8s)
+cycle  11  footprint=149.0 MB rss=152.9 MB threads=9 fds=38 dbs=0 disk=73 MB  (20s + 8s)
+cycle  12  footprint=149.3 MB rss=153.1 MB threads=9 fds=38 dbs=0 disk=73 MB  (19s + 8s)
+cycle  13  footprint=149.4 MB rss=153.3 MB threads=9 fds=38 dbs=0 disk=73 MB  (19s + 8s)
+cycle  14  footprint=150.6 MB rss=154.5 MB threads=9 fds=37 dbs=0 disk=73 MB  (17s + 8s)
+cycle  15  footprint=148.4 MB rss=152.3 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  16  footprint=150.4 MB rss=154.3 MB threads=9 fds=38 dbs=0 disk=73 MB  (19s + 8s)
+cycle  17  footprint=150.7 MB rss=154.6 MB threads=9 fds=37 dbs=0 disk=73 MB  (18s + 8s)
+cycle  18  footprint=150.8 MB rss=154.7 MB threads=9 fds=39 dbs=0 disk=73 MB  (20s + 8s)
+cycle  19  footprint=147.8 MB rss=151.6 MB threads=9 fds=38 dbs=0 disk=73 MB  (19s + 8s)
+cycle  20  footprint=150.9 MB rss=154.8 MB threads=9 fds=38 dbs=0 disk=73 MB  (20s + 8s)
+cycle  21  footprint=147.5 MB rss=151.3 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  22  footprint=149.0 MB rss=152.9 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  23  footprint=149.5 MB rss=153.4 MB threads=9 fds=37 dbs=0 disk=73 MB  (17s + 8s)
+cycle  24  footprint=151.6 MB rss=155.4 MB threads=9 fds=38 dbs=0 disk=73 MB  (19s + 8s)
+cycle  25  footprint=151.5 MB rss=155.4 MB threads=9 fds=37 dbs=0 disk=73 MB  (17s + 8s)
+cycle  26  footprint=151.0 MB rss=154.9 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  27  footprint=148.6 MB rss=152.5 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  28  footprint=150.0 MB rss=153.8 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  29  footprint=148.3 MB rss=152.2 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  30  footprint=151.3 MB rss=155.1 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  31  footprint=148.9 MB rss=152.7 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  32  footprint=151.3 MB rss=155.2 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  33  footprint=148.5 MB rss=152.4 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  34  footprint=151.2 MB rss=155.0 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  35  footprint=152.0 MB rss=155.9 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  36  footprint=149.3 MB rss=153.2 MB threads=9 fds=38 dbs=0 disk=73 MB  (19s + 8s)
+cycle  37  footprint=152.3 MB rss=156.1 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  38  footprint=152.3 MB rss=156.2 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  39  footprint=152.9 MB rss=156.8 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  40  footprint=152.8 MB rss=156.7 MB threads=9 fds=37 dbs=0 disk=73 MB  (18s + 8s)
+cycle  41  footprint=154.0 MB rss=157.9 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  42  footprint=153.7 MB rss=157.6 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  43  footprint=153.2 MB rss=157.1 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  44  footprint=152.9 MB rss=156.8 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  45  footprint=151.5 MB rss=155.4 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  46  footprint=151.0 MB rss=154.8 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  47  footprint=151.5 MB rss=155.4 MB threads=9 fds=44 dbs=0 disk=73 MB  (20s + 8s)
+cycle  48  footprint=155.6 MB rss=159.5 MB threads=9 fds=37 dbs=0 disk=73 MB  (18s + 8s)
+cycle  49  footprint=152.3 MB rss=156.1 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  50  footprint=156.7 MB rss=160.5 MB threads=9 fds=38 dbs=0 disk=73 MB  (18s + 8s)
+cycle  51  footprint=156.6 MB rss=160.4 MB threads=9 fds=38 dbs=0 disk=73 MB  (18s + 8s)
+cycle  52  footprint=156.4 MB rss=160.3 MB threads=9 fds=38 dbs=0 disk=73 MB  (19s + 8s)
+cycle  53  footprint=153.9 MB rss=157.8 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  54  footprint=156.3 MB rss=160.2 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  55  footprint=156.4 MB rss=160.3 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  56  footprint=157.6 MB rss=161.4 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 9s)
+cycle  57  footprint=157.6 MB rss=161.5 MB threads=9 fds=38 dbs=0 disk=73 MB  (20s + 8s)
+cycle  58  footprint=157.4 MB rss=161.2 MB threads=9 fds=38 dbs=0 disk=73 MB  (19s + 8s)
+cycle  59  footprint=159.0 MB rss=162.8 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  60  footprint=157.8 MB rss=161.6 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  61  footprint=160.2 MB rss=164.0 MB threads=9 fds=38 dbs=0 disk=73 MB  (18s + 8s)
+cycle  62  footprint=155.6 MB rss=159.5 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  63  footprint=158.7 MB rss=162.6 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  64  footprint=158.6 MB rss=162.5 MB threads=9 fds=38 dbs=0 disk=73 MB  (20s + 8s)
+cycle  65  footprint=156.3 MB rss=160.2 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  66  footprint=158.8 MB rss=162.7 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  67  footprint=158.2 MB rss=162.1 MB threads=9 fds=38 dbs=0 disk=73 MB  (20s + 8s)
+cycle  68  footprint=158.5 MB rss=162.4 MB threads=9 fds=38 dbs=0 disk=73 MB  (20s + 8s)
+cycle  69  footprint=159.9 MB rss=163.7 MB threads=9 fds=38 dbs=0 disk=73 MB  (18s + 8s)
+cycle  70  footprint=156.1 MB rss=159.9 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  71  footprint=156.7 MB rss=160.6 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  72  footprint=158.8 MB rss=162.7 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  73  footprint=157.5 MB rss=161.3 MB threads=9 fds=37 dbs=0 disk=73 MB  (18s + 8s)
+cycle  74  footprint=159.7 MB rss=163.6 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  75  footprint=159.0 MB rss=162.9 MB threads=9 fds=37 dbs=0 disk=73 MB  (17s + 9s)
+cycle  76  footprint=159.5 MB rss=163.4 MB threads=9 fds=38 dbs=0 disk=73 MB  (19s + 8s)
+cycle  77  footprint=159.0 MB rss=162.9 MB threads=9 fds=38 dbs=0 disk=73 MB  (20s + 8s)
+cycle  78  footprint=159.6 MB rss=163.5 MB threads=9 fds=38 dbs=0 disk=73 MB  (19s + 8s)
+cycle  79  footprint=154.9 MB rss=158.7 MB threads=9 fds=37 dbs=0 disk=73 MB  (17s + 9s)
+cycle  80  footprint=159.8 MB rss=163.7 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 9s)
+cycle  81  footprint=160.9 MB rss=164.8 MB threads=9 fds=37 dbs=0 disk=73 MB  (17s + 9s)
+cycle  82  footprint=159.4 MB rss=163.2 MB threads=9 fds=38 dbs=0 disk=73 MB  (18s + 8s)
+cycle  83  footprint=155.8 MB rss=159.6 MB threads=9 fds=38 dbs=0 disk=73 MB  (19s + 8s)
+cycle  84  footprint=159.9 MB rss=163.8 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  85  footprint=156.5 MB rss=160.3 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  86  footprint=161.0 MB rss=164.9 MB threads=9 fds=37 dbs=0 disk=73 MB  (18s + 8s)
+cycle  87  footprint=159.8 MB rss=163.7 MB threads=9 fds=38 dbs=0 disk=73 MB  (19s + 8s)
+cycle  88  footprint=159.6 MB rss=163.5 MB threads=9 fds=37 dbs=0 disk=73 MB  (18s + 8s)
+cycle  89  footprint=158.7 MB rss=162.6 MB threads=9 fds=37 dbs=0 disk=73 MB  (17s + 8s)
+cycle  90  footprint=156.6 MB rss=160.5 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  91  footprint=159.5 MB rss=163.3 MB threads=9 fds=38 dbs=0 disk=73 MB  (19s + 8s)
+cycle  92  footprint=157.0 MB rss=160.8 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  93  footprint=159.0 MB rss=162.8 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  94  footprint=161.2 MB rss=165.1 MB threads=9 fds=38 dbs=0 disk=73 MB  (18s + 9s)
+cycle  95  footprint=160.8 MB rss=164.7 MB threads=9 fds=38 dbs=0 disk=73 MB  (19s + 8s)
+cycle  96  footprint=157.0 MB rss=160.8 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  97  footprint=157.7 MB rss=161.6 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle  98  footprint=159.5 MB rss=163.4 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+cycle  99  footprint=158.1 MB rss=162.0 MB threads=9 fds=37 dbs=0 disk=73 MB  (19s + 8s)
+cycle 100  footprint=159.8 MB rss=163.6 MB threads=9 fds=37 dbs=0 disk=73 MB  (20s + 8s)
+wrote /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-999a78baff/churn-skipidle/churn.json
+    exit=0
+=== pool  22:52:11
+pool=0   burst=1    ready=0   p50=77.0 p95=77.0 p99=77.0 ms  drain=80.1 ms  hits=0/1  errors=0  refill=0.0 s
+pool=0   burst=10   ready=0   p50=252.3 p95=256.7 p99=257.1 ms  drain=262.2 ms  hits=0/10  errors=0  refill=0.0 s
+pool=0   burst=50   ready=0   p50=747.0 p95=1118.0 p99=1120.5 ms  drain=1135.3 ms  hits=0/50  errors=0  refill=0.0 s
+pool=0   burst=100  ready=0   p50=1569.2 p95=2355.7 p99=2776.4 ms  drain=2786.3 ms  hits=0/100  errors=0  refill=0.0 s
+pool=0   burst=250  ready=0   p50=3356.7 p95=6706.0 p99=6735.4 ms  drain=6827.4 ms  hits=0/250  errors=0  refill=0.0 s
+pool=0   burst=500  ready=0   p50=5743.9 p95=10185.4 p99=10258.6 ms  drain=10313.1 ms  hits=0/500  errors=90  refill=0.0 s
+pool=8   burst=1    ready=8   p50=4.5 p95=4.5 p99=4.5 ms  drain=7.1 ms  hits=1/1  errors=0  refill=0.56 s
+pool=8   burst=10   ready=8   p50=64.1 p95=239.0 p99=239.2 ms  drain=242.5 ms  hits=8/10  errors=0  refill=0.1 s
+pool=8   burst=50   ready=8   p50=828.4 p95=955.5 p99=959.2 ms  drain=966.2 ms  hits=8/50  errors=0  refill=0.56 s
+pool=8   burst=100  ready=8   p50=1473.6 p95=2651.1 p99=2664.4 ms  drain=2709.8 ms  hits=8/100  errors=0  refill=0.1 s
+pool=8   burst=250  ready=8   p50=3237.7 p95=6260.8 p99=6293.7 ms  drain=6332.6 ms  hits=8/250  errors=0  refill=0.05 s
+pool=8   burst=500  ready=8   p50=5549.1 p95=10647.1 p99=10726.7 ms  drain=10827.1 ms  hits=8/500  errors=93  refill=0.16 s
+pool=32  burst=1    ready=32  p50=6.1 p95=6.1 p99=6.1 ms  drain=11.0 ms  hits=1/1  errors=0  refill=0.61 s
+pool=32  burst=10   ready=32  p50=19.5 p95=26.6 p99=27.2 ms  drain=31.8 ms  hits=10/10  errors=0  refill=0.72 s
+pool=32  burst=50   ready=32  p50=251.7 p95=518.3 p99=520.5 ms  drain=529.6 ms  hits=32/50  errors=0  refill=2.07 s
+pool=32  burst=100  ready=32  p50=867.4 p95=1714.9 p99=1728.8 ms  drain=1770.1 ms  hits=32/100  errors=0  refill=2.13 s
+pool=32  burst=250  ready=32  p50=3002.6 p95=5147.8 p99=5835.5 ms  drain=5862.9 ms  hits=32/250  errors=0  refill=2.17 s
+pool=32  burst=500  ready=32  p50=6712.8 p95=11565.1 p99=12558.8 ms  drain=12665.1 ms  hits=32/500  errors=0  refill=1.96 s
+wrote /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-999a78baff/warm-pool/warm-pool.json
+    exit=0
+=== querybench  22:55:19
+Traceback (most recent call last):
+  File "/home/ubuntu/pgrust/benchmarks/pgx/linux/query-bench.py", line 209, in <module>
+    main()
+    ~~~~^^
+  File "/home/ubuntu/pgrust/benchmarks/pgx/linux/query-bench.py", line 201, in main
+    doc["runs"].append(run_engine(label, mk(), args, copy_file, args.port + i))
+                       ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/pgrust/benchmarks/pgx/linux/query-bench.py", line 103, in run_engine
+    c.query(SCHEMA)
+    ~~~~~~~^^^^^^^^
+  File "/home/ubuntu/pgrust/benchmarks/pgx/pgxbench.py", line 112, in query
+    return self._until_ready()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/home/ubuntu/pgrust/benchmarks/pgx/pgxbench.py", line 91, in _until_ready
+    raise ServerNotReady(error)
+pgxbench.ServerNotReady: SERROR VERROR C25001 MVACUUM cannot run inside a transaction block Fxact.c L3654 RPreventInTransactionBlock  
+    exit=1
+=== analyze  22:55:33
+Traceback (most recent call last):
+  File "/home/ubuntu/pgrust/benchmarks/pgx/linux/analyze-policy.py", line 132, in <module>
+    main()
+    ~~~~^^
+  File "/home/ubuntu/pgrust/benchmarks/pgx/linux/analyze-policy.py", line 97, in main
+    c.query(SCHEMA)
+    ~~~~~~~^^^^^^^^
+  File "/home/ubuntu/pgrust/benchmarks/pgx/pgxbench.py", line 112, in query
+    return self._until_ready()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/home/ubuntu/pgrust/benchmarks/pgx/pgxbench.py", line 91, in _until_ready
+    raise ServerNotReady(error)
+pgxbench.ServerNotReady: SERROR VERROR C25001 MVACUUM cannot run inside a transaction block Fxact.c L0 RPreventInTransactionBlock  
+    exit=1
+=== limits  22:55:35
+none      peak=  1800 MB  solo:ok  bystander errors=0 alive=True panic=False
+session   peak=   350 MB  solo:FAIL(0.82s)  bystander errors=0 alive=True panic=False
+database  peak=   790 MB  other:ok, shared:FAIL(0.74s), shared:ok  bystander errors=0 alive=True panic=False
+runtime   peak=  2044 MB  r1:FAIL(3.45s), r2:ok, r3:FAIL(1.71s), r4:FAIL(1.39s)  bystander errors=0 alive=True panic=False
+wrote /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-999a78baff/limits/limits.json
+    exit=0
+=== regress  22:56:10
+create_index           plan_only  plan lines   29  other lines 0
+select_distinct        plan_only  plan lines   25  other lines 0
+subselect              plan_only  plan lines   61  other lines 0
+join                   plan_only  plan lines  212  other lines 0
+portals                plan_only  plan lines   16  other lines 0
+tidscan                plan_only  plan lines   48  other lines 0
+incremental_sort       plan_only  plan lines   41  other lines 0
+limit                  plan_only  plan lines   11  other lines 0
+partition_join         plan_only  plan lines  150  other lines 0
+partition_prune        plan_only  plan lines  331  other lines 0
+partition_aggregate    plan_only  plan lines  194  other lines 0
+memoize                plan_only  plan lines   39  other lines 0
+    exit=0
+=== cgroup backstop  22:56:42
+limited   session ok=False server alive=True exit=None oom_kills=0 cgroup peak=676.3 MB host avail 6819->6639 MB
+unlimited session ok=False server alive=False exit=-9 oom_kills=1 cgroup peak=1024.0 MB host avail 6727->6636 MB
+wrote /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-999a78baff/limits/cgroup.json
