@@ -10,8 +10,12 @@ set -euo pipefail
 DIR=${1:?usage: rails-app-setup.sh <dir>}
 rm -rf "$DIR"
 rails new "$DIR" --minimal --database=postgresql --skip-git --skip-docker --skip-ci --skip-kamal \
-  --skip-solid --skip-thruster --skip-rubocop --skip-brakeman --quiet
+  --skip-solid --skip-thruster --skip-rubocop --skip-brakeman --skip-bundle --quiet
 cd "$DIR"
+# gems go beside the app (shared by every copy the workload makes); the
+# absolute path is recorded in the app's .bundle/config
+bundle config set --local path "$(cd .. && pwd)/bundle"
+bundle install --quiet
 cat > config/database.yml <<'YML'
 default: &default
   adapter: postgresql
