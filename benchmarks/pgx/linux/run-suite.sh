@@ -63,6 +63,9 @@ for step in "${STEPS[@]}"; do
         $PY "$HERE/linux/query-bench.py" --engines "${PGX_QB_ENGINES:-postgres,postgres-nodurable,pgrust,pgx}" --out "$OUT/query-bench" ;;
     analyze)
         $PY "$HERE/linux/analyze-policy.py" --out "$OUT/analyze-policy" ;;
+    scale-touched)
+        $PY "$HERE/scale.py" --counts "${PGX_SCALE_COUNTS:-0,100,300,1000}" --active "" --long-idle-seconds 60 --touch \
+            --guc pgrust.autovacuum_skip_idle_databases=on --guc autovacuum_naptime=300 --out "$OUT/scale-touched" ;;
     scale-naptime)
         for nap in ${PGX_NAPTIMES:-60 300}; do
             $PY "$HERE/scale.py" --counts "${PGX_SCALE_COUNTS:-0,100,300,1000}" --active "" --long-idle-seconds 60 \

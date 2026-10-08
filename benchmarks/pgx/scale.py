@@ -25,6 +25,7 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import pgxbench as pb  # noqa: E402
 import ephemeral as eph  # noqa: E402
+import churn  # noqa: E402
 
 M = 1048576.0
 ACTIVE_SQL = ("SELECT count(*) FROM t1 WHERE account_id < 50;"
@@ -49,6 +50,8 @@ def main():
     ap.add_argument("--tables", type=int, default=50)
     ap.add_argument("--rows", type=int, default=200)
     ap.add_argument("--port", type=int, default=54410)
+    ap.add_argument("--touch", action="store_true",
+                    help="run churn.py's workload (insert, update, join, CREATE TABLE) once in each database when minted")
     args = ap.parse_args()
 
     gucs = ["pgrust.ephemeral_db_prefix=" + eph.PREFIX, "pgrust.ephemeral_db_mint_roles=postgres",
@@ -62,7 +65,7 @@ def main():
     name = lambda i: "%s%s__s%d" % (eph.PREFIX, eph.TEMPLATE, i)  # noqa: E731
     os.makedirs(args.out, exist_ok=True)
     path = os.path.join(args.out, "scale.json")
-    doc = {"benchmark": "scale", "git_commit": pb.git("rev-parse", "HEAD"), "conf": args.conf, "settings": gucs,
+    doc = {"benchmark": "scale", "touch": args.touch, "git_commit": pb.git("rev-parse", "HEAD"), "conf": args.conf, "settings": gucs,
            "template": {"tables": args.tables, "rows_per_table": args.rows}, "idle": [], "active": []}
 
     def save():
@@ -89,7 +92,7 @@ def main():
                 made += 1
                 t0 = time.perf_counter()
                 c = conn(name(made))
-                c.query("SELECT 1")
+                c.query(churn.WORKLOAD if args.touch else "SELECT 1")
                 lat.append(time.perf_counter() - t0)
                 c.close()
             time.sleep(15)  # let prewarm and checkpoints finish before calling it idle
