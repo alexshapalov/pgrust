@@ -79,6 +79,56 @@ runtime limit must sit well below the cgroup.
 
 `limits.py --mode workloads`: sort, hash join, hash aggregate, materialized
 CTE, JSON aggregation, `array_agg`, COPY out/in, large INSERT…SELECT,
-CREATE INDEX, a rewriting ALTER TABLE and a spilling sort, each under
-`pgrust.session_memory_limit = 256` with `work_mem = 2GB`. Results: pass 5
-(WORKLOADS_PENDING).
+CREATE INDEX, a rewriting ALTER TABLE and a spilling sort (`work_mem =
+256kB`), each under `pgrust.session_memory_limit = 256` with `work_mem =
+2GB` and `maintenance_work_mem = 2GB`, over a 3M-row table (`big`: int,
+int, md5 text, jsonb; ~600 MB). A bystander database runs `SELECT 1` every
+50 ms throughout. Pass 7, build `67269453b2`
+(`vps-d2a3c460-67269453b2/limits/workloads.json`):
+
+| Workload | Outcome | Peak PSS |
+|---|---|---|
+| sort (`ORDER BY` md5) | refused, 53200, 1.5 s | 277 MB |
+| hash join | refused, 53200, 2.1 s | 311 MB |
+| hash aggregate | refused, 53200, 2.3 s | 316 MB |
+| materialized CTE self-join | refused, 53200, 1.3 s | 299 MB |
+| `json_agg` | refused, 53200, 2.1 s | 263 MB |
+| `array_agg` | refused, 53200, 1.2 s | 292 MB |
+| COPY out | ok, 3.4 s | 75 MB |
+| COPY in (3M rows into a temp table) | ok, 6.4 s | 141 MB |
+| `INSERT INTO ins SELECT * FROM big` | ok, 4.9 s | 76 MB |
+| CREATE INDEX | ok, 5.3 s | 308 MB |
+| rewriting `ALTER TABLE … TYPE` | ok, 6.7 s | 76 MB |
+| sort with `work_mem = 256kB` (spills) | ok, 4.3 s | 78 MB |
+
+- Every refusal is SQLSTATE 53200 with the session-limit hint; every
+  session answered `SELECT 1` afterwards; the bystander had 0 errors (max
+  10.4 ms); no internal errors, no PANIC.
+- The refused six are the operations `work_mem = 2GB` lets keep their whole
+  input in memory — the limit is doing its job. With a `work_mem` below the
+  limit they spill, as the last row shows.
+- Peak PSS is the whole runtime (~70 MB idle base, shared buffers, the
+  binary), so it exceeds the 256 MB session figure without a breach.
+  CREATE INDEX's sort is bounded by `maintenance_work_mem`'s tuplesort
+  accounting and finished under the limit.
+- **Bugs this found** (all DML paths that kept one tuple copy per row in
+  the statement's arena until the statement ended):
+  - `ea6d055cb2` INSERT … SELECT through a projection (2M rows +290 MB;
+    3M rows refused);
+  - `67269453b2` INSERT … SELECT without projection (`SELECT *` from a
+    table): `large_insert` above, refused at 321 MB on the build before;
+  - `daf827c0ff` UPDATE / MERGE UPDATE / ON CONFLICT DO UPDATE: a 3M-row
+    whole-table UPDATE grew 400 MB.
+  
+  `insert-memory-repro.py` (pass 7): peak growth at 1M / 2M / 3M rows
+
+  | Statement | PGX before | PGX after | PostgreSQL 18 |
+  |---|---|---|---|
+  | INSERT … SELECT md5, jsonb FROM generate_series | 59 / ~290 / refused | 63 / 85 / 89 MB | 165 / 144 / 146 MB |
+  | INSERT INTO t SELECT * FROM src | (refused in workloads) | 13 / 13 / 13 MB | 111 / 111 / 112 MB |
+  | UPDATE t SET s = md5(…), j = jsonb… (every row) | 98 / 261 / 400 MB | 1 / 3 / 11 MB | 93 / 59 / 24 MB |
+
+  The generate_series variants hold the function's output in `work_mem`
+  (64 MB) on both engines; PostgreSQL's figures also include filling its
+  shared buffers, so compare the trend with row count, not the absolute
+  value.
