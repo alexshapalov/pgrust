@@ -145,7 +145,9 @@ pgrust.autovacuum_skip_idle_databases = on
 autovacuum_naptime = 300
 ```
 
-Ephemeral databases that see writes are still vacuumed and analyzed. A
+Ephemeral databases that see writes are still vacuumed and analyzed, on
+builds with `6fe0b1ad65`. Before that fix, skip-idle could starve written
+databases at high counts (`linux-analyze.md`). A
 database written once and then left gets its first visit within 5 minutes
 instead of 1. `analyze-policy` results (`linux-analyze.md`) show stale
 statistics barely change plans at agent-branch scale.

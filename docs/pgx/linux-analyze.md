@@ -44,8 +44,23 @@ Coverage: the regression suite runs with the setting at its default
 (off), so it shows the default path is unchanged, not skip-idle itself.
 Skip-idle is exercised by the scale runs and by `scale.py --touch`, where
 every database is written once: idle CPU is 1.45 % while the first visits
-complete, against 0.33 % untouched. A test that a written database does
-get vacuumed under skip-idle is not in the suite yet.
+complete, against 0.33 % untouched.
+
+**Starvation bug, found by the check below and fixed in `6fe0b1ad65`.**
+A skipped database never gets a worker, so its `last_autovac_time` stayed
+0. The launcher chooses the candidate with the oldest `last_autovac_time`.
+When its schedule spans more than `autovacuum_naptime`, idle databases
+were always candidates and always won, and written databases later in
+`pg_database` order were never vacuumed or analyzed. The schedule spans
+more than naptime when databases × 100 ms (the minimum spacing) exceeds
+naptime: at naptime 60 that means 1000 databases. Before the fix,
+`skipidle-check.py` with 50 idle + 5 written databases and naptime 5 s
+autovacuumed 0 of the 5 written databases in 180 s; the stock launcher
+did all 5 in 2 s. The launcher now records when it skipped each database
+and uses that time as if a worker had visited.
+`benchmarks/pgx/linux/skipidle-check.py` (suite step `skipidle`) checks
+that written databases are vacuumed and analyzed, and visited again after
+new writes. Pass 8 verifies the fix.
 
 ## 2. Does a branch need ANALYZE?
 
