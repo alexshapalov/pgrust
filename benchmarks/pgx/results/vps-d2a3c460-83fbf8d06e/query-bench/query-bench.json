@@ -1,0 +1,830 @@
+{
+  "benchmark": "query-bench",
+  "git_commit": "83fbf8d06ec5b7ab64ec73f69236ef63770f434c",
+  "iterations": 500,
+  "clients": 4,
+  "runs": [
+    {
+      "label": "postgres18",
+      "engine": {
+        "name": "postgres",
+        "binary": "/usr/lib/postgresql/18/bin/postgres",
+        "env": {},
+        "args": [
+          "-D",
+          "$DATADIR",
+          "-k",
+          "$SOCKDIR",
+          "-p",
+          "$PORT",
+          "-c",
+          "listen_addresses=",
+          "-c",
+          "max_connections=40"
+        ],
+        "stack_limit_bytes": null,
+        "conf_file": null
+      },
+      "ops": {
+        "point_select": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.093,
+            "p50": 0.111,
+            "p95": 0.151,
+            "p99": 0.187,
+            "max": 0.364,
+            "mean": 0.116
+          },
+          "server_cpu_ms_per_op": 0.08
+        },
+        "indexed_lookup": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.133,
+            "p50": 0.179,
+            "p95": 0.24,
+            "p99": 0.291,
+            "max": 0.497,
+            "mean": 0.185
+          },
+          "server_cpu_ms_per_op": 0.12
+        },
+        "insert": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.335,
+            "p50": 0.463,
+            "p95": 0.599,
+            "p99": 0.945,
+            "max": 4.426,
+            "mean": 0.489
+          },
+          "server_cpu_ms_per_op": 0.14
+        },
+        "update": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.39,
+            "p50": 0.545,
+            "p95": 0.698,
+            "p99": 2.094,
+            "max": 4.176,
+            "mean": 0.583
+          },
+          "server_cpu_ms_per_op": 0.2
+        },
+        "delete": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.398,
+            "p50": 0.551,
+            "p95": 0.704,
+            "p99": 1.107,
+            "max": 2.877,
+            "mean": 0.582
+          },
+          "server_cpu_ms_per_op": 0.22
+        },
+        "simple_join": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.165,
+            "p50": 0.228,
+            "p95": 0.34,
+            "p99": 0.419,
+            "max": 0.877,
+            "mean": 0.24
+          },
+          "server_cpu_ms_per_op": 0.16
+        },
+        "multi_join": {
+          "iterations": 100,
+          "latency_ms": {
+            "min": 1.463,
+            "p50": 1.651,
+            "p95": 1.867,
+            "p99": 2.968,
+            "max": 6.034,
+            "mean": 1.705
+          },
+          "server_cpu_ms_per_op": 1.7
+        },
+        "aggregation": {
+          "iterations": 30,
+          "latency_ms": {
+            "min": 55.154,
+            "p50": 57.093,
+            "p95": 61.05,
+            "p99": 61.122,
+            "max": 61.144,
+            "mean": 57.466
+          },
+          "server_cpu_ms_per_op": 52.667
+        },
+        "sort": {
+          "iterations": 30,
+          "latency_ms": {
+            "min": 74.66,
+            "p50": 79.103,
+            "p95": 93.388,
+            "p99": 105.442,
+            "max": 108.884,
+            "mean": 81.344
+          },
+          "server_cpu_ms_per_op": 73.667
+        },
+        "jsonb": {
+          "iterations": 30,
+          "latency_ms": {
+            "min": 38.822,
+            "p50": 42.7,
+            "p95": 46.502,
+            "p99": 48.383,
+            "max": 48.873,
+            "mean": 42.492
+          },
+          "server_cpu_ms_per_op": 42.333
+        },
+        "transaction": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.58,
+            "p50": 0.778,
+            "p95": 1.057,
+            "p99": 1.541,
+            "max": 4.199,
+            "mean": 0.814
+          },
+          "server_cpu_ms_per_op": 0.38
+        },
+        "copy_10k": {
+          "iterations": 20,
+          "latency_ms": {
+            "min": 8.75,
+            "p50": 9.571,
+            "p95": 10.43,
+            "p99": 10.68,
+            "max": 10.742,
+            "mean": 9.656
+          },
+          "server_cpu_ms_per_op": 8.5
+        },
+        "create_index": {
+          "iterations": 10,
+          "latency_ms": {
+            "min": 318.619,
+            "p50": 333.288,
+            "p95": 360.573,
+            "p99": 363.957,
+            "max": 364.803,
+            "mean": 338.137
+          },
+          "server_cpu_ms_per_op": 323.0
+        },
+        "migration": {
+          "iterations": 20,
+          "latency_ms": {
+            "min": 2.958,
+            "p50": 3.147,
+            "p95": 4.206,
+            "p99": 5.589,
+            "max": 5.934,
+            "mean": 3.395
+          },
+          "server_cpu_ms_per_op": 2.5
+        }
+      },
+      "load_s": 13.02,
+      "throughput": {
+        "clients": 4,
+        "qps": 8126.9,
+        "server_cpu_cores": 0.0
+      },
+      "peak_pss_mb": 143.1,
+      "idle_pss_mb_after": 126.9
+    },
+    {
+      "label": "postgres18-nodur",
+      "engine": {
+        "name": "postgres",
+        "binary": "/usr/lib/postgresql/18/bin/postgres",
+        "env": {},
+        "args": [
+          "-D",
+          "$DATADIR",
+          "-k",
+          "$SOCKDIR",
+          "-p",
+          "$PORT",
+          "-c",
+          "listen_addresses=",
+          "-c",
+          "max_connections=40",
+          "-c",
+          "fsync=off",
+          "-c",
+          "synchronous_commit=off",
+          "-c",
+          "full_page_writes=off"
+        ],
+        "stack_limit_bytes": null,
+        "conf_file": null
+      },
+      "ops": {
+        "point_select": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.092,
+            "p50": 0.113,
+            "p95": 0.176,
+            "p99": 0.224,
+            "max": 2.745,
+            "mean": 0.127
+          },
+          "server_cpu_ms_per_op": 0.1
+        },
+        "indexed_lookup": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.127,
+            "p50": 0.181,
+            "p95": 0.242,
+            "p99": 0.293,
+            "max": 0.507,
+            "mean": 0.187
+          },
+          "server_cpu_ms_per_op": 0.12
+        },
+        "insert": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.071,
+            "p50": 0.08,
+            "p95": 0.139,
+            "p99": 0.181,
+            "max": 0.457,
+            "mean": 0.091
+          },
+          "server_cpu_ms_per_op": 0.08
+        },
+        "update": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.101,
+            "p50": 0.128,
+            "p95": 0.192,
+            "p99": 0.23,
+            "max": 0.456,
+            "mean": 0.136
+          },
+          "server_cpu_ms_per_op": 0.12
+        },
+        "delete": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.114,
+            "p50": 0.148,
+            "p95": 0.243,
+            "p99": 0.454,
+            "max": 0.705,
+            "mean": 0.164
+          },
+          "server_cpu_ms_per_op": 0.12
+        },
+        "simple_join": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.163,
+            "p50": 0.232,
+            "p95": 0.428,
+            "p99": 0.685,
+            "max": 4.579,
+            "mean": 0.268
+          },
+          "server_cpu_ms_per_op": 0.18
+        },
+        "multi_join": {
+          "iterations": 100,
+          "latency_ms": {
+            "min": 1.355,
+            "p50": 1.582,
+            "p95": 2.022,
+            "p99": 2.184,
+            "max": 2.244,
+            "mean": 1.622
+          },
+          "server_cpu_ms_per_op": 1.4
+        },
+        "aggregation": {
+          "iterations": 30,
+          "latency_ms": {
+            "min": 54.959,
+            "p50": 57.747,
+            "p95": 65.285,
+            "p99": 80.231,
+            "max": 85.358,
+            "mean": 58.913
+          },
+          "server_cpu_ms_per_op": 53.667
+        },
+        "sort": {
+          "iterations": 30,
+          "latency_ms": {
+            "min": 76.818,
+            "p50": 83.188,
+            "p95": 92.735,
+            "p99": 101.106,
+            "max": 103.387,
+            "mean": 83.799
+          },
+          "server_cpu_ms_per_op": 76.0
+        },
+        "jsonb": {
+          "iterations": 30,
+          "latency_ms": {
+            "min": 39.529,
+            "p50": 41.896,
+            "p95": 44.084,
+            "p99": 45.138,
+            "max": 45.513,
+            "mean": 42.094
+          },
+          "server_cpu_ms_per_op": 42.0
+        },
+        "transaction": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.272,
+            "p50": 0.391,
+            "p95": 0.509,
+            "p99": 0.621,
+            "max": 1.237,
+            "mean": 0.399
+          },
+          "server_cpu_ms_per_op": 0.3
+        },
+        "copy_10k": {
+          "iterations": 20,
+          "latency_ms": {
+            "min": 8.195,
+            "p50": 8.763,
+            "p95": 9.387,
+            "p99": 9.457,
+            "max": 9.475,
+            "mean": 8.763
+          },
+          "server_cpu_ms_per_op": 9.0
+        },
+        "create_index": {
+          "iterations": 10,
+          "latency_ms": {
+            "min": 310.062,
+            "p50": 329.887,
+            "p95": 349.653,
+            "p99": 351.995,
+            "max": 352.581,
+            "mean": 328.038
+          },
+          "server_cpu_ms_per_op": 323.0
+        },
+        "migration": {
+          "iterations": 20,
+          "latency_ms": {
+            "min": 2.248,
+            "p50": 2.542,
+            "p95": 3.116,
+            "p99": 3.118,
+            "max": 3.119,
+            "mean": 2.6
+          },
+          "server_cpu_ms_per_op": 2.5
+        }
+      },
+      "load_s": 11.71,
+      "throughput": {
+        "clients": 4,
+        "qps": 8222.0,
+        "server_cpu_cores": 0.0
+      },
+      "peak_pss_mb": 132.5,
+      "idle_pss_mb_after": 126.7
+    },
+    {
+      "label": "pgrust-default",
+      "engine": {
+        "name": "pgrust",
+        "binary": "/home/ubuntu/pgrust/target/release/postgres",
+        "env": {
+          "PGRUST_PGSHAREDIR": "/usr/share/postgresql/18",
+          "PGRUST_TZDIR": "/usr/share/zoneinfo",
+          "RUST_MIN_STACK": "33554432"
+        },
+        "args": [
+          "-D",
+          "$DATADIR",
+          "-k",
+          "$SOCKDIR",
+          "-p",
+          "$PORT",
+          "-c",
+          "listen_addresses=",
+          "-c",
+          "io_method=sync",
+          "-c",
+          "max_stack_depth=60000",
+          "-c",
+          "max_connections=40"
+        ],
+        "stack_limit_bytes": 67092480,
+        "conf_file": null
+      },
+      "ops": {
+        "point_select": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.15,
+            "p50": 0.21,
+            "p95": 0.275,
+            "p99": 0.302,
+            "max": 0.617,
+            "mean": 0.213
+          },
+          "server_cpu_ms_per_op": 0.16
+        },
+        "indexed_lookup": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.195,
+            "p50": 0.291,
+            "p95": 0.369,
+            "p99": 0.403,
+            "max": 0.641,
+            "mean": 0.294
+          },
+          "server_cpu_ms_per_op": 0.32
+        },
+        "insert": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.358,
+            "p50": 0.521,
+            "p95": 0.67,
+            "p99": 0.949,
+            "max": 3.052,
+            "mean": 0.542
+          },
+          "server_cpu_ms_per_op": 0.22
+        },
+        "update": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.48,
+            "p50": 0.612,
+            "p95": 0.794,
+            "p99": 0.961,
+            "max": 1.698,
+            "mean": 0.635
+          },
+          "server_cpu_ms_per_op": 0.28
+        },
+        "delete": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.539,
+            "p50": 0.675,
+            "p95": 0.821,
+            "p99": 0.886,
+            "max": 1.545,
+            "mean": 0.685
+          },
+          "server_cpu_ms_per_op": 0.34
+        },
+        "simple_join": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.267,
+            "p50": 0.37,
+            "p95": 0.476,
+            "p99": 0.652,
+            "max": 1.14,
+            "mean": 0.379
+          },
+          "server_cpu_ms_per_op": 0.28
+        },
+        "multi_join": {
+          "iterations": 100,
+          "latency_ms": {
+            "min": 1.783,
+            "p50": 2.051,
+            "p95": 2.567,
+            "p99": 3.296,
+            "max": 3.968,
+            "mean": 2.127
+          },
+          "server_cpu_ms_per_op": 2.0
+        },
+        "aggregation": {
+          "iterations": 30,
+          "latency_ms": {
+            "min": 23.777,
+            "p50": 25.045,
+            "p95": 29.749,
+            "p99": 34.142,
+            "max": 35.17,
+            "mean": 25.669
+          },
+          "server_cpu_ms_per_op": 96.0
+        },
+        "sort": {
+          "iterations": 30,
+          "latency_ms": {
+            "min": 55.829,
+            "p50": 63.861,
+            "p95": 73.737,
+            "p99": 76.635,
+            "max": 76.822,
+            "mean": 64.382
+          },
+          "server_cpu_ms_per_op": 209.333
+        },
+        "jsonb": {
+          "iterations": 30,
+          "latency_ms": {
+            "min": 56.312,
+            "p50": 60.213,
+            "p95": 67.5,
+            "p99": 70.433,
+            "max": 71.287,
+            "mean": 61.21
+          },
+          "server_cpu_ms_per_op": 60.667
+        },
+        "transaction": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.826,
+            "p50": 1.05,
+            "p95": 1.304,
+            "p99": 1.936,
+            "max": 3.403,
+            "mean": 1.089
+          },
+          "server_cpu_ms_per_op": 0.64
+        },
+        "copy_10k": {
+          "iterations": 20,
+          "latency_ms": {
+            "min": 8.024,
+            "p50": 9.154,
+            "p95": 9.791,
+            "p99": 9.96,
+            "max": 10.003,
+            "mean": 9.102
+          },
+          "server_cpu_ms_per_op": 8.5
+        },
+        "create_index": {
+          "iterations": 10,
+          "latency_ms": {
+            "min": 399.906,
+            "p50": 418.294,
+            "p95": 445.432,
+            "p99": 447.418,
+            "max": 447.914,
+            "mean": 421.321
+          },
+          "server_cpu_ms_per_op": 404.0
+        },
+        "migration": {
+          "iterations": 20,
+          "latency_ms": {
+            "min": 3.767,
+            "p50": 4.119,
+            "p95": 9.312,
+            "p99": 17.599,
+            "max": 19.67,
+            "mean": 5.318
+          },
+          "server_cpu_ms_per_op": 4.0
+        }
+      },
+      "load_s": 29.78,
+      "throughput": {
+        "clients": 4,
+        "qps": 7712.6,
+        "server_cpu_cores": 1.52
+      },
+      "peak_pss_mb": 256.2,
+      "idle_pss_mb_after": 241.1
+    },
+    {
+      "label": "pgx-profile",
+      "engine": {
+        "name": "pgrust",
+        "binary": "/home/ubuntu/pgrust/target/release/postgres",
+        "env": {
+          "PGRUST_PGSHAREDIR": "/usr/share/postgresql/18",
+          "PGRUST_TZDIR": "/usr/share/zoneinfo",
+          "RUST_MIN_STACK": "33554432"
+        },
+        "args": [
+          "-D",
+          "$DATADIR",
+          "-k",
+          "$SOCKDIR",
+          "-p",
+          "$PORT",
+          "-c",
+          "listen_addresses=",
+          "-c",
+          "io_method=sync",
+          "-c",
+          "max_stack_depth=60000",
+          "-c",
+          "max_connections=40"
+        ],
+        "stack_limit_bytes": 67092480,
+        "conf_file": "/home/ubuntu/pgrust/configs/pgx-ephemeral.conf"
+      },
+      "ops": {
+        "point_select": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.152,
+            "p50": 0.235,
+            "p95": 0.325,
+            "p99": 0.387,
+            "max": 0.579,
+            "mean": 0.241
+          },
+          "server_cpu_ms_per_op": 0.18
+        },
+        "indexed_lookup": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.215,
+            "p50": 0.351,
+            "p95": 0.48,
+            "p99": 0.52,
+            "max": 0.75,
+            "mean": 0.359
+          },
+          "server_cpu_ms_per_op": 0.26
+        },
+        "insert": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.119,
+            "p50": 0.166,
+            "p95": 0.268,
+            "p99": 0.354,
+            "max": 0.623,
+            "mean": 0.178
+          },
+          "server_cpu_ms_per_op": 0.14
+        },
+        "update": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.184,
+            "p50": 0.323,
+            "p95": 0.413,
+            "p99": 0.459,
+            "max": 0.955,
+            "mean": 0.324
+          },
+          "server_cpu_ms_per_op": 0.26
+        },
+        "delete": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.231,
+            "p50": 0.315,
+            "p95": 0.432,
+            "p99": 0.536,
+            "max": 3.214,
+            "mean": 0.329
+          },
+          "server_cpu_ms_per_op": 0.28
+        },
+        "simple_join": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.28,
+            "p50": 0.458,
+            "p95": 0.627,
+            "p99": 0.711,
+            "max": 1.836,
+            "mean": 0.47
+          },
+          "server_cpu_ms_per_op": 0.36
+        },
+        "multi_join": {
+          "iterations": 100,
+          "latency_ms": {
+            "min": 1.738,
+            "p50": 2.029,
+            "p95": 3.685,
+            "p99": 3.932,
+            "max": 3.943,
+            "mean": 2.361
+          },
+          "server_cpu_ms_per_op": 2.2
+        },
+        "aggregation": {
+          "iterations": 30,
+          "latency_ms": {
+            "min": 96.403,
+            "p50": 103.182,
+            "p95": 110.27,
+            "p99": 112.454,
+            "max": 113.294,
+            "mean": 103.285
+          },
+          "server_cpu_ms_per_op": 103.0
+        },
+        "sort": {
+          "iterations": 30,
+          "latency_ms": {
+            "min": 172.238,
+            "p50": 183.032,
+            "p95": 211.278,
+            "p99": 223.179,
+            "max": 226.144,
+            "mean": 187.508
+          },
+          "server_cpu_ms_per_op": 187.0
+        },
+        "jsonb": {
+          "iterations": 30,
+          "latency_ms": {
+            "min": 57.251,
+            "p50": 60.113,
+            "p95": 70.346,
+            "p99": 72.315,
+            "max": 72.413,
+            "mean": 61.522
+          },
+          "server_cpu_ms_per_op": 61.333
+        },
+        "transaction": {
+          "iterations": 500,
+          "latency_ms": {
+            "min": 0.509,
+            "p50": 0.722,
+            "p95": 0.88,
+            "p99": 1.048,
+            "max": 1.507,
+            "mean": 0.731
+          },
+          "server_cpu_ms_per_op": 0.64
+        },
+        "copy_10k": {
+          "iterations": 20,
+          "latency_ms": {
+            "min": 8.15,
+            "p50": 8.708,
+            "p95": 14.086,
+            "p99": 16.807,
+            "max": 17.487,
+            "mean": 9.507
+          },
+          "server_cpu_ms_per_op": 9.0
+        },
+        "create_index": {
+          "iterations": 10,
+          "latency_ms": {
+            "min": 395.535,
+            "p50": 407.667,
+            "p95": 441.877,
+            "p99": 447.33,
+            "max": 448.693,
+            "mean": 414.974
+          },
+          "server_cpu_ms_per_op": 411.0
+        },
+        "migration": {
+          "iterations": 20,
+          "latency_ms": {
+            "min": 3.274,
+            "p50": 3.753,
+            "p95": 4.426,
+            "p99": 4.607,
+            "max": 4.652,
+            "mean": 3.747
+          },
+          "server_cpu_ms_per_op": 4.0
+        }
+      },
+      "load_s": 27.83,
+      "throughput": {
+        "clients": 4,
+        "qps": 7972.5,
+        "server_cpu_cores": 1.53
+      },
+      "peak_pss_mb": 129.7,
+      "idle_pss_mb_after": 111.9
+    }
+  ]
+}

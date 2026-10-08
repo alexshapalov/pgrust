@@ -1,0 +1,171 @@
+{
+  "benchmark": "cpu-noisy",
+  "git_commit": "83fbf8d06ec5b7ab64ec73f69236ef63770f434c",
+  "settings": [
+    "max_connections=80",
+    "statement_timeout=0"
+  ],
+  "workload": "agent",
+  "same_db": true,
+  "conn_limit": -1,
+  "label": "one-agent-mix",
+  "cpus": 4,
+  "noisy_sql": "SELECT sum((g::bigint * g) % 7) FROM generate_series(1, 20000000) g",
+  "levels": [
+    {
+      "noisy_clients": 0,
+      "quiet_latency_ms": {
+        "n": 5245,
+        "min": 0.38,
+        "p50": 0.58,
+        "p95": 0.86,
+        "p99": 1.07,
+        "max": 6.03,
+        "mean": 0.62
+      },
+      "quiet_errors": 0,
+      "quiet_error_examples": [],
+      "new_connection_ms": {
+        "n": 119,
+        "min": 3.08,
+        "p50": 3.79,
+        "p95": 4.91,
+        "p99": 6.77,
+        "max": 12.54,
+        "mean": 3.94
+      },
+      "new_connection_errors": 0,
+      "host_cpu_busy_percent": 3.7,
+      "server_cpu_percent_of_one_core": 9.3,
+      "load1": 1.41,
+      "noisy_queries_completed": 0,
+      "noisy_errors": [],
+      "noisy_refused": 0,
+      "pss_mb": 79.9
+    },
+    {
+      "noisy_clients": 1,
+      "quiet_latency_ms": {
+        "n": 5168,
+        "min": 0.38,
+        "p50": 0.62,
+        "p95": 0.92,
+        "p99": 1.53,
+        "max": 63.99,
+        "mean": 0.7
+      },
+      "quiet_errors": 0,
+      "quiet_error_examples": [],
+      "new_connection_ms": {
+        "n": 118,
+        "min": 3.3,
+        "p50": 5.81,
+        "p95": 8.22,
+        "p99": 8.82,
+        "max": 9.33,
+        "mean": 5.52
+      },
+      "new_connection_errors": 0,
+      "host_cpu_busy_percent": 29.5,
+      "server_cpu_percent_of_one_core": 109.9,
+      "load1": 1.29,
+      "noisy_queries_completed": 591,
+      "noisy_errors": [],
+      "noisy_refused": 0,
+      "pss_mb": 99.3
+    },
+    {
+      "noisy_clients": 4,
+      "quiet_latency_ms": {
+        "n": 4793,
+        "min": 0.38,
+        "p50": 0.89,
+        "p95": 2.08,
+        "p99": 4.06,
+        "max": 45.45,
+        "mean": 1.1
+      },
+      "quiet_errors": 0,
+      "quiet_error_examples": [],
+      "new_connection_ms": {
+        "n": 115,
+        "min": 4.35,
+        "p50": 11.46,
+        "p95": 18.88,
+        "p99": 21.44,
+        "max": 22.33,
+        "mean": 11.93
+      },
+      "new_connection_errors": 0,
+      "host_cpu_busy_percent": 84.4,
+      "server_cpu_percent_of_one_core": 317.8,
+      "load1": 2.26,
+      "noisy_queries_completed": 1560,
+      "noisy_errors": [],
+      "noisy_refused": 0,
+      "pss_mb": 155.0
+    },
+    {
+      "noisy_clients": 8,
+      "quiet_latency_ms": {
+        "n": 4707,
+        "min": 0.37,
+        "p50": 0.79,
+        "p95": 2.75,
+        "p99": 4.29,
+        "max": 36.17,
+        "mean": 1.13
+      },
+      "quiet_errors": 0,
+      "quiet_error_examples": [],
+      "new_connection_ms": {
+        "n": 116,
+        "min": 3.63,
+        "p50": 8.03,
+        "p95": 15.91,
+        "p99": 22.21,
+        "max": 23.39,
+        "mean": 8.95
+      },
+      "new_connection_errors": 0,
+      "host_cpu_busy_percent": 55.0,
+      "server_cpu_percent_of_one_core": 213.5,
+      "load1": 2.23,
+      "noisy_queries_completed": 880,
+      "noisy_errors": [],
+      "noisy_refused": 0,
+      "pss_mb": 186.3
+    },
+    {
+      "noisy_clients": 16,
+      "quiet_latency_ms": {
+        "n": 4544,
+        "min": 0.4,
+        "p50": 0.89,
+        "p95": 3.23,
+        "p99": 5.33,
+        "max": 38.66,
+        "mean": 1.3
+      },
+      "quiet_errors": 0,
+      "quiet_error_examples": [],
+      "new_connection_ms": {
+        "n": 116,
+        "min": 3.85,
+        "p50": 8.17,
+        "p95": 16.32,
+        "p99": 23.03,
+        "max": 28.33,
+        "mean": 9.38
+      },
+      "new_connection_errors": 0,
+      "host_cpu_busy_percent": 62.6,
+      "server_cpu_percent_of_one_core": 240.0,
+      "load1": 3.65,
+      "noisy_queries_completed": 797,
+      "noisy_errors": [],
+      "noisy_refused": 0,
+      "pss_mb": 233.7
+    }
+  ]
+}

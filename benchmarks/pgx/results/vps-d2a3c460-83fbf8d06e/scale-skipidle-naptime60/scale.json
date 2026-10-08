@@ -1,0 +1,201 @@
+{
+  "benchmark": "scale",
+  "git_commit": "83fbf8d06ec5b7ab64ec73f69236ef63770f434c",
+  "conf": "/home/ubuntu/pgrust/configs/pgx-ephemeral.conf",
+  "settings": [
+    "pgrust.ephemeral_db_prefix=tdb_",
+    "pgrust.ephemeral_db_mint_roles=postgres",
+    "pgrust.ephemeral_db_grace=86400",
+    "max_connections=130",
+    "pgrust.autovacuum_skip_idle_databases=on",
+    "autovacuum_naptime=60"
+  ],
+  "template": {
+    "tables": 50,
+    "rows_per_table": 200
+  },
+  "idle": [
+    {
+      "databases": 0,
+      "mint_ms": null,
+      "footprint_bytes": 90307584,
+      "rss_bytes": 94392320,
+      "threads": 8,
+      "fds": 168,
+      "datadir_apparent_bytes": 74996736,
+      "idle_window_s": 60,
+      "idle_cpu_percent_per_10s": [
+        0.0998,
+        0.0,
+        0.1997,
+        0.0998,
+        0.1997,
+        0.0998
+      ],
+      "idle_cpu_percent_mean": 0.1165,
+      "idle_cpu_percent_last_minute": 0.1165,
+      "idle_disk_written_bytes": 93675,
+      "idle_wakeups": 63,
+      "on_cpu": {
+        "window_s": 10,
+        "busy_share_by_thread": {
+          "postgres": 0.001,
+          "pg:memwatchdog": 0.001
+        }
+      }
+    },
+    {
+      "databases": 100,
+      "mint_ms": {
+        "n": 100000.0,
+        "min": 66.9,
+        "p50": 73.7,
+        "p95": 86.2,
+        "p99": 109.1,
+        "max": 126.8,
+        "mean": 75.6
+      },
+      "footprint_bytes": 150983680,
+      "rss_bytes": 155058176,
+      "threads": 8,
+      "fds": 42,
+      "datadir_apparent_bytes": 1751662592,
+      "idle_window_s": 60,
+      "idle_cpu_percent_per_10s": [
+        0.0998,
+        0.9981,
+        0.9983,
+        0.9983,
+        1.0981,
+        1.1979
+      ],
+      "idle_cpu_percent_mean": 0.8984,
+      "idle_cpu_percent_last_minute": 0.8984,
+      "idle_disk_written_bytes": 285828,
+      "idle_wakeups": 267,
+      "on_cpu": {
+        "window_s": 10,
+        "busy_share_by_thread": {
+          "postgres": 0.002,
+          "pg:checkpointer": 0.001,
+          "pg:memwatchdog": 0.001,
+          "pg:autovacuum l": 0.001,
+          "pg:bgworker": 0.001
+        }
+      }
+    },
+    {
+      "databases": 300,
+      "mint_ms": {
+        "n": 200000.0,
+        "min": 66.4,
+        "p50": 73.5,
+        "p95": 86.5,
+        "p99": 101.9,
+        "max": 109.8,
+        "mean": 75.1
+      },
+      "footprint_bytes": 267045888,
+      "rss_bytes": 271122432,
+      "threads": 8,
+      "fds": 40,
+      "datadir_apparent_bytes": 5102751744,
+      "idle_window_s": 60,
+      "idle_cpu_percent_per_10s": [
+        3.5933,
+        3.2935,
+        1.1977,
+        0.3993,
+        0.2993,
+        0.2993
+      ],
+      "idle_cpu_percent_mean": 1.5137,
+      "idle_cpu_percent_last_minute": 1.5137,
+      "idle_disk_written_bytes": 151019,
+      "idle_wakeups": 380,
+      "on_cpu": {
+        "window_s": 10,
+        "busy_share_by_thread": {
+          "pg:autovacuum l": 0.002,
+          "pg-timeout-time": 0.001
+        }
+      }
+    },
+    {
+      "databases": 500,
+      "mint_ms": {
+        "n": 200000.0,
+        "min": 65.0,
+        "p50": 73.0,
+        "p95": 88.2,
+        "p99": 102.1,
+        "max": 132.2,
+        "mean": 74.8
+      },
+      "footprint_bytes": 390827008,
+      "rss_bytes": 394899456,
+      "threads": 8,
+      "fds": 37,
+      "datadir_apparent_bytes": 8453849088,
+      "idle_window_s": 60,
+      "idle_cpu_percent_per_10s": [
+        3.6916,
+        0.7982,
+        0.5987,
+        0.6985,
+        0.6985,
+        0.6985
+      ],
+      "idle_cpu_percent_mean": 1.1973,
+      "idle_cpu_percent_last_minute": 1.1973,
+      "idle_disk_written_bytes": 24751,
+      "idle_wakeups": 257,
+      "on_cpu": {
+        "window_s": 10,
+        "busy_share_by_thread": {
+          "pg:autovacuum l": 0.005,
+          "pg:bgworker": 0.001
+        }
+      }
+    },
+    {
+      "databases": 1000,
+      "mint_ms": {
+        "n": 500000.0,
+        "min": 65.4,
+        "p50": 73.1,
+        "p95": 90.2,
+        "p99": 105.0,
+        "max": 170.9,
+        "mean": 75.2
+      },
+      "footprint_bytes": 694389760,
+      "rss_bytes": 698466304,
+      "threads": 8,
+      "fds": 37,
+      "datadir_apparent_bytes": 16831678464,
+      "idle_window_s": 60,
+      "idle_cpu_percent_per_10s": [
+        6.0838,
+        6.3824,
+        4.1888,
+        1.795,
+        1.8948,
+        1.6955
+      ],
+      "idle_cpu_percent_mean": 3.6734,
+      "idle_cpu_percent_last_minute": 3.6734,
+      "idle_disk_written_bytes": 16559,
+      "idle_wakeups": 826,
+      "on_cpu": {
+        "window_s": 10,
+        "busy_share_by_thread": {
+          "pg:autovacuum l": 0.016,
+          "postgres": 0.001,
+          "pg:bgworker": 0.001
+        }
+      }
+    }
+  ],
+  "active": []
+}

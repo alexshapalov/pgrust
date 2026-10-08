@@ -1,0 +1,61 @@
+{
+  "benchmark": "cgroup-backstop",
+  "git_commit": "83fbf8d06ec5b7ab64ec73f69236ef63770f434c",
+  "memory_max_mb": 1024,
+  "cases": [
+    {
+      "case": "limited",
+      "settings": [
+        "max_connections=50",
+        "pgrust.runtime_memory_limit=700"
+      ],
+      "session": {
+        "database": "postgres",
+        "rows": 30000000,
+        "ok": false,
+        "error": "SERROR VERROR C53200 Mout of memory DFailed on request of size 268435456 in memory context \"tuplestore\". HThe server reached pgrust.runtime_memory_limit. Fmcxt.c L0  ",
+        "seconds": 1.64,
+        "select1_after": true
+      },
+      "server_alive_after": true,
+      "server_exit": null,
+      "oom_kill_events": 0,
+      "memory_max_hits": 0,
+      "cgroup_memory_peak_mb": 675.7,
+      "host_mem_available_mb_before": 6803,
+      "host_mem_available_mb_after": 6726,
+      "kernel_log": [],
+      "panic_in_log": false,
+      "log_tail": "cks: 680260920 bytes\n2026-10-08 01:44:17.319 UTC [1009] ERROR:  out of memory\n2026-10-08 01:44:17.319 UTC [1009] DETAIL:  Failed on request of size 268435456 in memory context \"tuplestore\".\n2026-10-08 01:44:17.319 UTC [1009] HINT:  The server reached pgrust.runtime_memory_limit.\n2026-10-08 01:44:17.319 UTC [1009] STATEMENT:  SELECT array_length(array_agg(g), 1) FROM generate_series(1, 30000000) g\n"
+    },
+    {
+      "case": "unlimited",
+      "settings": [
+        "max_connections=50"
+      ],
+      "session": {
+        "database": "postgres",
+        "rows": 30000000,
+        "ok": false,
+        "error": "connection closed by server",
+        "seconds": 2.51,
+        "select1_after": false,
+        "select1_error": "[Errno 32] Broken pipe"
+      },
+      "server_alive_after": false,
+      "server_exit": -9,
+      "oom_kill_events": 1,
+      "memory_max_hits": 29,
+      "cgroup_memory_peak_mb": 1024.0,
+      "host_mem_available_mb_before": 6856,
+      "host_mem_available_mb_after": 6818,
+      "kernel_log": [
+        "Oct 08 01:44:25 vps-d2a3c460 kernel: Memory cgroup stats for /system.slice/pgx-cgroup-unlimited-1791423863.scope:",
+        "Oct 08 01:44:25 vps-d2a3c460 kernel: oom-kill:constraint=CONSTRAINT_MEMCG,nodemask=(null),cpuset=/,mems_allowed=0,oom_memcg=/system.slice/pgx-cgroup-unlimited-1791423863.scope,task_memcg=/system.slice/pgx-cgroup-unlimited-1791423863.scope,task=postgres,pid=513405,uid=1000",
+        "Oct 08 01:44:25 vps-d2a3c460 kernel: Memory cgroup out of memory: Killed process 513405 (postgres) total-vm:3908916kB, anon-rss:1045620kB, file-rss:34992kB, shmem-rss:0kB, UID:1000 pgtables:2624kB oom_score_adj:0"
+      ],
+      "panic_in_log": false,
+      "log_tail": "\n2026-10-08 01:44:25.256 UTC [1009] LOG:  level: 1; tuplestore: 268443648 total in 2 blocks; 6912 free (0 chunks); 268436736 used\n2026-10-08 01:44:25.256 UTC [1009] LOG:  level: 2; tuplestore tuples: 679477248 total in 91 blocks (0 chunks); 0 free (0 chunks); 679477248 used\n2026-10-08 01:44:25.256 UTC [1009] LOG:  Grand total: 948407052 bytes in 158 blocks; 271280 free (16 chunks); 948135772 used\n"
+    }
+  ]
+}

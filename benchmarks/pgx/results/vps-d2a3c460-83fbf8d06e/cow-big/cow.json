@@ -1,0 +1,262 @@
+{
+  "benchmark": "cow",
+  "git_commit": "83fbf8d06ec5b7ab64ec73f69236ef63770f434c",
+  "conf": "/home/ubuntu/pgrust/configs/pgx-ephemeral.conf",
+  "platform": "linux",
+  "filesystem": "tank/pgx-bench   48G  114M   47G   1% /tank/pgx-bench\ntank/pgx-bench on /tank/pgx-bench type zfs (rw,noatime,xattr,noacl,casesensitive)",
+  "zfs_dataset": "tank/pgx-bench",
+  "runs": [
+    {
+      "method": "clone",
+      "target_mb": 1500,
+      "template": {
+        "tables": 50,
+        "rows_per_table": 104298,
+        "logical_bytes": 1057686031,
+        "build_s": 195.53798481800186,
+        "seal_s": 7.134050496999407
+      },
+      "clone": {
+        "count": 3,
+        "samples": [
+          {
+            "mint_to_select1_s": 0.15082675099984044,
+            "first_real_query_s": 0.015547479000815656
+          },
+          {
+            "mint_to_select1_s": 0.1307275080034742,
+            "first_real_query_s": 0.011893037997651845
+          },
+          {
+            "mint_to_select1_s": 0.13491254700056743,
+            "first_real_query_s": 0.012766523999744095
+          }
+        ],
+        "bclone_used_delta_bytes": 1063657472,
+        "bclone_saved_per_clone_bytes": 1063657472.0,
+        "mint_to_select1_ms_median": 134.91254700056743,
+        "first_real_query_ms_median": 12.766523999744095,
+        "logical_bytes_per_clone": 1057686031,
+        "physical_bytes_per_clone": 2426197.3333333335
+      },
+      "writes_insert": [
+        {
+          "inserted_mb_nominal": 1,
+          "cumulative_nominal_mb": 1,
+          "insert_s": 0.15258867100055795,
+          "cumulative_logical_growth_bytes": 1204224,
+          "cumulative_physical_growth_bytes": 2670592
+        },
+        {
+          "inserted_mb_nominal": 10,
+          "cumulative_nominal_mb": 11,
+          "insert_s": 1.551767369004665,
+          "cumulative_logical_growth_bytes": 12967936,
+          "cumulative_physical_growth_bytes": 14487552
+        },
+        {
+          "inserted_mb_nominal": 100,
+          "cumulative_nominal_mb": 111,
+          "insert_s": 19.83044578499539,
+          "cumulative_logical_growth_bytes": 129908736,
+          "cumulative_physical_growth_bytes": 139357184
+        }
+      ],
+      "write_update_one_table": {
+        "table_total_bytes_before": 21020672,
+        "logical_growth_bytes": 19316736,
+        "physical_growth_bytes": 40542208
+      },
+      "agent_writes": {
+        "scattered_updates_1000": {
+          "seconds": 1.96,
+          "logical_growth_bytes": 319488,
+          "physical_growth_bytes": 474365952
+        },
+        "create_index": {
+          "seconds": 0.118,
+          "logical_growth_bytes": 2359296,
+          "physical_growth_bytes": 4026368
+        },
+        "migration_rewrite": {
+          "seconds": 0.355,
+          "logical_growth_bytes": -65536,
+          "physical_growth_bytes": 23650304
+        }
+      },
+      "delete": {
+        "count": 2,
+        "drop_ms_median": 52.70837349962676,
+        "physical_bytes_returned_per_clone": 2236416.0
+      }
+    },
+    {
+      "method": "clone",
+      "target_mb": 3000,
+      "template": {
+        "tables": 50,
+        "rows_per_table": 209155,
+        "logical_bytes": 2145319946,
+        "build_s": 382.2894706720035,
+        "seal_s": 12.837354915005562
+      },
+      "clone": {
+        "count": 3,
+        "samples": [
+          {
+            "mint_to_select1_s": 0.23455696299788542,
+            "first_real_query_s": 0.06321731900243321
+          },
+          {
+            "mint_to_select1_s": 0.19626299799710978,
+            "first_real_query_s": 0.021566360999713652
+          },
+          {
+            "mint_to_select1_s": 0.19765490900317673,
+            "first_real_query_s": 0.022311289998469874
+          }
+        ],
+        "bclone_used_delta_bytes": 2156716032,
+        "bclone_saved_per_clone_bytes": 2156716032.0,
+        "mint_to_select1_ms_median": 197.65490900317673,
+        "first_real_query_ms_median": 22.311289998469874,
+        "logical_bytes_per_clone": 2145319946,
+        "physical_bytes_per_clone": 3848874.6666666665
+      },
+      "writes_insert": [
+        {
+          "inserted_mb_nominal": 1,
+          "cumulative_nominal_mb": 1,
+          "insert_s": 0.16372888500336558,
+          "cumulative_logical_growth_bytes": 1196032,
+          "cumulative_physical_growth_bytes": 2670592
+        },
+        {
+          "inserted_mb_nominal": 10,
+          "cumulative_nominal_mb": 11,
+          "insert_s": 1.5211877850015298,
+          "cumulative_logical_growth_bytes": 12951552,
+          "cumulative_physical_growth_bytes": 14331904
+        },
+        {
+          "inserted_mb_nominal": 100,
+          "cumulative_nominal_mb": 111,
+          "insert_s": 20.894294107005408,
+          "cumulative_logical_growth_bytes": 129744896,
+          "cumulative_physical_growth_bytes": 131506176
+        }
+      ],
+      "write_update_one_table": {
+        "table_total_bytes_before": 42196992,
+        "logical_growth_bytes": 36028416,
+        "physical_growth_bytes": 78467072
+      },
+      "agent_writes": {
+        "scattered_updates_1000": {
+          "seconds": 2.424,
+          "logical_growth_bytes": 319488,
+          "physical_growth_bytes": 440532992
+        },
+        "create_index": {
+          "seconds": 0.224,
+          "logical_growth_bytes": 4734976,
+          "physical_growth_bytes": 5996544
+        },
+        "migration_rewrite": {
+          "seconds": 0.693,
+          "logical_growth_bytes": -188416,
+          "physical_growth_bytes": 44978176
+        }
+      },
+      "delete": {
+        "count": 2,
+        "drop_ms_median": 53.67104600372841,
+        "physical_bytes_returned_per_clone": 3121152.0
+      }
+    },
+    {
+      "method": "clone",
+      "target_mb": 7500,
+      "template": {
+        "tables": 50,
+        "rows_per_table": 523728,
+        "logical_bytes": 5402763791,
+        "build_s": 991.3167679249964,
+        "seal_s": 25.09046416899946
+      },
+      "clone": {
+        "count": 3,
+        "samples": [
+          {
+            "mint_to_select1_s": 0.44616129000496585,
+            "first_real_query_s": 0.13039967199438252
+          },
+          {
+            "mint_to_select1_s": 0.34096847199543845,
+            "first_real_query_s": 0.052470516005996615
+          },
+          {
+            "mint_to_select1_s": 0.4173838969945791,
+            "first_real_query_s": 0.05265750200487673
+          }
+        ],
+        "bclone_used_delta_bytes": 5413740544,
+        "bclone_saved_per_clone_bytes": 5413740544.0,
+        "mint_to_select1_ms_median": 417.3838969945791,
+        "first_real_query_ms_median": 52.65750200487673,
+        "logical_bytes_per_clone": 5402763791,
+        "physical_bytes_per_clone": 7338666.666666667
+      },
+      "writes_insert": [
+        {
+          "inserted_mb_nominal": 1,
+          "cumulative_nominal_mb": 1,
+          "insert_s": 0.1830865109950537,
+          "cumulative_logical_growth_bytes": 1212416,
+          "cumulative_physical_growth_bytes": 2813952
+        },
+        {
+          "inserted_mb_nominal": 10,
+          "cumulative_nominal_mb": 11,
+          "insert_s": 1.5911829149990808,
+          "cumulative_logical_growth_bytes": 12951552,
+          "cumulative_physical_growth_bytes": 31141888
+        },
+        {
+          "inserted_mb_nominal": 100,
+          "cumulative_nominal_mb": 111,
+          "insert_s": 21.083465564996004,
+          "cumulative_logical_growth_bytes": 129753088,
+          "cumulative_physical_growth_bytes": 149415936
+        }
+      ],
+      "write_update_one_table": {
+        "table_total_bytes_before": 105603072,
+        "logical_growth_bytes": 86368256,
+        "physical_growth_bytes": 192879616
+      },
+      "agent_writes": {
+        "scattered_updates_1000": {
+          "seconds": 2.74,
+          "logical_growth_bytes": 81920,
+          "physical_growth_bytes": 529539072
+        },
+        "create_index": {
+          "seconds": 0.554,
+          "logical_growth_bytes": 11796480,
+          "physical_growth_bytes": 12976128
+        },
+        "migration_rewrite": {
+          "seconds": 1.842,
+          "logical_growth_bytes": -540672,
+          "physical_growth_bytes": 107737088
+        }
+      },
+      "delete": {
+        "count": 2,
+        "drop_ms_median": 54.10489350106218,
+        "physical_bytes_returned_per_clone": 5412864.0
+      }
+    }
+  ]
+}
