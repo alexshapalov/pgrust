@@ -83,7 +83,7 @@ CREATE INDEX, a rewriting ALTER TABLE and a spilling sort (`work_mem =
 256kB`), each under `pgrust.session_memory_limit = 256` with `work_mem =
 2GB` and `maintenance_work_mem = 2GB`, over a 3M-row table (`big`: int,
 int, md5 text, jsonb; ~600 MB). A bystander database runs `SELECT 1` every
-50 ms throughout. Pass 7, build `67269453b2`
+50 ms throughout. Pass 7, build `67269453b2` (re-run on `d48f587da0`)
 (`vps-d2a3c460-67269453b2/limits/workloads.json`):
 
 | Workload | Outcome | Peak PSS |
@@ -119,6 +119,14 @@ int, md5 text, jsonb; ~600 MB). A bystander database runs `SELECT 1` every
     table): `large_insert` above, refused at 321 MB on the build before;
   - `daf827c0ff` UPDATE / MERGE UPDATE / ON CONFLICT DO UPDATE: a 3M-row
     whole-table UPDATE grew 400 MB.
+  - `d48f587da0` corrects the two above: their first version also
+    materialized *virtual* slots into per-row memory, but a virtual slot
+    reuses its materialize buffer across rows, so multi-row `VALUES` into a
+    partitioned table stored later rows' text columns as empty strings
+    (caught by the regression suite: 14 tests changed results). Virtual
+    slots keep the statement context (one reused buffer, no growth); the
+    row context is node-owned and reset only between rows. Regression back
+    to 219/231 with no semantic differences.
   
   `insert-memory-repro.py` (pass 7): peak growth at 1M / 2M / 3M rows
 
