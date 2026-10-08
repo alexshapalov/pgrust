@@ -12,7 +12,7 @@ symbols:
 
   alloc-trace.py [databases per cycle, default 50]
 
-Runs 3 warm-up cycles, asks the server for a dump of live allocations
+Runs 3 warm-up cycles (WARM_CYCLES=n for more), asks the server for a dump of live allocations
 (SIGWINCH), runs 6 more cycles, dumps again, and prints the growth between
 the two dumps summed by call site, in bytes and blocks per database.
 Symbolication: macOS `atos`; Linux `addr2line`, with the load base read from
@@ -81,7 +81,7 @@ try:
             c = conn("tdb_tpl_app__warm_%d" % i); c.query(churn.WORKLOAD); c.close()
         time.sleep(10)
     else:
-        for k in range(3): cycle("w%d" % k); print("warm cycle", k, pb.memory_sample(srv.proc.pid)[pb.MEM_KEY]/1048576, flush=True)
+        for k in range(int(os.environ.get("WARM_CYCLES", "3"))): cycle("w%d" % k); print("warm cycle", k, pb.memory_sample(srv.proc.pid)[pb.MEM_KEY]/1048576, flush=True)
     b1, by1, slide, d1 = dump(); print("dump1 blocks", b1, "bytes", by1, flush=True)
     K = int(sys.argv[2]) if len(sys.argv) > 2 else 6
     if os.environ.get("TRACE_MODE") == "density":
