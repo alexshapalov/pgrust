@@ -241,6 +241,12 @@ pub struct ModifyTableState<'mcx> {
     // relation/slot field borrows are live. Option: dropped in
     // exec_end_modify_table (the node struct is forgotten, never dropped).
     index_eval_cx: Option<mcx::MemoryContext>,
+    /// Holds ri_newTupleSlot's copy of the current row (ExecGetInsertNewTuple's
+    /// ExecCopySlot). C's slot owns that copy and frees it at the next copy;
+    /// in es_query_cxt (a bump arena, no frees) every inserted row's copy
+    /// stayed until the end of the statement. Reset per row, just before the
+    /// next copy.
+    insert_copy_cx: Option<mcx::MemoryContext>,
     snapshot_any: Option<Rc<SnapshotData<'mcx>>>,
     // The shared RETURNING result slot (C ps_ResultTupleSlot): all result
     // rels project into one slot over the node targetlist's descriptor.
@@ -915,6 +921,7 @@ pub fn exec_init_modify_table<'mcx>(
         last_result_oid: 0,
         result_oid_attno,
         index_eval_cx: Some(mcx::MemoryContext::new_bump("IndexEvalPerTuple")),
+        insert_copy_cx: Some(mcx::MemoryContext::new_bump("InsertNewTupleCopy")),
         snapshot_any: Some(Rc::new(SnapshotData::sentinel(
             estate.es_query_cxt,
             SNAPSHOT_ANY,
@@ -4607,6 +4614,7 @@ pub fn exec_end_modify_table(mt: &mut ModifyTableState<'_>) -> PgResult<()> {
     mt.leaf_trig_when.clear();
     mt.router = None;
     mt.index_eval_cx = None;
+    mt.insert_copy_cx = None;
     Ok(())
 }
 
@@ -4802,7 +4810,19 @@ fn exec_get_insert_new_tuple<'mcx>(
             &mut *base.add(plan_slot.0 as usize),
         )
     };
-    exectuples::exec_copy_slot(dst, src, mcx, mcx)?;
+    // The previous row's copy dies here, as C's slot frees it at the next
+    // ExecCopySlot: clear the slot (it no longer references the copy), then
+    // release the copy wholesale, then copy this row.
+    let copy_cx: core::ptr::NonNull<mcx::MemoryContext> =
+        core::ptr::NonNull::from(mt.insert_copy_cx.as_mut().expect("insert_copy_cx live until ExecEndNode"));
+    // SAFETY: the context lives in the node state for the whole query; it is
+    // reset only here, after the slot that held its last allocation has
+    // been cleared, and nothing else retains ri_newTupleSlot's tuple across
+    // rows (C frees it at the next copy too).
+    let copy_mcx: mcx::Mcx<'mcx> = unsafe { copy_cx.as_ref() }.mcx();
+    exectuples::exec_clear_tuple(dst, copy_mcx);
+    unsafe { &mut *copy_cx.as_ptr() }.reset();
+    exectuples::exec_copy_slot(dst, src, copy_mcx, mcx)?;
     Ok(new_slot)
 }
 
@@ -8418,6 +8438,8 @@ fn exec_insert<'mcx>(
         // ri_RootResultRelInfo).
         let target_rte = estate.es_range_table[(mt.rel().rti - 1) as usize];
         let perminfos = estate.es_rteperminfos;
+        let per_tuple_cx: core::ptr::NonNull<mcx::MemoryContext> =
+            core::ptr::NonNull::from(estate.get_per_tuple_memory().context());
         let EStateData {
             es_relations,
             es_tupleTable,
@@ -8475,6 +8497,10 @@ fn exec_insert<'mcx>(
         // ExecGetInsertedCols/UpdatedCols via the target RTE's perminfo, in
         // the description rel's (root's) numbering (execUtils.c
         // GetResultRTEPermissionInfo).
+        // Built every row but read only when a constraint fails (the error
+        // detail's visible columns): allocate it in per-tuple memory, which
+        // is reset at the top of every row, not in es_query_cxt, where each
+        // row's copy stayed for the whole statement.
         let mod_cols = {
             let rte = target_rte;
             let mut cols = types_nodes::Bitmapset::empty();
@@ -8484,7 +8510,11 @@ fn exec_insert<'mcx>(
                         .nth(rte.perminfoindex as usize - 1)
                         .as_rte_permission_info()
                         .expect("permInfos cell");
-                    cols = pi.insertedCols.union(&pi.updatedCols, mcx)?;
+                    // SAFETY: the per-tuple ExprContext lives in the estate
+                    // for the whole query; the bitmapset is dropped at the
+                    // end of this row's checks, before the next reset.
+                    let row_mcx: mcx::Mcx<'mcx> = unsafe { per_tuple_cx.as_ref() }.mcx();
+                    cols = pi.insertedCols.union(&pi.updatedCols, row_mcx)?;
                 }
             }
             cols
@@ -10826,7 +10856,7 @@ mcx::forget_safe_struct!(
         leaf_on_conflict, leaf_fdw_state,
         leaf_returning, leaf_trigdesc, leaf_trig_fmgr, leaf_trig_when,
         transition_capture, oc_transition_capture,
-        index_eval_cx },
+        index_eval_cx, insert_copy_cx },
 );
 
 // (The WAVE-9 WS-AG fusion-D1a append region — mt_rowchain_shape_mask +
