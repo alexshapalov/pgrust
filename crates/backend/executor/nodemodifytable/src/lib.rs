@@ -247,6 +247,16 @@ pub struct ModifyTableState<'mcx> {
     /// stayed until the end of the statement. Reset per row, just before the
     /// next copy.
     insert_copy_cx: Option<mcx::MemoryContext>,
+    /// One row's materialized new tuple (INSERT from an unprojected slot,
+    /// UPDATE, MERGE UPDATE, ON CONFLICT DO UPDATE) and its modified-column
+    /// set. C frees the image at the slot's next clear; in es_query_cxt (a
+    /// bump arena, no frees) every row's image stayed until the end of the
+    /// statement. Node-owned and reset only by mt_row_prologue, before the
+    /// next row is fetched — not per-tuple memory, which other code resets
+    /// in the middle of a row (routing a row to a newly opened partition
+    /// lost its by-reference columns). Option: dropped in
+    /// exec_end_modify_table.
+    row_tuple_cx: Option<mcx::MemoryContext>,
     snapshot_any: Option<Rc<SnapshotData<'mcx>>>,
     // The shared RETURNING result slot (C ps_ResultTupleSlot): all result
     // rels project into one slot over the node targetlist's descriptor.
@@ -922,6 +932,7 @@ pub fn exec_init_modify_table<'mcx>(
         result_oid_attno,
         index_eval_cx: Some(mcx::MemoryContext::new_bump("IndexEvalPerTuple")),
         insert_copy_cx: Some(mcx::MemoryContext::new_bump("InsertNewTupleCopy")),
+        row_tuple_cx: Some(mcx::MemoryContext::new_bump("ModifyTableRowTuple")),
         snapshot_any: Some(Rc::new(SnapshotData::sentinel(
             estate.es_query_cxt,
             SNAPSHOT_ANY,
@@ -2003,6 +2014,22 @@ pub fn mt_begin<'mcx>(
     Ok(true)
 }
 
+/// The context to materialize one row's slot into: `row` (reset before the
+/// next row) for heap, buffer and minimal slots, whose image is the slot's
+/// until its next clear; `query` for a virtual slot, which keeps its
+/// materialize buffer as scratch across clears and reuses it for later rows
+/// (one buffer per slot, so no per-row growth) — from a context reset
+/// between rows, that buffer would alias the next row's allocations
+/// (multi-row VALUES into a partitioned table lost its text columns).
+#[inline]
+fn row_materialize_mcx<'mcx>(slot: &SlotData<'mcx>, query: mcx::Mcx<'mcx>, row: mcx::Mcx<'mcx>) -> mcx::Mcx<'mcx> {
+    if matches!(slot, SlotData::Virtual(_)) {
+        query
+    } else {
+        row
+    }
+}
+
 /// The loop-top per-row reset of `exec_modify_table` (wave-2 WS-N seam
 /// `mt_row_prologue`, contract §3.7): the per-tuple expr-context reset plus
 /// the node's index-expression eval-context reset. Contract LAW (§3.7): this
@@ -2017,6 +2044,10 @@ pub fn mt_row_prologue<'mcx>(mt: &mut ModifyTableState<'mcx>, estate: &mut EStat
     mt.index_eval_cx
         .as_mut()
         .expect("index_eval_cx live until ExecEndNode")
+        .reset();
+    mt.row_tuple_cx
+        .as_mut()
+        .expect("row_tuple_cx live until ExecEndNode")
         .reset();
 }
 
@@ -4065,17 +4096,14 @@ fn merge_update_act<'mcx>(
     ) -> PgResult<Option<ExecSlotId>>,
 ) -> PgResult<MergeUpdActRes> {
     let mcx = estate.es_query_cxt;
-    // The new tuple's materialized image and the per-row modified-column set
-    // live in per-tuple memory (reset by mt_row_prologue before the next
-    // row), like the projected datums they are built from. C frees the image
-    // at the slot's next clear; in es_query_cxt (a bump arena, no frees) every
-    // updated row's image stayed until the end of the statement (a 3M-row
-    // UPDATE grew ~400 MB). After-trigger events and transition tables copy
-    // the tuple; nothing else keeps it past the row.
+    // This row's materialized tuple and modified-column set: row_tuple_cx
+    // (reset by mt_row_prologue before the next row).
     let row_cx: core::ptr::NonNull<mcx::MemoryContext> =
-        core::ptr::NonNull::from(estate.get_per_tuple_memory().context());
-    // SAFETY: the per-tuple ExprContext lives in the estate for the whole
-    // query and is reset only between rows.
+        core::ptr::NonNull::from(mt.row_tuple_cx.as_ref().expect("row_tuple_cx live until ExecEndNode"));
+    // SAFETY: the context lives in the node state for the whole query and
+    // is reset only by mt_row_prologue, between rows; nothing keeps this
+    // row's image past the row (after-trigger events and transition tables
+    // copy it).
     let row_mcx: mcx::Mcx<'mcx> = unsafe { row_cx.as_ref() }.mcx();
     let output_cid = estate.es_output_cid;
     let mut lockmode = LockTupleMode::LockTupleExclusive;
@@ -4111,7 +4139,7 @@ fn merge_update_act<'mcx>(
                 slot,
             )?;
         }
-        exectuples::exec_materialize_slot(slot, row_mcx)?;
+        exectuples::exec_materialize_slot(slot, row_materialize_mcx(slot, mcx, row_mcx))?;
         slot.base_mut().tts_tableOid = rel.rd_id;
 
         // C shares ExecUpdateAct with MERGE; same direct-leaf partition
@@ -4627,6 +4655,7 @@ pub fn exec_end_modify_table(mt: &mut ModifyTableState<'_>) -> PgResult<()> {
     mt.router = None;
     mt.index_eval_cx = None;
     mt.insert_copy_cx = None;
+    mt.row_tuple_cx = None;
     Ok(())
 }
 
@@ -4831,7 +4860,7 @@ fn exec_get_insert_new_tuple<'mcx>(
     // reset only here, after the slot that held its last allocation has
     // been cleared, and nothing else retains ri_newTupleSlot's tuple across
     // rows (C frees it at the next copy too).
-    let copy_mcx: mcx::Mcx<'mcx> = unsafe { copy_cx.as_ref() }.mcx();
+    let copy_mcx: mcx::Mcx<'mcx> = row_materialize_mcx(dst, mcx, unsafe { copy_cx.as_ref() }.mcx());
     exectuples::exec_clear_tuple(dst, copy_mcx);
     unsafe { &mut *copy_cx.as_ptr() }.reset();
     exectuples::exec_copy_slot(dst, src, copy_mcx, mcx)?;
@@ -5206,17 +5235,14 @@ fn exec_update<'mcx>(
         // nodeModifyTable.c:2545: the tid the caller locked for this attempt.
         let lockedtid = *tupleid;
         let mcx = estate.es_query_cxt;
-        // The new tuple's materialized image and the per-row modified-column set
-        // live in per-tuple memory (reset by mt_row_prologue before the next
-        // row), like the projected datums they are built from. C frees the image
-        // at the slot's next clear; in es_query_cxt (a bump arena, no frees) every
-        // updated row's image stayed until the end of the statement (a 3M-row
-        // UPDATE grew ~400 MB). After-trigger events and transition tables copy
-        // the tuple; nothing else keeps it past the row.
+        // This row's materialized tuple and modified-column set: row_tuple_cx
+        // (reset by mt_row_prologue before the next row).
         let row_cx: core::ptr::NonNull<mcx::MemoryContext> =
-            core::ptr::NonNull::from(estate.get_per_tuple_memory().context());
-        // SAFETY: the per-tuple ExprContext lives in the estate for the whole
-        // query and is reset only between rows.
+            core::ptr::NonNull::from(mt.row_tuple_cx.as_ref().expect("row_tuple_cx live until ExecEndNode"));
+        // SAFETY: the context lives in the node state for the whole query and
+        // is reset only by mt_row_prologue, between rows; nothing keeps this
+        // row's image past the row (after-trigger events and transition tables
+        // copy it).
         let row_mcx: mcx::Mcx<'mcx> = unsafe { row_cx.as_ref() }.mcx();
         let gen_filter = generated_update_filter(mt, estate)?;
         let mut cross_part = false;
@@ -5248,7 +5274,7 @@ fn exec_update<'mcx>(
                     slot,
                 )?;
             }
-            exectuples::exec_materialize_slot(slot, row_mcx)?;
+            exectuples::exec_materialize_slot(slot, row_materialize_mcx(slot, mcx, row_mcx))?;
             slot.base_mut().tts_tableOid = rel.rd_id;
 
             // ExecUpdateAct (nodeModifyTable.c): the new tuple must satisfy
@@ -8347,16 +8373,14 @@ fn exec_insert<'mcx>(
         }
     }
 
-    // A slot that is not already a materialized copy (a scan's buffer slot,
-    // INSERT ... SELECT * with no projection) is materialized into per-tuple
-    // memory, reset by mt_row_prologue before the next row: in es_query_cxt
-    // (a bump arena, no frees) every inserted row's copy stayed until the end
-    // of the statement. Nothing keeps the image past its row (after-trigger
-    // events and transition tables copy it).
+    // This row's materialized tuple and modified-column set: row_tuple_cx
+    // (reset by mt_row_prologue before the next row).
     let row_cx: core::ptr::NonNull<mcx::MemoryContext> =
-        core::ptr::NonNull::from(estate.get_per_tuple_memory().context());
-    // SAFETY: the per-tuple ExprContext lives in the estate for the whole
-    // query and is reset only between rows.
+        core::ptr::NonNull::from(mt.row_tuple_cx.as_ref().expect("row_tuple_cx live until ExecEndNode"));
+    // SAFETY: the context lives in the node state for the whole query and
+    // is reset only by mt_row_prologue, between rows; nothing keeps this
+    // row's image past the row (after-trigger events and transition tables
+    // copy it).
     let row_mcx: mcx::Mcx<'mcx> = unsafe { row_cx.as_ref() }.mcx();
     {
         let EStateData {
@@ -8413,7 +8437,7 @@ fn exec_insert<'mcx>(
         {
             exec_compute_stored_generated(mcx, gen_exprs, None, rel, slot)?;
         }
-        exectuples::exec_materialize_slot(slot, row_mcx)?;
+        exectuples::exec_materialize_slot(slot, row_materialize_mcx(slot, mcx, row_mcx))?;
         slot.base_mut().tts_tableOid = rel.rd_id;
 
         if rel.rd_rel.relhasindex && indexes.is_none() {
@@ -8473,8 +8497,8 @@ fn exec_insert<'mcx>(
         // ri_RootResultRelInfo).
         let target_rte = estate.es_range_table[(mt.rel().rti - 1) as usize];
         let perminfos = estate.es_rteperminfos;
-        let per_tuple_cx: core::ptr::NonNull<mcx::MemoryContext> =
-            core::ptr::NonNull::from(estate.get_per_tuple_memory().context());
+        let row_tuple_cx: core::ptr::NonNull<mcx::MemoryContext> =
+            core::ptr::NonNull::from(mt.row_tuple_cx.as_ref().expect("row_tuple_cx live until ExecEndNode"));
         let EStateData {
             es_relations,
             es_tupleTable,
@@ -8533,8 +8557,8 @@ fn exec_insert<'mcx>(
         // the description rel's (root's) numbering (execUtils.c
         // GetResultRTEPermissionInfo).
         // Built every row but read only when a constraint fails (the error
-        // detail's visible columns): allocate it in per-tuple memory, which
-        // is reset at the top of every row, not in es_query_cxt, where each
+        // detail's visible columns): allocate it in row_tuple_cx, which is
+        // reset at the top of every row, not in es_query_cxt, where each
         // row's copy stayed for the whole statement.
         let mod_cols = {
             let rte = target_rte;
@@ -8545,10 +8569,10 @@ fn exec_insert<'mcx>(
                         .nth(rte.perminfoindex as usize - 1)
                         .as_rte_permission_info()
                         .expect("permInfos cell");
-                    // SAFETY: the per-tuple ExprContext lives in the estate
-                    // for the whole query; the bitmapset is dropped at the
-                    // end of this row's checks, before the next reset.
-                    let row_mcx: mcx::Mcx<'mcx> = unsafe { per_tuple_cx.as_ref() }.mcx();
+                    // SAFETY: row_tuple_cx lives in the node state for the
+                    // whole query; the bitmapset is dropped at the end of
+                    // this row's checks, before the next reset.
+                    let row_mcx: mcx::Mcx<'mcx> = unsafe { row_tuple_cx.as_ref() }.mcx();
                     cols = pi.insertedCols.union(&pi.updatedCols, row_mcx)?;
                 }
             }
@@ -9602,17 +9626,14 @@ fn exec_leaf_conflict_update<'mcx>(
     proj_id: ExecSlotId,
 ) -> PgResult<bool> {
     let mcx = estate.es_query_cxt;
-    // The new tuple's materialized image and the per-row modified-column set
-    // live in per-tuple memory (reset by mt_row_prologue before the next
-    // row), like the projected datums they are built from. C frees the image
-    // at the slot's next clear; in es_query_cxt (a bump arena, no frees) every
-    // updated row's image stayed until the end of the statement (a 3M-row
-    // UPDATE grew ~400 MB). After-trigger events and transition tables copy
-    // the tuple; nothing else keeps it past the row.
+    // This row's materialized tuple and modified-column set: row_tuple_cx
+    // (reset by mt_row_prologue before the next row).
     let row_cx: core::ptr::NonNull<mcx::MemoryContext> =
-        core::ptr::NonNull::from(estate.get_per_tuple_memory().context());
-    // SAFETY: the per-tuple ExprContext lives in the estate for the whole
-    // query and is reset only between rows.
+        core::ptr::NonNull::from(mt.row_tuple_cx.as_ref().expect("row_tuple_cx live until ExecEndNode"));
+    // SAFETY: the context lives in the node state for the whole query and
+    // is reset only by mt_row_prologue, between rows; nothing keeps this
+    // row's image past the row (after-trigger events and transition tables
+    // copy it).
     let row_mcx: mcx::Mcx<'mcx> = unsafe { row_cx.as_ref() }.mcx();
     let output_cid = estate.es_output_cid;
 
@@ -9674,7 +9695,7 @@ fn exec_leaf_conflict_update<'mcx>(
                 slot,
             )?;
         }
-        exectuples::exec_materialize_slot(slot, row_mcx)?;
+        exectuples::exec_materialize_slot(slot, row_materialize_mcx(slot, mcx, row_mcx))?;
         slot.base_mut().tts_tableOid = rel.rd_id;
 
         // ExecUpdateAct: the updated row may not leave this partition under
@@ -10903,7 +10924,7 @@ mcx::forget_safe_struct!(
         leaf_on_conflict, leaf_fdw_state,
         leaf_returning, leaf_trigdesc, leaf_trig_fmgr, leaf_trig_when,
         transition_capture, oc_transition_capture,
-        index_eval_cx, insert_copy_cx },
+        index_eval_cx, insert_copy_cx, row_tuple_cx },
 );
 
 // (The WAVE-9 WS-AG fusion-D1a append region — mt_rowchain_shape_mask +
