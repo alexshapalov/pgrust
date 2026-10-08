@@ -84,7 +84,7 @@ CREATE INDEX, a rewriting ALTER TABLE and a spilling sort (`work_mem =
 2GB` and `maintenance_work_mem = 2GB`, over a 3M-row table (`big`: int,
 int, md5 text, jsonb; ~600 MB). A bystander database runs `SELECT 1` every
 50 ms throughout. Pass 7, build `67269453b2` (re-run on `d48f587da0`)
-(`vps-d2a3c460-67269453b2/limits/workloads.json`):
+(`vps-d2a3c460-d48f587da0/limits/workloads.json`):
 
 | Workload | Outcome | Peak PSS |
 |---|---|---|
