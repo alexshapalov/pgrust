@@ -111,7 +111,9 @@ class Run:
         self.admin = self.conn("postgres")
 
     def conn(self, db):
-        return pb.PgConn(self.ws.sockdir, self.args.port, database=db, timeout=1800)
+        # Large templates take a while to build on small hosts.
+        return pb.PgConn(self.ws.sockdir, self.args.port, database=db,
+                         timeout=int(os.environ.get("PGXBENCH_COW_TIMEOUT", "7200")))
 
     def settle(self):
         """Flush everything so volume usage reflects the databases, not dirty buffers."""
