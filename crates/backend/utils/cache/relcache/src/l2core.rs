@@ -105,6 +105,7 @@ unsafe fn mirror_string(src: &str) -> PgString<'static> {
 // The shared core
 // ---------------------------------------------------------------------------
 
+#[derive(PartialEq)]
 pub(crate) struct ConstrCore {
     pub defval: Box<[(AttrNumber, Option<Box<str>>)]>,
     pub check: Box<[CheckCore]>,
@@ -116,6 +117,7 @@ pub(crate) struct ConstrCore {
     pub has_generated_virtual: bool,
 }
 
+#[derive(PartialEq)]
 pub(crate) struct CheckCore {
     pub ccname: Option<Box<str>>,
     pub ccbin: Option<Box<str>>,
@@ -124,6 +126,7 @@ pub(crate) struct CheckCore {
     pub ccnoinherit: bool,
 }
 
+#[derive(PartialEq)]
 pub(crate) struct IndexCore {
     pub indexrelid: Oid,
     pub indrelid: Oid,
@@ -153,6 +156,7 @@ pub(crate) struct IndexCore {
 }
 
 /// The shareable immutable core of one relcache entry.
+#[derive(PartialEq)]
 pub(crate) struct RelCoreShared {
     pub relid: Oid,
     pub form: FormData_pg_class,
@@ -167,6 +171,88 @@ pub(crate) struct RelCoreShared {
     pub compact: Box<[CompactAttribute]>,
     pub constr: Option<ConstrCore>,
     pub index: Option<IndexCore>,
+}
+
+// ---------------------------------------------------------------------------
+// Content interning across databases
+// ---------------------------------------------------------------------------
+//
+// Cores are published per (relid, database). Every database cloned from one
+// template has the same relids and, until it runs DDL or ANALYZE on a
+// relation, byte-identical catalog rows for it, so 1000 clones held 1000
+// equal copies of every system-catalog and template-table core (the largest
+// relcache share of an idle database's memory in the density trace).
+// intern_core hands out one shared Arc per distinct content. Sharing is
+// sound because a core is immutable after construction and reached only
+// through Arc (see the Send/Sync note below); equality is full structural
+// equality, the hash only narrows the candidates. Per-(relid, db) cache
+// entries, invalidation and generations are untouched: a database whose
+// catalog row changes simply builds a core that is no longer equal.
+
+struct InternTable {
+    map: HashMap<u64, Vec<std::sync::Weak<RelCoreShared>>>,
+    inserts_since_sweep: usize,
+}
+
+static INTERN: std::sync::Mutex<Option<InternTable>> = std::sync::Mutex::new(None);
+
+fn intern_hash(c: &RelCoreShared) -> u64 {
+    use core::hash::{Hash, Hasher};
+    let mut h = std::collections::hash_map::DefaultHasher::new();
+    c.relid.hash(&mut h);
+    c.form.relfilenode.hash(&mut h);
+    c.form.relpages.hash(&mut h);
+    c.form.reltuples.to_bits().hash(&mut h);
+    c.form.relallvisible.hash(&mut h);
+    c.form.relkind.hash(&mut h);
+    c.attrs.len().hash(&mut h);
+    c.index.is_some().hash(&mut h);
+    h.finish()
+}
+
+/// One shared Arc per distinct core content. Returns the Arc and whether an
+/// existing equal core was reused.
+pub(crate) fn intern_core(core: RelCoreShared) -> (Arc<RelCoreShared>, bool) {
+    let key = intern_hash(&core);
+    let mut g = INTERN.lock().unwrap_or_else(|e| e.into_inner());
+    let t = g.get_or_insert_with(|| InternTable { map: HashMap::new(), inserts_since_sweep: 0 });
+    if let Some(bucket) = t.map.get_mut(&key) {
+        bucket.retain(|w| w.strong_count() > 0);
+        for w in bucket.iter() {
+            if let Some(a) = w.upgrade() {
+                if *a == core {
+                    return (a, true);
+                }
+            }
+        }
+    }
+    let a = Arc::new(core);
+    t.map.entry(key).or_default().push(Arc::downgrade(&a));
+    // Amortized sweep: dead Weaks (cores of dropped or changed databases)
+    // pin their ArcInner allocation until removed.
+    t.inserts_since_sweep += 1;
+    if t.inserts_since_sweep > t.map.len().max(256) {
+        t.map.retain(|_, b| {
+            b.retain(|w| w.strong_count() > 0);
+            !b.is_empty()
+        });
+        t.inserts_since_sweep = 0;
+    }
+    (a, false)
+}
+
+/// (distinct cores alive, interning table buckets) for diagnostics.
+pub fn interned_core_counts() -> (usize, usize) {
+    let g = INTERN.lock().unwrap_or_else(|e| e.into_inner());
+    g.as_ref().map_or((0, 0), |t| {
+        (t.map.values().map(|b| b.iter().filter(|w| w.strong_count() > 0).count()).sum(), t.map.len())
+    })
+}
+
+/// l2cache byte charge for a core: a reused (shared) core costs its holder
+/// only the entry, not another copy of the content.
+pub(crate) fn charge_bytes(core: &RelCoreShared, shared: bool) -> usize {
+    if shared { core::mem::size_of::<usize>() * 8 } else { core.approx_bytes() }
 }
 
 // SAFETY: immutable after construction and publication. The lone interior-
@@ -579,8 +665,9 @@ pub(crate) fn miss_via_l2(relid: Oid) -> PgResult<Option<Rc<RelationData<'static
                                     relid, gen, core.attrs.len(), std::thread::current().id()
                                 );
                             }
-                            let bytes = core.approx_bytes();
-                            let v: Arc<dyn core::any::Any + Send + Sync> = Arc::new(core);
+                            let (core, shared) = intern_core(core);
+                            let bytes = charge_bytes(&core, shared);
+                            let v: Arc<dyn core::any::Any + Send + Sync> = core;
                             l2cache::insert(key, gen, v, bytes, |a| a.is::<RelCoreShared>());
                         }
                     } else if l2_debug() {
@@ -613,4 +700,69 @@ pub fn MirrorCensus() -> (usize, usize) {
         let live = m.values().filter(|(rc, _)| Rc::strong_count(rc) > 1).count();
         (m.len(), live)
     })
+}
+
+#[cfg(test)]
+mod intern_tests {
+    use super::*;
+
+    fn core(relid: Oid, relpages: i32) -> RelCoreShared {
+        let mut name = types_tuple::NameData::default();
+        name.namestrcpy("t");
+        RelCoreShared {
+            relid,
+            form: FormData_pg_class {
+                relname: name,
+                relnamespace: 2200,
+                reltype: 0,
+                relowner: 10,
+                relam: 2,
+                relfilenode: relid,
+                reltablespace: 0,
+                relpages,
+                reltuples: -1.0,
+                relallvisible: 0,
+                reltoastrelid: 0,
+                relhasindex: false,
+                relisshared: false,
+                relpersistence: b'p',
+                relkind: b'r',
+                relhassubclass: false,
+                relrowsecurity: false,
+                relispopulated: true,
+                relreplident: b'd',
+                relispartition: false,
+                relfrozenxid: 3,
+                relminmxid: 1,
+            },
+            relhastriggers: false,
+            relhasrules: false,
+            options: None,
+            tdtypeid: 0,
+            tdtypmod: -1,
+            attrs: Box::new([]),
+            compact: Box::new([]),
+            constr: None,
+            index: None,
+        }
+    }
+
+    // Equal content from two databases shares one Arc; different content
+    // (here: relpages after an ANALYZE in one branch) does not; a core whose
+    // last holder is gone is not resurrected.
+    #[test]
+    fn equal_cores_share_one_arc() {
+        let (a, shared_a) = intern_core(core(900_001, 1));
+        let (b, shared_b) = intern_core(core(900_001, 1));
+        assert!(!shared_a);
+        assert!(shared_b);
+        assert!(Arc::ptr_eq(&a, &b));
+        let (c, shared_c) = intern_core(core(900_001, 7));
+        assert!(!shared_c);
+        assert!(!Arc::ptr_eq(&a, &c));
+        drop((a, b, c));
+        let (d, shared_d) = intern_core(core(900_001, 1));
+        assert!(!shared_d, "a dropped core must not be handed out again");
+        drop(d);
+    }
 }

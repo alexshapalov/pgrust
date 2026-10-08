@@ -43,7 +43,7 @@ pub const fn RELKIND_HAS_TABLE_AM(relkind: u8) -> bool {
 
 // FormData_pg_class trimmed to the fields ports consume (the decode-once
 // rd_rel projection of a relcache entry).
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct FormData_pg_class {
     pub relname: NameData,
     pub relnamespace: Oid,

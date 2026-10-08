@@ -1171,8 +1171,9 @@ fn load_entries_via_l2(bytes: &[u8], shared: bool, gens: &[u64]) -> PgResult<boo
             let tmp: Mcx<'static> = scratch_mcx!();
             let (data, _) = parse_span(tmp, start, end)?;
             let built = RelCoreShared::from_built(&data).map(|c| {
-                let sz = c.approx_bytes();
-                let v: std::sync::Arc<dyn core::any::Any + Send + Sync> = std::sync::Arc::new(c);
+                let (c, shared) = crate::l2core::intern_core(c);
+                let sz = crate::l2core::charge_bytes(&c, shared);
+                let v: std::sync::Arc<dyn core::any::Any + Send + Sync> = c;
                 l2cache::insert(key, gen, v, sz, |a| a.is::<RelCoreShared>())
                     .downcast()
                     .expect("KIND_REL entries are RelCoreShared")
