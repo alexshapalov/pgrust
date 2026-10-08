@@ -52,8 +52,8 @@ A skipped database never gets a worker, so its `last_autovac_time` stayed
 When its schedule spans more than `autovacuum_naptime`, idle databases
 were always candidates and always won, and written databases later in
 `pg_database` order were never vacuumed or analyzed. The schedule spans
-more than naptime when databases × 100 ms (the minimum spacing) exceeds
-naptime: at naptime 60 that means 1000 databases. Before the fix,
+more than naptime once the per-database spacing hits its 110 ms floor:
+above ~545 databases at naptime 60, ~2,700 at naptime 300. Before the fix,
 `skipidle-check.py` with 50 idle + 5 written databases and naptime 5 s
 autovacuumed 0 of the 5 written databases in 180 s; the stock launcher
 did all 5 in 2 s. The launcher now records when it skipped each database
