@@ -1,0 +1,92 @@
+=== insertmem  05:30:38
+pgx       ints          1000000 rows  peak growth    62.7 MB  (1.6s)
+pgx       ints          2000000 rows  peak growth    84.3 MB  (3.1s)
+pgx       ints          3000000 rows  peak growth    83.4 MB  (5.0s)
+pgx       md5           1000000 rows  peak growth    62.3 MB  (2.5s)
+pgx       md5           2000000 rows  peak growth    88.4 MB  (5.5s)
+pgx       md5           3000000 rows  peak growth    88.8 MB  (7.5s)
+pgx       jsonb         1000000 rows  peak growth    62.9 MB  (3.4s)
+pgx       jsonb         2000000 rows  peak growth    88.7 MB  (6.7s)
+pgx       jsonb         3000000 rows  peak growth    85.9 MB  (11.3s)
+pgx       md5+jsonb     1000000 rows  peak growth    58.8 MB  (5.9s)
+pgx       md5+jsonb     2000000 rows  peak growth    84.8 MB  (12.5s)
+pgx       md5+jsonb     3000000 rows  peak growth    88.2 MB  (18.2s)
+pgx       select-only   1000000 rows  peak growth    48.0 MB  (0.1s)
+pgx       select-only   2000000 rows  peak growth    69.8 MB  (0.4s)
+pgx       select-only   3000000 rows  peak growth    67.9 MB  (0.6s)
+pgx       update        1000000 rows  peak growth    98.0 MB  (7.7s)
+pgx       update        2000000 rows  peak growth   261.1 MB  (15.9s)
+pgx       update        3000000 rows  peak growth   400.2 MB  (23.2s)
+postgres  ints          1000000 rows  peak growth    71.6 MB  (1.3s)
+postgres  ints          2000000 rows  peak growth    85.8 MB  (2.6s)
+postgres  ints          3000000 rows  peak growth   118.7 MB  (4.1s)
+postgres  md5           1000000 rows  peak growth   104.3 MB  (2.9s)
+postgres  md5           2000000 rows  peak growth   143.9 MB  (6.0s)
+postgres  md5           3000000 rows  peak growth   143.7 MB  (8.8s)
+postgres  jsonb         1000000 rows  peak growth    94.0 MB  (2.4s)
+postgres  jsonb         2000000 rows  peak growth   129.1 MB  (5.2s)
+postgres  jsonb         3000000 rows  peak growth   144.0 MB  (7.7s)
+postgres  md5+jsonb     1000000 rows  peak growth   165.5 MB  (6.2s)
+postgres  md5+jsonb     2000000 rows  peak growth   144.0 MB  (13.6s)
+postgres  md5+jsonb     3000000 rows  peak growth   144.0 MB  (20.1s)
+postgres  select-only   1000000 rows  peak growth    39.0 MB  (0.2s)
+postgres  select-only   2000000 rows  peak growth    42.1 MB  (0.6s)
+postgres  select-only   3000000 rows  peak growth    49.2 MB  (0.8s)
+postgres  update        1000000 rows  peak growth    92.7 MB  (7.8s)
+postgres  update        2000000 rows  peak growth    59.2 MB  (16.1s)
+postgres  update        3000000 rows  peak growth    24.9 MB  (24.1s)
+    exit=0
+=== workloads  05:36:21
+sort               FAIL  53200    1.30s peak=   239 MB select1_after=True reached pgrust.session_memory_limit
+hash_join          FAIL  53200    2.10s peak=   311 MB select1_after=True reached pgrust.session_memory_limit
+hash_aggregate     FAIL  53200    2.19s peak=   301 MB select1_after=True reached pgrust.session_memory_limit
+cte                FAIL  53200    1.40s peak=   314 MB select1_after=True reached pgrust.session_memory_limit
+json_aggregation   FAIL  53200    2.08s peak=   262 MB select1_after=True reached pgrust.session_memory_limit
+array_agg          FAIL  53200    1.21s peak=   282 MB select1_after=True reached pgrust.session_memory_limit
+copy_out           ok             3.23s peak=    76 MB select1_after=True 
+copy_in            ok             6.56s peak=   142 MB select1_after=True 
+large_insert       FAIL  53200    3.55s peak=   321 MB select1_after=True reached pgrust.session_memory_limit
+create_index       ok             5.26s peak=   308 MB select1_after=True 
+migration_rewrite  ok             6.49s peak=    75 MB select1_after=True 
+temp_spill         ok             3.86s peak=    78 MB select1_after=True 
+bystander errors=0 max=27.6 ms  internal_errors=0 panic=False
+wrote /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-0131cc9b12/limits/workloads.json
+    exit=0
+=== regress  05:37:26
+create_index           plan_only  plan lines   29  other lines 0
+select_distinct        plan_only  plan lines   25  other lines 0
+subselect              plan_only  plan lines   61  other lines 0
+join                   plan_only  plan lines  212  other lines 0
+portals                plan_only  plan lines   16  other lines 0
+tidscan                plan_only  plan lines   48  other lines 0
+incremental_sort       plan_only  plan lines   41  other lines 0
+limit                  plan_only  plan lines   11  other lines 0
+partition_join         plan_only  plan lines  150  other lines 0
+partition_prune        plan_only  plan lines  331  other lines 0
+partition_aggregate    plan_only  plan lines  194  other lines 0
+memoize                plan_only  plan lines   38  other lines 0
+    exit=0
+=== scale-naptime  05:38:04
+n=0     footprint=85 MB threads=8 fds=132  idle cpu mean=0.100% last-minute=0.100%  busy={}
+n=100   footprint=93 MB threads=8 fds=37  idle cpu mean=0.133% last-minute=0.133%  busy={'pg:memwatchdog': 0.001, 'pg:autovacuum l': 0.001, 'pg:bgworker': 0.001}
+n=300   footprint=104 MB threads=8 fds=37  idle cpu mean=0.233% last-minute=0.233%  busy={'pg:autovacuum l': 0.001, 'pg:bgworker': 0.001}
+n=500   footprint=120 MB threads=8 fds=37  idle cpu mean=0.399% last-minute=0.399%  busy={'pg:autovacuum l': 0.002, 'pg:bgworker': 0.001}
+n=1000  footprint=155 MB threads=8 fds=37  idle cpu mean=1.214% last-minute=1.214%  busy={'pg:autovacuum l': 0.01, 'pg:bgworker': 0.002}
+wrote /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-0131cc9b12/scale-skipidle-naptime60/scale.json
+n=0     footprint=86 MB threads=8 fds=131  idle cpu mean=0.083% last-minute=0.083%  busy={'pg:bgworker': 0.001}
+n=100   footprint=91 MB threads=8 fds=36  idle cpu mean=0.117% last-minute=0.117%  busy={'pg:memwatchdog': 0.001}
+n=300   footprint=104 MB threads=8 fds=36  idle cpu mean=0.166% last-minute=0.166%  busy={'pg:memwatchdog': 0.001}
+n=500   footprint=119 MB threads=8 fds=37  idle cpu mean=0.216% last-minute=0.216%  busy={'pg:bgworker': 0.002}
+n=1000  footprint=154 MB threads=8 fds=37  idle cpu mean=0.333% last-minute=0.333%  busy={'pg:autovacuum l': 0.003, 'pg:memwatchdog': 0.001, 'pg:bgworker': 0.001}
+wrote /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-0131cc9b12/scale-skipidle-naptime300/scale.json
+    exit=0
+=== scale-touched  05:56:52
+n=0     footprint=86 MB threads=8 fds=138  idle cpu mean=0.083% last-minute=0.083%  busy={}
+n=100   footprint=101 MB threads=8 fds=36  idle cpu mean=0.100% last-minute=0.100%  busy={}
+n=300   footprint=124 MB threads=8 fds=36  idle cpu mean=0.116% last-minute=0.116%  busy={'pg:memwatchdog': 0.001, 'pg-timeout-time': 0.001}
+n=500   footprint=155 MB threads=8 fds=129  idle cpu mean=1.214% last-minute=1.214%  busy={'pg:bgwriter': 0.001, 'pg:wal_writer': 0.001, 'pg:autovacuum l': 0.001, 'pg:bgworker': 0.001}
+n=1000  footprint=213 MB threads=8 fds=137  idle cpu mean=1.447% last-minute=1.447%  busy={'pg:bgwriter': 0.001, 'pg:autovacuum l': 0.001, 'pg:bgworker': 0.001}
+wrote /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-0131cc9b12/scale-touched/scale.json
+    exit=0
+=== churn  06:06:52
+before: 82.0 MB

@@ -1,0 +1,330 @@
+{
+  "benchmark": "insert-memory",
+  "git_commit": "0131cc9b12cf57592b04a1ca6bd4826f8fac838b",
+  "rows": [
+    {
+      "base_mb": 50.5,
+      "peak_mb": 113.2,
+      "growth_mb": 62.7,
+      "seconds": 1.56,
+      "engine": "pgx",
+      "variant": "ints",
+      "n": 1000000
+    },
+    {
+      "base_mb": 50.6,
+      "peak_mb": 134.9,
+      "growth_mb": 84.3,
+      "seconds": 3.14,
+      "engine": "pgx",
+      "variant": "ints",
+      "n": 2000000
+    },
+    {
+      "base_mb": 50.8,
+      "peak_mb": 134.2,
+      "growth_mb": 83.4,
+      "seconds": 4.97,
+      "engine": "pgx",
+      "variant": "ints",
+      "n": 3000000
+    },
+    {
+      "base_mb": 50.7,
+      "peak_mb": 113.1,
+      "growth_mb": 62.3,
+      "seconds": 2.49,
+      "engine": "pgx",
+      "variant": "md5",
+      "n": 1000000
+    },
+    {
+      "base_mb": 50.3,
+      "peak_mb": 138.7,
+      "growth_mb": 88.4,
+      "seconds": 5.5,
+      "engine": "pgx",
+      "variant": "md5",
+      "n": 2000000
+    },
+    {
+      "base_mb": 49.6,
+      "peak_mb": 138.4,
+      "growth_mb": 88.8,
+      "seconds": 7.52,
+      "engine": "pgx",
+      "variant": "md5",
+      "n": 3000000
+    },
+    {
+      "base_mb": 50.9,
+      "peak_mb": 113.7,
+      "growth_mb": 62.9,
+      "seconds": 3.36,
+      "engine": "pgx",
+      "variant": "jsonb",
+      "n": 1000000
+    },
+    {
+      "base_mb": 49.7,
+      "peak_mb": 138.3,
+      "growth_mb": 88.7,
+      "seconds": 6.71,
+      "engine": "pgx",
+      "variant": "jsonb",
+      "n": 2000000
+    },
+    {
+      "base_mb": 50.4,
+      "peak_mb": 136.3,
+      "growth_mb": 85.9,
+      "seconds": 11.32,
+      "engine": "pgx",
+      "variant": "jsonb",
+      "n": 3000000
+    },
+    {
+      "base_mb": 50.7,
+      "peak_mb": 109.4,
+      "growth_mb": 58.8,
+      "seconds": 5.92,
+      "engine": "pgx",
+      "variant": "md5+jsonb",
+      "n": 1000000
+    },
+    {
+      "base_mb": 50.7,
+      "peak_mb": 135.5,
+      "growth_mb": 84.8,
+      "seconds": 12.46,
+      "engine": "pgx",
+      "variant": "md5+jsonb",
+      "n": 2000000
+    },
+    {
+      "base_mb": 50.8,
+      "peak_mb": 139.0,
+      "growth_mb": 88.2,
+      "seconds": 18.23,
+      "engine": "pgx",
+      "variant": "md5+jsonb",
+      "n": 3000000
+    },
+    {
+      "base_mb": 50.6,
+      "peak_mb": 98.7,
+      "growth_mb": 48.0,
+      "seconds": 0.15,
+      "engine": "pgx",
+      "variant": "select-only",
+      "n": 1000000
+    },
+    {
+      "base_mb": 50.4,
+      "peak_mb": 120.2,
+      "growth_mb": 69.8,
+      "seconds": 0.43,
+      "engine": "pgx",
+      "variant": "select-only",
+      "n": 2000000
+    },
+    {
+      "base_mb": 50.1,
+      "peak_mb": 117.9,
+      "growth_mb": 67.9,
+      "seconds": 0.63,
+      "engine": "pgx",
+      "variant": "select-only",
+      "n": 3000000
+    },
+    {
+      "base_mb": 109.3,
+      "peak_mb": 207.3,
+      "growth_mb": 98.0,
+      "seconds": 7.7,
+      "engine": "pgx",
+      "variant": "update",
+      "n": 1000000
+    },
+    {
+      "base_mb": 82.1,
+      "peak_mb": 343.2,
+      "growth_mb": 261.1,
+      "seconds": 15.91,
+      "engine": "pgx",
+      "variant": "update",
+      "n": 2000000
+    },
+    {
+      "base_mb": 81.5,
+      "peak_mb": 481.7,
+      "growth_mb": 400.2,
+      "seconds": 23.18,
+      "engine": "pgx",
+      "variant": "update",
+      "n": 3000000
+    },
+    {
+      "base_mb": 27.8,
+      "peak_mb": 99.4,
+      "growth_mb": 71.6,
+      "seconds": 1.33,
+      "engine": "postgres",
+      "variant": "ints",
+      "n": 1000000
+    },
+    {
+      "base_mb": 28.0,
+      "peak_mb": 113.8,
+      "growth_mb": 85.8,
+      "seconds": 2.59,
+      "engine": "postgres",
+      "variant": "ints",
+      "n": 2000000
+    },
+    {
+      "base_mb": 28.1,
+      "peak_mb": 146.8,
+      "growth_mb": 118.7,
+      "seconds": 4.1,
+      "engine": "postgres",
+      "variant": "ints",
+      "n": 3000000
+    },
+    {
+      "base_mb": 27.6,
+      "peak_mb": 131.8,
+      "growth_mb": 104.3,
+      "seconds": 2.88,
+      "engine": "postgres",
+      "variant": "md5",
+      "n": 1000000
+    },
+    {
+      "base_mb": 27.7,
+      "peak_mb": 171.6,
+      "growth_mb": 143.9,
+      "seconds": 5.98,
+      "engine": "postgres",
+      "variant": "md5",
+      "n": 2000000
+    },
+    {
+      "base_mb": 27.9,
+      "peak_mb": 171.6,
+      "growth_mb": 143.7,
+      "seconds": 8.83,
+      "engine": "postgres",
+      "variant": "md5",
+      "n": 3000000
+    },
+    {
+      "base_mb": 27.7,
+      "peak_mb": 121.8,
+      "growth_mb": 94.0,
+      "seconds": 2.43,
+      "engine": "postgres",
+      "variant": "jsonb",
+      "n": 1000000
+    },
+    {
+      "base_mb": 27.5,
+      "peak_mb": 156.6,
+      "growth_mb": 129.1,
+      "seconds": 5.18,
+      "engine": "postgres",
+      "variant": "jsonb",
+      "n": 2000000
+    },
+    {
+      "base_mb": 27.6,
+      "peak_mb": 171.6,
+      "growth_mb": 144.0,
+      "seconds": 7.74,
+      "engine": "postgres",
+      "variant": "jsonb",
+      "n": 3000000
+    },
+    {
+      "base_mb": 27.9,
+      "peak_mb": 193.5,
+      "growth_mb": 165.5,
+      "seconds": 6.23,
+      "engine": "postgres",
+      "variant": "md5+jsonb",
+      "n": 1000000
+    },
+    {
+      "base_mb": 27.6,
+      "peak_mb": 171.5,
+      "growth_mb": 144.0,
+      "seconds": 13.58,
+      "engine": "postgres",
+      "variant": "md5+jsonb",
+      "n": 2000000
+    },
+    {
+      "base_mb": 27.9,
+      "peak_mb": 171.9,
+      "growth_mb": 144.0,
+      "seconds": 20.14,
+      "engine": "postgres",
+      "variant": "md5+jsonb",
+      "n": 3000000
+    },
+    {
+      "base_mb": 27.5,
+      "peak_mb": 66.5,
+      "growth_mb": 39.0,
+      "seconds": 0.17,
+      "engine": "postgres",
+      "variant": "select-only",
+      "n": 1000000
+    },
+    {
+      "base_mb": 27.7,
+      "peak_mb": 69.8,
+      "growth_mb": 42.1,
+      "seconds": 0.56,
+      "engine": "postgres",
+      "variant": "select-only",
+      "n": 2000000
+    },
+    {
+      "base_mb": 27.9,
+      "peak_mb": 77.1,
+      "growth_mb": 49.2,
+      "seconds": 0.75,
+      "engine": "postgres",
+      "variant": "select-only",
+      "n": 3000000
+    },
+    {
+      "base_mb": 63.3,
+      "peak_mb": 156.0,
+      "growth_mb": 92.7,
+      "seconds": 7.79,
+      "engine": "postgres",
+      "variant": "update",
+      "n": 1000000
+    },
+    {
+      "base_mb": 97.4,
+      "peak_mb": 156.7,
+      "growth_mb": 59.2,
+      "seconds": 16.12,
+      "engine": "postgres",
+      "variant": "update",
+      "n": 2000000
+    },
+    {
+      "base_mb": 131.9,
+      "peak_mb": 156.8,
+      "growth_mb": 24.9,
+      "seconds": 24.07,
+      "engine": "postgres",
+      "variant": "update",
+      "n": 3000000
+    }
+  ]
+}
