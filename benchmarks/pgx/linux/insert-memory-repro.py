@@ -25,7 +25,11 @@ VARIANTS = {
     "jsonb": "INSERT INTO t(a, j) SELECT g, jsonb_build_object('n', g) FROM generate_series(1, %d) g",
     "md5+jsonb": "INSERT INTO t(a, s, j) SELECT g, md5(g::text), jsonb_build_object('n', g, 's', md5(g::text)) FROM generate_series(1, %d) g",
     "select-only": "SELECT count(*) FROM (SELECT md5(g::text), jsonb_build_object('n', g, 's', md5(g::text)) FROM generate_series(1, %d) g) x",
-    # (setup, measured statement): the table is filled first, then every row is rewritten
+    # (setup, measured statement): a source table is filled first
+    "insert-from-table": ("CREATE TABLE src AS SELECT g AS a, md5(g::text) AS s, "
+                          "jsonb_build_object('n', g, 's', md5(g::text)) AS j FROM generate_series(1, %d) g",
+                          "INSERT INTO t SELECT * FROM src"),
+    # the table is filled first, then every row is rewritten
     "update": ("INSERT INTO t(a) SELECT g FROM generate_series(1, %d) g",
                "UPDATE t SET s = md5(a::text), j = jsonb_build_object('n', a, 's', md5(a::text))"),
 }

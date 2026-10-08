@@ -8347,6 +8347,17 @@ fn exec_insert<'mcx>(
         }
     }
 
+    // A slot that is not already a materialized copy (a scan's buffer slot,
+    // INSERT ... SELECT * with no projection) is materialized into per-tuple
+    // memory, reset by mt_row_prologue before the next row: in es_query_cxt
+    // (a bump arena, no frees) every inserted row's copy stayed until the end
+    // of the statement. Nothing keeps the image past its row (after-trigger
+    // events and transition tables copy it).
+    let row_cx: core::ptr::NonNull<mcx::MemoryContext> =
+        core::ptr::NonNull::from(estate.get_per_tuple_memory().context());
+    // SAFETY: the per-tuple ExprContext lives in the estate for the whole
+    // query and is reset only between rows.
+    let row_mcx: mcx::Mcx<'mcx> = unsafe { row_cx.as_ref() }.mcx();
     {
         let EStateData {
             es_relations,
@@ -8402,7 +8413,7 @@ fn exec_insert<'mcx>(
         {
             exec_compute_stored_generated(mcx, gen_exprs, None, rel, slot)?;
         }
-        exectuples::exec_materialize_slot(slot, mcx)?;
+        exectuples::exec_materialize_slot(slot, row_mcx)?;
         slot.base_mut().tts_tableOid = rel.rd_id;
 
         if rel.rd_rel.relhasindex && indexes.is_none() {
