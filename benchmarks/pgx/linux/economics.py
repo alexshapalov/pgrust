@@ -15,8 +15,9 @@ MEASURED = {
     "host_ram_gib": 7.6,
     "host_vcpu": 4,
     "pool_gib": 47.0,                      # usable ZFS pool
-    "runtime_base_mb": 86.0,               # PGX runtime with 0 DBs (density, fixed build)
-    "idle_db_mb": 0.55,                    # per idle database (autovacuum on); 0.50 with it off
+    "runtime_base_mb": 86.0,               # PGX runtime with 0 DBs (linux-density.md)
+    "idle_db_mb": 0.127,                   # per idle database touched once (1000 touched: 213 MB, linux-density.md)
+    "active_db_mb": 1.5,                   # extra per active database (1000 DBs, 100 active: 283 MB)
     "branch_fresh_physical_mb": 2.0,       # zfs-cow.md
     "active_db_core_share": 1.0 / 20,      # 20 active DBs (query + 10 ms think time) ~ 1 core, p99 2.3 ms
     "safe_active_dbs_per_host": 50,        # p99 < 16 ms on 4 vCPU with co-located load generator
@@ -47,13 +48,14 @@ SCENARIOS = [
 
 
 def host_capacity(m, a):
-    ram_dbs = (a["ram_budget_gib"] * 1024 - m["runtime_base_mb"]) / m["idle_db_mb"]
+    per_branch_ram_mb = m["idle_db_mb"] + a["active_fraction"] * m["active_db_mb"]
+    ram_dbs = (a["ram_budget_gib"] * 1024 - m["runtime_base_mb"]) / per_branch_ram_mb
     cpu_dbs = m["safe_active_dbs_per_host"] / a["active_fraction"]
     per_branch_disk_mb = m["branch_fresh_physical_mb"] + a["writes_per_branch_mb"] * m["bulk_write_amplification"]
     disk_dbs = (m["pool_gib"] * a["pool_budget_fraction"] - a["golden_gib_per_host"]) * 1024 / per_branch_disk_mb
     return {"by_ram": int(ram_dbs), "by_cpu": int(cpu_dbs), "by_disk": int(disk_dbs),
             "tested_max": 1000, "concurrent_branches": int(min(ram_dbs, cpu_dbs, disk_dbs, 1000)),
-            "per_branch_disk_mb": per_branch_disk_mb}
+            "per_branch_disk_mb": per_branch_disk_mb, "per_branch_ram_mb": round(per_branch_ram_mb, 3)}
 
 
 def scenario(name, per_day, minutes, m, a, cap):
