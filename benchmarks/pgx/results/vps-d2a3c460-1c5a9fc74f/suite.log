@@ -1,0 +1,22 @@
+=== regress  08:59:29
+create_index           plan_only  plan lines   29  other lines 0
+select_distinct        plan_only  plan lines   25  other lines 0
+subselect              plan_only  plan lines   61  other lines 0
+join                   plan_only  plan lines  212  other lines 0
+portals                plan_only  plan lines   16  other lines 0
+tidscan                plan_only  plan lines   48  other lines 0
+incremental_sort       plan_only  plan lines   41  other lines 0
+limit                  plan_only  plan lines   11  other lines 0
+partition_join         plan_only  plan lines  150  other lines 0
+partition_prune        plan_only  plan lines  331  other lines 0
+partition_aggregate    plan_only  plan lines  194  other lines 0
+memoize                plan_only  plan lines   39  other lines 0
+    exit=0
+=== skipidle  09:00:04
+round 1: 5/5 busy databases autovacuumed + autoanalyzed in 2 s
+round 2: 5/5 busy databases autovacuumed again after new writes in 6 s
+OK
+round 1: 5/5 busy databases autovacuumed + autoanalyzed in 4 s
+round 2: 5/5 busy databases autovacuumed again after new writes in 6 s
+OK
+    exit=0

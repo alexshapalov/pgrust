@@ -1,0 +1,44 @@
+=== skipidle  08:29:19
+round 1: 5/5 busy databases autovacuumed + autoanalyzed in 2 s
+round 2: 5/5 busy databases autovacuumed again after new writes in 6 s
+OK
+round 1: 5/5 busy databases autovacuumed + autoanalyzed in 4 s
+round 2: 5/5 busy databases autovacuumed again after new writes in 6 s
+OK
+    exit=0
+=== regress  08:29:51
+create_index           plan_only  plan lines   29  other lines 0
+select_distinct        plan_only  plan lines   25  other lines 0
+subselect              plan_only  plan lines   61  other lines 0
+join                   plan_only  plan lines  212  other lines 0
+portals                plan_only  plan lines   16  other lines 0
+tidscan                plan_only  plan lines   48  other lines 0
+incremental_sort       plan_only  plan lines   41  other lines 0
+limit                  plan_only  plan lines   11  other lines 0
+partition_join         plan_only  plan lines  150  other lines 0
+partition_prune        plan_only  plan lines  331  other lines 0
+partition_aggregate    plan_only  plan lines  194  other lines 0
+memoize                plan_only  plan lines   39  other lines 0
+    exit=0
+=== scale-naptime  08:30:26
+n=0     footprint=84 MB threads=8 fds=132  idle cpu mean=0.100% last-minute=0.100%  busy={'pg:bgworker': 0.001}
+n=100   footprint=93 MB threads=8 fds=37  idle cpu mean=0.150% last-minute=0.150%  busy={}
+n=300   footprint=105 MB threads=8 fds=37  idle cpu mean=0.299% last-minute=0.299%  busy={'pg:autovacuum l': 0.001}
+n=500   footprint=120 MB threads=8 fds=37  idle cpu mean=0.433% last-minute=0.433%  busy={'pg:autovacuum l': 0.003, 'pg:bgworker': 0.001}
+n=1000  footprint=155 MB threads=8 fds=37  idle cpu mean=0.715% last-minute=0.715%  busy={'pg:autovacuum l': 0.006, 'pg:bgworker': 0.001}
+wrote /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/scale-skipidle-naptime60/scale.json
+n=0     footprint=86 MB threads=8 fds=138  idle cpu mean=0.100% last-minute=0.100%  busy={}
+n=100   footprint=93 MB threads=8 fds=38  idle cpu mean=0.216% last-minute=0.216%  busy={'pg:memwatchdog': 0.001}
+n=300   footprint=105 MB threads=8 fds=37  idle cpu mean=0.150% last-minute=0.150%  busy={}
+n=500   footprint=120 MB threads=8 fds=37  idle cpu mean=0.150% last-minute=0.150%  busy={'pg:checkpointer': 0.001, 'pg:bgworker': 0.001}
+n=1000  footprint=154 MB threads=8 fds=37  idle cpu mean=0.432% last-minute=0.432%  busy={'pg:autovacuum l': 0.002, 'pg:bgworker': 0.002, 'pg:memwatchdog': 0.001}
+wrote /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/scale-skipidle-naptime300/scale.json
+    exit=0
+=== scale-touched  08:49:16
+n=0     footprint=86 MB threads=8 fds=132  idle cpu mean=0.100% last-minute=0.100%  busy={}
+n=100   footprint=102 MB threads=8 fds=38  idle cpu mean=0.200% last-minute=0.200%  busy={'pg:wal_writer': 0.001, 'pg:bgworker': 0.001}
+n=300   footprint=124 MB threads=8 fds=37  idle cpu mean=0.133% last-minute=0.133%  busy={'pg:bgworker': 0.001}
+n=500   footprint=155 MB threads=8 fds=37  idle cpu mean=0.150% last-minute=0.150%  busy={'pg:memwatchdog': 0.001, 'pg:bgworker': 0.001}
+n=1000  footprint=217 MB threads=8 fds=302  idle cpu mean=2.911% last-minute=2.911%  busy={'postgres': 0.002, 'pg:autovacuum l': 0.002, 'pg:bgworker': 0.002, 'pg:bgwriter': 0.001}
+wrote /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/scale-touched/scale.json
+    exit=0

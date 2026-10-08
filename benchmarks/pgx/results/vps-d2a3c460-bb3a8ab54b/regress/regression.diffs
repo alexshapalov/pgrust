@@ -1,0 +1,1477 @@
+diff -U3 /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/create_index.out /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/create_index.out
+--- /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/create_index.out	2026-10-07 06:41:12.191347568 +0000
++++ /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/create_index.out	2026-10-08 08:29:59.399535346 +0000
+@@ -2250,19 +2250,22 @@
+ SELECT count(*) FROM tenk1 LEFT JOIN tenk2 ON
+   tenk1.hundred = 42 AND (tenk2.thousand = 42 OR tenk2.thousand = 41 OR tenk2.tenthous = 2) AND
+   tenk2.hundred = tenk1.hundred;
+-                                     QUERY PLAN                                     
+-------------------------------------------------------------------------------------
+- Aggregate
+-   ->  Nested Loop Left Join
+-         Join Filter: (tenk1.hundred = 42)
+-         ->  Index Only Scan using tenk1_hundred on tenk1
+-         ->  Memoize
+-               Cache Key: tenk1.hundred
+-               Cache Mode: logical
+-               ->  Index Scan using tenk2_hundred on tenk2
+-                     Index Cond: (hundred = tenk1.hundred)
+-                     Filter: ((thousand = 42) OR (thousand = 41) OR (tenthous = 2))
+-(10 rows)
++                                           QUERY PLAN                                           
++------------------------------------------------------------------------------------------------
++ Finalize Aggregate
++   ->  Gather
++         Workers Planned: 1
++         ->  Partial Aggregate
++               ->  Nested Loop Left Join
++                     Join Filter: (tenk1.hundred = 42)
++                     ->  Parallel Index Only Scan using tenk1_hundred on tenk1
++                     ->  Memoize
++                           Cache Key: tenk1.hundred
++                           Cache Mode: logical
++                           ->  Index Scan using tenk2_hundred on tenk2
++                                 Index Cond: (hundred = tenk1.hundred)
++                                 Filter: ((thousand = 42) OR (thousand = 41) OR (tenthous = 2))
++(13 rows)
+ 
+ --
+ -- Check behavior with duplicate index column contents
+diff -U3 /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/select_distinct.out /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/select_distinct.out
+--- /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/select_distinct.out	2026-10-07 06:41:12.227347874 +0000
++++ /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/select_distinct.out	2026-10-08 08:30:02.836566041 +0000
+@@ -175,14 +175,17 @@
+ -- Check to see we get an incremental sort plan
+ EXPLAIN (costs off)
+ SELECT DISTINCT hundred, two FROM tenk1;
+-                     QUERY PLAN                      
+------------------------------------------------------
++                                QUERY PLAN                                
++--------------------------------------------------------------------------
+  Unique
+-   ->  Incremental Sort
+-         Sort Key: hundred, two
+-         Presorted Key: hundred
+-         ->  Index Scan using tenk1_hundred on tenk1
+-(5 rows)
++   ->  Gather Merge
++         Workers Planned: 1
++         ->  Unique
++               ->  Incremental Sort
++                     Sort Key: hundred, two
++                     Presorted Key: hundred
++                     ->  Parallel Index Scan using tenk1_hundred on tenk1
++(8 rows)
+ 
+ RESET enable_seqscan;
+ SET enable_hashagg=TRUE;
+@@ -279,15 +282,15 @@
+ -- Ensure we do parallel distinct now that the function is parallel safe
+ EXPLAIN (COSTS OFF)
+ SELECT DISTINCT distinct_func(1) FROM tenk1;
+-                     QUERY PLAN                     
+-----------------------------------------------------
++                                  QUERY PLAN                                   
++-------------------------------------------------------------------------------
+  Unique
+    ->  Gather Merge
+-         Workers Planned: 2
++         Workers Planned: 1
+          ->  Unique
+                ->  Sort
+                      Sort Key: (distinct_func(1))
+-                     ->  Parallel Seq Scan on tenk1
++                     ->  Parallel Index Only Scan using tenk1_hundred on tenk1
+ (7 rows)
+ 
+ RESET max_parallel_workers_per_gather;
+diff -U3 /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/subselect.out /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/subselect.out
+--- /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/subselect.out	2026-10-07 06:41:12.231347908 +0000
++++ /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/subselect.out	2026-10-08 08:30:03.477571766 +0000
+@@ -1739,19 +1739,22 @@
+ select * from
+   (select generate_series(1, ten) as g, count(*) from tenk1 group by 1) ss
+   where ss.g = 1;
+-                                                                                                                            QUERY PLAN                                                                                                                             
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
++                                                                                                                               QUERY PLAN                                                                                                                                
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  Subquery Scan on ss
+    Output: ss.g, ss.count
+    Filter: (ss.g = 1)
+    ->  HashAggregate
+          Output: (generate_series(1, tenk1.ten)), count(*)
+-         Group Key: generate_series(1, tenk1.ten)
+-         ->  ProjectSet
+-               Output: generate_series(1, tenk1.ten)
+-               ->  Seq Scan on public.tenk1
+-                     Output: tenk1.unique1, tenk1.unique2, tenk1.two, tenk1.four, tenk1.ten, tenk1.twenty, tenk1.hundred, tenk1.thousand, tenk1.twothousand, tenk1.fivethous, tenk1.tenthous, tenk1.odd, tenk1.even, tenk1.stringu1, tenk1.stringu2, tenk1.string4
+-(10 rows)
++         Group Key: (generate_series(1, tenk1.ten))
++         ->  Gather
++               Output: (generate_series(1, tenk1.ten))
++               Workers Planned: 1
++               ->  ProjectSet
++                     Output: generate_series(1, tenk1.ten)
++                     ->  Parallel Seq Scan on public.tenk1
++                           Output: tenk1.unique1, tenk1.unique2, tenk1.two, tenk1.four, tenk1.ten, tenk1.twenty, tenk1.hundred, tenk1.thousand, tenk1.twothousand, tenk1.fivethous, tenk1.tenthous, tenk1.odd, tenk1.even, tenk1.stringu1, tenk1.stringu2, tenk1.string4
++(13 rows)
+ 
+ select * from
+   (select generate_series(1, ten) as g, count(*) from tenk1 group by 1) ss
+@@ -2182,24 +2185,30 @@
+   ) ss on t1.unique1 = ss.fivethous
+ group by t1.ten
+ order by t1.ten;
+-                                                                                                    QUERY PLAN                                                                                                     
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+- Sort
+-   Output: t1.ten, (sum((t1.ten + t2.ten)))
+-   Sort Key: t1.ten
+-   ->  HashAggregate
+-         Output: t1.ten, sum((t1.ten + t2.ten))
+-         Group Key: t1.ten
+-         ->  Hash Right Join
+-               Output: t1.ten, t2.ten
+-               Hash Cond: (t2.fivethous = t1.unique1)
+-               ->  Seq Scan on public.tenk1 t2
+-                     Output: t2.unique1, t2.unique2, t2.two, t2.four, t2.ten, t2.twenty, t2.hundred, t2.thousand, t2.twothousand, t2.fivethous, t2.tenthous, t2.odd, t2.even, t2.stringu1, t2.stringu2, t2.string4
+-               ->  Hash
+-                     Output: t1.ten, t1.unique1
+-                     ->  Seq Scan on public.tenk1 t1
+-                           Output: t1.ten, t1.unique1
+-(15 rows)
++                                                                                                          QUERY PLAN                                                                                                           
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
++ Finalize GroupAggregate
++   Output: t1.ten, sum((t1.ten + t2.ten))
++   Group Key: t1.ten
++   ->  Gather Merge
++         Output: t1.ten, (PARTIAL sum((t1.ten + t2.ten)))
++         Workers Planned: 1
++         ->  Sort
++               Output: t1.ten, (PARTIAL sum((t1.ten + t2.ten)))
++               Sort Key: t1.ten
++               ->  Partial HashAggregate
++                     Output: t1.ten, PARTIAL sum((t1.ten + t2.ten))
++                     Group Key: t1.ten
++                     ->  Parallel Hash Left Join
++                           Output: t1.ten, t2.ten
++                           Hash Cond: (t1.unique1 = t2.fivethous)
++                           ->  Parallel Seq Scan on public.tenk1 t1
++                                 Output: t1.unique1, t1.unique2, t1.two, t1.four, t1.ten, t1.twenty, t1.hundred, t1.thousand, t1.twothousand, t1.fivethous, t1.tenthous, t1.odd, t1.even, t1.stringu1, t1.stringu2, t1.string4
++                           ->  Parallel Hash
++                                 Output: t2.ten, t2.fivethous
++                                 ->  Parallel Seq Scan on public.tenk1 t2
++                                       Output: t2.ten, t2.fivethous
++(21 rows)
+ 
+ select t1.ten, sum(x) from
+   tenk1 t1 left join lateral (
+diff -U3 /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/join.out /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/join.out
+--- /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/join.out	2026-10-07 06:41:12.206347695 +0000
++++ /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/join.out	2026-10-08 08:30:03.912575651 +0000
+@@ -2841,15 +2841,15 @@
+ ----------------------------------------------------------------------------------
+  GroupAggregate
+    Group Key: x.thousand, x.twothousand
+-   ->  Incremental Sort
+-         Sort Key: x.thousand DESC, x.twothousand
+-         Presorted Key: x.thousand
+-         ->  Merge Join
+-               Merge Cond: (y.thousand = x.thousand)
+-               ->  Index Only Scan Backward using tenk1_thous_tenthous on tenk1 y
++   ->  Merge Join
++         Merge Cond: (x.thousand = y.thousand)
++         ->  Gather Merge
++               Workers Planned: 1
+                ->  Sort
+-                     Sort Key: x.thousand DESC
+-                     ->  Seq Scan on tenk1 x
++                     Sort Key: x.thousand DESC, x.twothousand
++                     ->  Parallel Seq Scan on tenk1 x
++         ->  Materialize
++               ->  Index Only Scan Backward using tenk1_thous_tenthous on tenk1 y
+ (11 rows)
+ 
+ reset enable_hashagg;
+@@ -3111,16 +3111,19 @@
+ explain (costs off)
+ select count(*) from tenk1 a, tenk1 b
+   where a.hundred = b.thousand and (b.fivethous % 10) < 10;
+-                         QUERY PLAN                         
+-------------------------------------------------------------
+- Aggregate
+-   ->  Hash Join
+-         Hash Cond: (a.hundred = b.thousand)
+-         ->  Index Only Scan using tenk1_hundred on tenk1 a
+-         ->  Hash
+-               ->  Seq Scan on tenk1 b
+-                     Filter: ((fivethous % 10) < 10)
+-(7 rows)
++                                   QUERY PLAN                                    
++---------------------------------------------------------------------------------
++ Finalize Aggregate
++   ->  Gather
++         Workers Planned: 1
++         ->  Partial Aggregate
++               ->  Parallel Hash Join
++                     Hash Cond: (a.hundred = b.thousand)
++                     ->  Parallel Index Only Scan using tenk1_hundred on tenk1 a
++                     ->  Parallel Hash
++                           ->  Parallel Seq Scan on tenk1 b
++                                 Filter: ((fivethous % 10) < 10)
++(10 rows)
+ 
+ select count(*) from tenk1 a, tenk1 b
+   where a.hundred = b.thousand and (b.fivethous % 10) < 10;
+@@ -3228,26 +3231,30 @@
+ explain (costs off)
+ select a.* from tenk1 a
+ where not exists (select 1 from tenk1 b where a.unique1 = b.unique2);
+-                         QUERY PLAN                         
+-------------------------------------------------------------
+- Hash Anti Join
+-   Hash Cond: (a.unique1 = b.unique2)
+-   ->  Seq Scan on tenk1 a
+-   ->  Hash
+-         ->  Index Only Scan using tenk1_unique2 on tenk1 b
+-(5 rows)
++                                QUERY PLAN                                 
++---------------------------------------------------------------------------
++ Gather
++   Workers Planned: 1
++   ->  Parallel Hash Anti Join
++         Hash Cond: (a.unique1 = b.unique2)
++         ->  Parallel Seq Scan on tenk1 a
++         ->  Parallel Hash
++               ->  Parallel Index Only Scan using tenk1_unique2 on tenk1 b
++(7 rows)
+ 
+ explain (costs off)
+ select a.* from tenk1 a left join tenk1 b on a.unique1 = b.unique2
+ where b.unique2 is null;
+-                         QUERY PLAN                         
+-------------------------------------------------------------
+- Hash Anti Join
+-   Hash Cond: (a.unique1 = b.unique2)
+-   ->  Seq Scan on tenk1 a
+-   ->  Hash
+-         ->  Index Only Scan using tenk1_unique2 on tenk1 b
+-(5 rows)
++                                QUERY PLAN                                 
++---------------------------------------------------------------------------
++ Gather
++   Workers Planned: 1
++   ->  Parallel Hash Anti Join
++         Hash Cond: (a.unique1 = b.unique2)
++         ->  Parallel Seq Scan on tenk1 a
++         ->  Parallel Hash
++               ->  Parallel Index Only Scan using tenk1_unique2 on tenk1 b
++(7 rows)
+ 
+ -- check that we avoid de-duplicating columns redundantly
+ set enable_memoize to off;
+@@ -8233,43 +8240,52 @@
+ 
+ explain (costs off)
+   select count(*) from tenk1 a, lateral generate_series(1,two) g;
+-                      QUERY PLAN                      
+-------------------------------------------------------
+- Aggregate
+-   ->  Nested Loop
+-         ->  Seq Scan on tenk1 a
+-         ->  Memoize
+-               Cache Key: a.two
+-               Cache Mode: binary
+-               ->  Function Scan on generate_series g
+-(7 rows)
++                            QUERY PLAN                            
++------------------------------------------------------------------
++ Finalize Aggregate
++   ->  Gather
++         Workers Planned: 1
++         ->  Partial Aggregate
++               ->  Nested Loop
++                     ->  Parallel Seq Scan on tenk1 a
++                     ->  Memoize
++                           Cache Key: a.two
++                           Cache Mode: binary
++                           ->  Function Scan on generate_series g
++(10 rows)
+ 
+ explain (costs off)
+   select count(*) from tenk1 a cross join lateral generate_series(1,two) g;
+-                      QUERY PLAN                      
+-------------------------------------------------------
+- Aggregate
+-   ->  Nested Loop
+-         ->  Seq Scan on tenk1 a
+-         ->  Memoize
+-               Cache Key: a.two
+-               Cache Mode: binary
+-               ->  Function Scan on generate_series g
+-(7 rows)
++                            QUERY PLAN                            
++------------------------------------------------------------------
++ Finalize Aggregate
++   ->  Gather
++         Workers Planned: 1
++         ->  Partial Aggregate
++               ->  Nested Loop
++                     ->  Parallel Seq Scan on tenk1 a
++                     ->  Memoize
++                           Cache Key: a.two
++                           Cache Mode: binary
++                           ->  Function Scan on generate_series g
++(10 rows)
+ 
+ -- don't need the explicit LATERAL keyword for functions
+ explain (costs off)
+   select count(*) from tenk1 a, generate_series(1,two) g;
+-                      QUERY PLAN                      
+-------------------------------------------------------
+- Aggregate
+-   ->  Nested Loop
+-         ->  Seq Scan on tenk1 a
+-         ->  Memoize
+-               Cache Key: a.two
+-               Cache Mode: binary
+-               ->  Function Scan on generate_series g
+-(7 rows)
++                            QUERY PLAN                            
++------------------------------------------------------------------
++ Finalize Aggregate
++   ->  Gather
++         Workers Planned: 1
++         ->  Partial Aggregate
++               ->  Nested Loop
++                     ->  Parallel Seq Scan on tenk1 a
++                     ->  Memoize
++                           Cache Key: a.two
++                           Cache Mode: binary
++                           ->  Function Scan on generate_series g
++(10 rows)
+ 
+ -- lateral with UNION ALL subselect
+ explain (costs off)
+@@ -8301,14 +8317,18 @@
+ explain (costs off)
+   select count(*) from tenk1 a,
+     tenk1 b join lateral (values(a.unique1)) ss(x) on b.unique2 = ss.x;
+-                         QUERY PLAN                         
+-------------------------------------------------------------
+- Aggregate
+-   ->  Merge Join
+-         Merge Cond: (a.unique1 = b.unique2)
+-         ->  Index Only Scan using tenk1_unique1 on tenk1 a
+-         ->  Index Only Scan using tenk1_unique2 on tenk1 b
+-(5 rows)
++                                      QUERY PLAN                                       
++---------------------------------------------------------------------------------------
++ Finalize Aggregate
++   ->  Gather
++         Workers Planned: 2
++         ->  Partial Aggregate
++               ->  Parallel Hash Join
++                     Hash Cond: (a.unique1 = b.unique2)
++                     ->  Parallel Index Only Scan using tenk1_unique1 on tenk1 a
++                     ->  Parallel Hash
++                           ->  Parallel Index Only Scan using tenk1_unique2 on tenk1 b
++(9 rows)
+ 
+ select count(*) from tenk1 a,
+   tenk1 b join lateral (values(a.unique1)) ss(x) on b.unique2 = ss.x;
+@@ -8321,19 +8341,22 @@
+ explain (costs off)
+   select count(*) from tenk1 a,
+     tenk1 b join lateral (values(a.unique1),(-1)) ss(x) on b.unique2 = ss.x;
+-                            QUERY PLAN                            
+-------------------------------------------------------------------
+- Aggregate
+-   ->  Nested Loop
+-         ->  Nested Loop
+-               ->  Index Only Scan using tenk1_unique1 on tenk1 a
+-               ->  Values Scan on "*VALUES*"
+-         ->  Memoize
+-               Cache Key: "*VALUES*".column1
+-               Cache Mode: logical
+-               ->  Index Only Scan using tenk1_unique2 on tenk1 b
+-                     Index Cond: (unique2 = "*VALUES*".column1)
+-(10 rows)
++                                      QUERY PLAN                                       
++---------------------------------------------------------------------------------------
++ Finalize Aggregate
++   ->  Gather
++         Workers Planned: 2
++         ->  Partial Aggregate
++               ->  Nested Loop
++                     ->  Nested Loop
++                           ->  Parallel Index Only Scan using tenk1_unique1 on tenk1 a
++                           ->  Values Scan on "*VALUES*"
++                     ->  Memoize
++                           Cache Key: "*VALUES*".column1
++                           Cache Mode: logical
++                           ->  Index Only Scan using tenk1_unique2 on tenk1 b
++                                 Index Cond: (unique2 = "*VALUES*".column1)
++(13 rows)
+ 
+ select count(*) from tenk1 a,
+   tenk1 b join lateral (values(a.unique1),(-1)) ss(x) on b.unique2 = ss.x;
+@@ -9968,14 +9991,17 @@
+ EXPLAIN (COSTS OFF)
+ SELECT COUNT(*) FROM tenk1 t1, tenk1 t2
+ WHERE t2.thousand = t1.tenthous OR t2.thousand = t1.unique1 OR t2.thousand = t1.unique2;
+-                                       QUERY PLAN                                        
+------------------------------------------------------------------------------------------
+- Aggregate
+-   ->  Nested Loop
+-         ->  Seq Scan on tenk1 t1
+-         ->  Index Only Scan using tenk1_thous_tenthous on tenk1 t2
+-               Index Cond: (thousand = ANY (ARRAY[t1.tenthous, t1.unique1, t1.unique2]))
+-(5 rows)
++                                             QUERY PLAN                                              
++-----------------------------------------------------------------------------------------------------
++ Finalize Aggregate
++   ->  Gather
++         Workers Planned: 1
++         ->  Partial Aggregate
++               ->  Nested Loop
++                     ->  Parallel Seq Scan on tenk1 t1
++                     ->  Index Only Scan using tenk1_thous_tenthous on tenk1 t2
++                           Index Cond: (thousand = ANY (ARRAY[t1.tenthous, t1.unique1, t1.unique2]))
++(8 rows)
+ 
+ SELECT COUNT(*) FROM tenk1 t1, tenk1 t2
+ WHERE t2.thousand = t1.tenthous OR t2.thousand = t1.unique1 OR t2.thousand = t1.unique2;
+diff -U3 /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/portals.out /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/portals.out
+--- /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/portals.out	2026-10-07 06:41:12.220347815 +0000
++++ /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/portals.out	2026-10-08 08:30:02.822565916 +0000
+@@ -1493,11 +1493,10 @@
+ explain (costs off) declare c1 scroll cursor for select (select 42) as x;
+    QUERY PLAN   
+ ----------------
+- Materialize
++ Result
+    InitPlan 1
+      ->  Result
+-   ->  Result
+-(4 rows)
++(3 rows)
+ 
+ declare c1 scroll cursor for select (select 42) as x;
+ fetch all in c1;
+@@ -1522,12 +1521,11 @@
+ (2 rows)
+ 
+ explain (costs off) declare c2 scroll cursor for select generate_series(1,3) as g;
+-     QUERY PLAN     
+---------------------
+- Materialize
+-   ->  ProjectSet
+-         ->  Result
+-(3 rows)
++  QUERY PLAN  
++--------------
++ ProjectSet
++   ->  Result
++(2 rows)
+ 
+ declare c2 scroll cursor for select generate_series(1,3) as g;
+ fetch all in c2;
+diff -U3 /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/tidscan.out /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/tidscan.out
+--- /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/tidscan.out	2026-10-07 06:41:12.232347917 +0000
++++ /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/tidscan.out	2026-10-08 08:30:07.903611293 +0000
+@@ -238,15 +238,18 @@
+ -- appropriate place for these tests)
+ EXPLAIN (COSTS OFF)
+ SELECT count(*) FROM tenk1 t1 JOIN tenk1 t2 ON t1.ctid = t2.ctid;
+-               QUERY PLAN               
+-----------------------------------------
+- Aggregate
+-   ->  Hash Join
+-         Hash Cond: (t1.ctid = t2.ctid)
+-         ->  Seq Scan on tenk1 t1
+-         ->  Hash
+-               ->  Seq Scan on tenk1 t2
+-(6 rows)
++                         QUERY PLAN                          
++-------------------------------------------------------------
++ Finalize Aggregate
++   ->  Gather
++         Workers Planned: 1
++         ->  Partial Aggregate
++               ->  Parallel Hash Join
++                     Hash Cond: (t1.ctid = t2.ctid)
++                     ->  Parallel Seq Scan on tenk1 t1
++                     ->  Parallel Hash
++                           ->  Parallel Seq Scan on tenk1 t2
++(9 rows)
+ 
+ SELECT count(*) FROM tenk1 t1 JOIN tenk1 t2 ON t1.ctid = t2.ctid;
+  count 
+@@ -257,18 +260,21 @@
+ SET enable_hashjoin TO off;
+ EXPLAIN (COSTS OFF)
+ SELECT count(*) FROM tenk1 t1 JOIN tenk1 t2 ON t1.ctid = t2.ctid;
+-               QUERY PLAN                
+------------------------------------------
+- Aggregate
+-   ->  Merge Join
+-         Merge Cond: (t1.ctid = t2.ctid)
+-         ->  Sort
+-               Sort Key: t1.ctid
+-               ->  Seq Scan on tenk1 t1
+-         ->  Sort
+-               Sort Key: t2.ctid
+-               ->  Seq Scan on tenk1 t2
+-(9 rows)
++                         QUERY PLAN                          
++-------------------------------------------------------------
++ Finalize Aggregate
++   ->  Gather
++         Workers Planned: 1
++         ->  Partial Aggregate
++               ->  Merge Join
++                     Merge Cond: (t1.ctid = t2.ctid)
++                     ->  Sort
++                           Sort Key: t1.ctid
++                           ->  Parallel Seq Scan on tenk1 t1
++                     ->  Sort
++                           Sort Key: t2.ctid
++                           ->  Seq Scan on tenk1 t2
++(12 rows)
+ 
+ SELECT count(*) FROM tenk1 t1 JOIN tenk1 t2 ON t1.ctid = t2.ctid;
+  count 
+diff -U3 /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/incremental_sort.out /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/incremental_sort.out
+--- /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/incremental_sort.out	2026-10-07 06:41:12.201347653 +0000
++++ /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/incremental_sort.out	2026-10-08 08:30:08.122613249 +0000
+@@ -19,15 +19,17 @@
+ set work_mem to '2MB';
+ explain (costs off)
+ select * from (select * from tenk1 order by four) t order by four, ten;
+-            QUERY PLAN             
+------------------------------------
++                  QUERY PLAN                  
++----------------------------------------------
+  Incremental Sort
+    Sort Key: tenk1.four, tenk1.ten
+    Presorted Key: tenk1.four
+-   ->  Sort
+-         Sort Key: tenk1.four
+-         ->  Seq Scan on tenk1
+-(6 rows)
++   ->  Gather Merge
++         Workers Planned: 1
++         ->  Sort
++               Sort Key: tenk1.four
++               ->  Parallel Seq Scan on tenk1
++(8 rows)
+ 
+ reset work_mem;
+ create table t(a integer, b integer);
+@@ -1706,19 +1708,22 @@
+ select * from
+   (select * from tenk1 order by four) t1 join tenk1 t2 on t1.four = t2.four and t1.two = t2.two
+ order by t1.four, t1.two limit 1;
+-                              QUERY PLAN                               
+------------------------------------------------------------------------
++                        QUERY PLAN                        
++----------------------------------------------------------
+  Limit
+    ->  Merge Join
+-         Merge Cond: ((tenk1.four = t2.four) AND (tenk1.two = t2.two))
+-         ->  Incremental Sort
+-               Sort Key: tenk1.four, tenk1.two
+-               Presorted Key: tenk1.four
++         Merge Cond: (t2.four = tenk1.four)
++         Join Filter: (tenk1.two = t2.two)
++         ->  Gather Merge
++               Workers Planned: 1
+                ->  Sort
+-                     Sort Key: tenk1.four
+-                     ->  Seq Scan on tenk1
+-         ->  Sort
+-               Sort Key: t2.four, t2.two
+-               ->  Seq Scan on tenk1 t2
+-(12 rows)
++                     Sort Key: t2.four, t2.two
++                     ->  Parallel Seq Scan on tenk1 t2
++         ->  Materialize
++               ->  Gather Merge
++                     Workers Planned: 1
++                     ->  Sort
++                           Sort Key: tenk1.four
++                           ->  Parallel Seq Scan on tenk1
++(15 rows)
+ 
+diff -U3 /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/limit.out /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/limit.out
+--- /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/limit.out	2026-10-07 06:41:12.209347721 +0000
++++ /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/limit.out	2026-10-08 08:30:17.918700733 +0000
+@@ -471,12 +471,15 @@
+    Output: unique1, unique2, (generate_series(1, 10)), tenthous
+    ->  ProjectSet
+          Output: unique1, unique2, generate_series(1, 10), tenthous
+-         ->  Sort
++         ->  Gather Merge
+                Output: unique1, unique2, tenthous
+-               Sort Key: tenk1.tenthous
+-               ->  Seq Scan on public.tenk1
++               Workers Planned: 1
++               ->  Sort
+                      Output: unique1, unique2, tenthous
+-(9 rows)
++                     Sort Key: tenk1.tenthous
++                     ->  Parallel Seq Scan on public.tenk1
++                           Output: unique1, unique2, tenthous
++(12 rows)
+ 
+ select unique1, unique2, generate_series(1,10)
+   from tenk1 order by tenthous limit 7;
+diff -U3 /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/partition_join.out /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/partition_join.out
+--- /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/partition_join.out	2026-10-07 06:41:12.217347789 +0000
++++ /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/partition_join.out	2026-10-08 08:30:23.078746814 +0000
+@@ -549,25 +549,27 @@
+ SELECT * FROM prt1 t1 JOIN LATERAL
+ 			  (SELECT * FROM prt1 t2 TABLESAMPLE SYSTEM (t1.a) REPEATABLE(t1.b)) s
+ 			  ON t1.a = s.a;
+-                         QUERY PLAN                          
+--------------------------------------------------------------
+- Append
+-   ->  Nested Loop
+-         ->  Seq Scan on prt1_p1 t1_1
+-         ->  Sample Scan on prt1_p1 t2_1
+-               Sampling: system (t1_1.a) REPEATABLE (t1_1.b)
+-               Filter: (t1_1.a = a)
+-   ->  Nested Loop
+-         ->  Seq Scan on prt1_p2 t1_2
+-         ->  Sample Scan on prt1_p2 t2_2
+-               Sampling: system (t1_2.a) REPEATABLE (t1_2.b)
+-               Filter: (t1_2.a = a)
+-   ->  Nested Loop
+-         ->  Seq Scan on prt1_p3 t1_3
+-         ->  Sample Scan on prt1_p3 t2_3
+-               Sampling: system (t1_3.a) REPEATABLE (t1_3.b)
+-               Filter: (t1_3.a = a)
+-(16 rows)
++                            QUERY PLAN                             
++-------------------------------------------------------------------
++ Gather
++   Workers Planned: 2
++   ->  Parallel Append
++         ->  Nested Loop
++               ->  Parallel Seq Scan on prt1_p1 t1_1
++               ->  Sample Scan on prt1_p1 t2_1
++                     Sampling: system (t1_1.a) REPEATABLE (t1_1.b)
++                     Filter: (t1_1.a = a)
++         ->  Nested Loop
++               ->  Parallel Seq Scan on prt1_p2 t1_2
++               ->  Sample Scan on prt1_p2 t2_2
++                     Sampling: system (t1_2.a) REPEATABLE (t1_2.b)
++                     Filter: (t1_2.a = a)
++         ->  Nested Loop
++               ->  Parallel Seq Scan on prt1_p3 t1_3
++               ->  Sample Scan on prt1_p3 t2_3
++                     Sampling: system (t1_3.a) REPEATABLE (t1_3.b)
++                     Filter: (t1_3.a = a)
++(18 rows)
+ 
+ -- lateral reference in scan's restriction clauses
+ EXPLAIN (COSTS OFF)
+@@ -2164,35 +2166,37 @@
+ SELECT * FROM prt1_l t1 JOIN LATERAL
+ 			  (SELECT * FROM prt1_l t2 TABLESAMPLE SYSTEM (t1.a) REPEATABLE(t1.b)) s
+ 			  ON t1.a = s.a AND t1.b = s.b AND t1.c = s.c;
+-                                       QUERY PLAN                                       
+-----------------------------------------------------------------------------------------
+- Append
+-   ->  Nested Loop
+-         ->  Seq Scan on prt1_l_p1 t1_1
+-         ->  Sample Scan on prt1_l_p1 t2_1
+-               Sampling: system (t1_1.a) REPEATABLE (t1_1.b)
+-               Filter: ((t1_1.a = a) AND (t1_1.b = b) AND ((t1_1.c)::text = (c)::text))
+-   ->  Nested Loop
+-         ->  Seq Scan on prt1_l_p2_p1 t1_2
+-         ->  Sample Scan on prt1_l_p2_p1 t2_2
+-               Sampling: system (t1_2.a) REPEATABLE (t1_2.b)
+-               Filter: ((t1_2.a = a) AND (t1_2.b = b) AND ((t1_2.c)::text = (c)::text))
+-   ->  Nested Loop
+-         ->  Seq Scan on prt1_l_p2_p2 t1_3
+-         ->  Sample Scan on prt1_l_p2_p2 t2_3
+-               Sampling: system (t1_3.a) REPEATABLE (t1_3.b)
+-               Filter: ((t1_3.a = a) AND (t1_3.b = b) AND ((t1_3.c)::text = (c)::text))
+-   ->  Nested Loop
+-         ->  Seq Scan on prt1_l_p3_p1 t1_4
+-         ->  Sample Scan on prt1_l_p3_p1 t2_4
+-               Sampling: system (t1_4.a) REPEATABLE (t1_4.b)
+-               Filter: ((t1_4.a = a) AND (t1_4.b = b) AND ((t1_4.c)::text = (c)::text))
+-   ->  Nested Loop
+-         ->  Seq Scan on prt1_l_p3_p2 t1_5
+-         ->  Sample Scan on prt1_l_p3_p2 t2_5
+-               Sampling: system (t1_5.a) REPEATABLE (t1_5.b)
+-               Filter: ((t1_5.a = a) AND (t1_5.b = b) AND ((t1_5.c)::text = (c)::text))
+-(26 rows)
++                                          QUERY PLAN                                          
++----------------------------------------------------------------------------------------------
++ Gather
++   Workers Planned: 2
++   ->  Parallel Append
++         ->  Nested Loop
++               ->  Parallel Seq Scan on prt1_l_p1 t1_1
++               ->  Sample Scan on prt1_l_p1 t2_1
++                     Sampling: system (t1_1.a) REPEATABLE (t1_1.b)
++                     Filter: ((t1_1.a = a) AND (t1_1.b = b) AND ((t1_1.c)::text = (c)::text))
++         ->  Nested Loop
++               ->  Parallel Seq Scan on prt1_l_p2_p2 t1_3
++               ->  Sample Scan on prt1_l_p2_p2 t2_3
++                     Sampling: system (t1_3.a) REPEATABLE (t1_3.b)
++                     Filter: ((t1_3.a = a) AND (t1_3.b = b) AND ((t1_3.c)::text = (c)::text))
++         ->  Nested Loop
++               ->  Parallel Seq Scan on prt1_l_p2_p1 t1_2
++               ->  Sample Scan on prt1_l_p2_p1 t2_2
++                     Sampling: system (t1_2.a) REPEATABLE (t1_2.b)
++                     Filter: ((t1_2.a = a) AND (t1_2.b = b) AND ((t1_2.c)::text = (c)::text))
++         ->  Nested Loop
++               ->  Parallel Seq Scan on prt1_l_p3_p1 t1_4
++               ->  Sample Scan on prt1_l_p3_p1 t2_4
++                     Sampling: system (t1_4.a) REPEATABLE (t1_4.b)
++                     Filter: ((t1_4.a = a) AND (t1_4.b = b) AND ((t1_4.c)::text = (c)::text))
++         ->  Nested Loop
++               ->  Parallel Seq Scan on prt1_l_p3_p2 t1_5
++               ->  Sample Scan on prt1_l_p3_p2 t2_5
++                     Sampling: system (t1_5.a) REPEATABLE (t1_5.b)
++                     Filter: ((t1_5.a = a) AND (t1_5.b = b) AND ((t1_5.c)::text = (c)::text))
++(28 rows)
+ 
+ -- partitionwise join with lateral reference in scan's restriction clauses
+ EXPLAIN (COSTS OFF)
+@@ -2200,31 +2204,33 @@
+ 			  (SELECT t1.b AS t1b, t2.* FROM prt2_l t2) s
+ 			  ON t1.a = s.b AND t1.b = s.a AND t1.c = s.c
+ 			  WHERE s.t1b = s.a;
+-                                                  QUERY PLAN                                                   
+----------------------------------------------------------------------------------------------------------------
++                                                     QUERY PLAN                                                      
++---------------------------------------------------------------------------------------------------------------------
+  Aggregate
+-   ->  Append
+-         ->  Nested Loop
+-               ->  Seq Scan on prt1_l_p1 t1_1
+-               ->  Seq Scan on prt2_l_p1 t2_1
+-                     Filter: ((a = t1_1.b) AND (t1_1.a = b) AND (t1_1.b = a) AND ((t1_1.c)::text = (c)::text))
+-         ->  Nested Loop
+-               ->  Seq Scan on prt1_l_p2_p1 t1_2
+-               ->  Seq Scan on prt2_l_p2_p1 t2_2
+-                     Filter: ((a = t1_2.b) AND (t1_2.a = b) AND (t1_2.b = a) AND ((t1_2.c)::text = (c)::text))
+-         ->  Nested Loop
+-               ->  Seq Scan on prt1_l_p2_p2 t1_3
+-               ->  Seq Scan on prt2_l_p2_p2 t2_3
+-                     Filter: ((a = t1_3.b) AND (t1_3.a = b) AND (t1_3.b = a) AND ((t1_3.c)::text = (c)::text))
+-         ->  Nested Loop
+-               ->  Seq Scan on prt1_l_p3_p1 t1_4
+-               ->  Seq Scan on prt2_l_p3_p1 t2_4
+-                     Filter: ((a = t1_4.b) AND (t1_4.a = b) AND (t1_4.b = a) AND ((t1_4.c)::text = (c)::text))
+-         ->  Nested Loop
+-               ->  Seq Scan on prt1_l_p3_p2 t1_5
+-               ->  Seq Scan on prt2_l_p3_p2 t2_5
+-                     Filter: ((a = t1_5.b) AND (t1_5.a = b) AND (t1_5.b = a) AND ((t1_5.c)::text = (c)::text))
+-(22 rows)
++   ->  Gather
++         Workers Planned: 2
++         ->  Parallel Append
++               ->  Nested Loop
++                     ->  Parallel Seq Scan on prt1_l_p1 t1_1
++                     ->  Seq Scan on prt2_l_p1 t2_1
++                           Filter: ((a = t1_1.b) AND (t1_1.a = b) AND (t1_1.b = a) AND ((t1_1.c)::text = (c)::text))
++               ->  Nested Loop
++                     ->  Parallel Seq Scan on prt1_l_p2_p2 t1_3
++                     ->  Seq Scan on prt2_l_p2_p2 t2_3
++                           Filter: ((a = t1_3.b) AND (t1_3.a = b) AND (t1_3.b = a) AND ((t1_3.c)::text = (c)::text))
++               ->  Nested Loop
++                     ->  Parallel Seq Scan on prt1_l_p2_p1 t1_2
++                     ->  Seq Scan on prt2_l_p2_p1 t2_2
++                           Filter: ((a = t1_2.b) AND (t1_2.a = b) AND (t1_2.b = a) AND ((t1_2.c)::text = (c)::text))
++               ->  Nested Loop
++                     ->  Parallel Seq Scan on prt1_l_p3_p1 t1_4
++                     ->  Seq Scan on prt2_l_p3_p1 t2_4
++                           Filter: ((a = t1_4.b) AND (t1_4.a = b) AND (t1_4.b = a) AND ((t1_4.c)::text = (c)::text))
++               ->  Nested Loop
++                     ->  Parallel Seq Scan on prt1_l_p3_p2 t1_5
++                     ->  Seq Scan on prt2_l_p3_p2 t2_5
++                           Filter: ((a = t1_5.b) AND (t1_5.a = b) AND (t1_5.b = a) AND ((t1_5.c)::text = (c)::text))
++(24 rows)
+ 
+ SELECT COUNT(*) FROM prt1_l t1 LEFT JOIN LATERAL
+ 			  (SELECT t1.b AS t1b, t2.* FROM prt2_l t2) s
+diff -U3 /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/partition_prune.out /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/partition_prune.out
+--- /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/partition_prune.out	2026-10-07 06:41:12.218347797 +0000
++++ /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/partition_prune.out	2026-10-08 08:30:22.647742965 +0000
+@@ -246,40 +246,42 @@
+ (2 rows)
+ 
+ explain (costs off) select * from rlp where a = 1::numeric;		/* no pruning */
+-                  QUERY PLAN                   
+------------------------------------------------
+- Append
+-   ->  Seq Scan on rlp1 rlp_1
+-         Filter: ((a)::numeric = '1'::numeric)
+-   ->  Seq Scan on rlp2 rlp_2
+-         Filter: ((a)::numeric = '1'::numeric)
+-   ->  Seq Scan on rlp3abcd rlp_3
+-         Filter: ((a)::numeric = '1'::numeric)
+-   ->  Seq Scan on rlp3efgh rlp_4
+-         Filter: ((a)::numeric = '1'::numeric)
+-   ->  Seq Scan on rlp3nullxy rlp_5
+-         Filter: ((a)::numeric = '1'::numeric)
+-   ->  Seq Scan on rlp3_default rlp_6
+-         Filter: ((a)::numeric = '1'::numeric)
+-   ->  Seq Scan on rlp4_1 rlp_7
+-         Filter: ((a)::numeric = '1'::numeric)
+-   ->  Seq Scan on rlp4_2 rlp_8
+-         Filter: ((a)::numeric = '1'::numeric)
+-   ->  Seq Scan on rlp4_default rlp_9
+-         Filter: ((a)::numeric = '1'::numeric)
+-   ->  Seq Scan on rlp5_1 rlp_10
+-         Filter: ((a)::numeric = '1'::numeric)
+-   ->  Seq Scan on rlp5_default rlp_11
+-         Filter: ((a)::numeric = '1'::numeric)
+-   ->  Seq Scan on rlp_default_10 rlp_12
+-         Filter: ((a)::numeric = '1'::numeric)
+-   ->  Seq Scan on rlp_default_30 rlp_13
+-         Filter: ((a)::numeric = '1'::numeric)
+-   ->  Seq Scan on rlp_default_null rlp_14
+-         Filter: ((a)::numeric = '1'::numeric)
+-   ->  Seq Scan on rlp_default_default rlp_15
+-         Filter: ((a)::numeric = '1'::numeric)
+-(31 rows)
++                         QUERY PLAN                          
++-------------------------------------------------------------
++ Gather
++   Workers Planned: 3
++   ->  Parallel Append
++         ->  Parallel Seq Scan on rlp1 rlp_1
++               Filter: ((a)::numeric = '1'::numeric)
++         ->  Parallel Seq Scan on rlp2 rlp_2
++               Filter: ((a)::numeric = '1'::numeric)
++         ->  Parallel Seq Scan on rlp3abcd rlp_3
++               Filter: ((a)::numeric = '1'::numeric)
++         ->  Parallel Seq Scan on rlp3efgh rlp_4
++               Filter: ((a)::numeric = '1'::numeric)
++         ->  Parallel Seq Scan on rlp3nullxy rlp_5
++               Filter: ((a)::numeric = '1'::numeric)
++         ->  Parallel Seq Scan on rlp3_default rlp_6
++               Filter: ((a)::numeric = '1'::numeric)
++         ->  Parallel Seq Scan on rlp4_1 rlp_7
++               Filter: ((a)::numeric = '1'::numeric)
++         ->  Parallel Seq Scan on rlp4_2 rlp_8
++               Filter: ((a)::numeric = '1'::numeric)
++         ->  Parallel Seq Scan on rlp4_default rlp_9
++               Filter: ((a)::numeric = '1'::numeric)
++         ->  Parallel Seq Scan on rlp5_1 rlp_10
++               Filter: ((a)::numeric = '1'::numeric)
++         ->  Parallel Seq Scan on rlp5_default rlp_11
++               Filter: ((a)::numeric = '1'::numeric)
++         ->  Parallel Seq Scan on rlp_default_10 rlp_12
++               Filter: ((a)::numeric = '1'::numeric)
++         ->  Parallel Seq Scan on rlp_default_30 rlp_13
++               Filter: ((a)::numeric = '1'::numeric)
++         ->  Parallel Seq Scan on rlp_default_null rlp_14
++               Filter: ((a)::numeric = '1'::numeric)
++         ->  Parallel Seq Scan on rlp_default_default rlp_15
++               Filter: ((a)::numeric = '1'::numeric)
++(33 rows)
+ 
+ explain (costs off) select * from rlp where a <= 10;
+                  QUERY PLAN                  
+@@ -907,18 +909,20 @@
+ (9 rows)
+ 
+ explain (costs off) select * from mc3p where (a = 1 and abs(b) = 1 and c = 1) or (a = 10 and abs(b) = 5 and c = 10) or (a > 11 and a < 20);
+-                                                           QUERY PLAN                                                            
+----------------------------------------------------------------------------------------------------------------------------------
+- Append
+-   ->  Seq Scan on mc3p1 mc3p_1
+-         Filter: (((a = 1) AND (abs(b) = 1) AND (c = 1)) OR ((a = 10) AND (abs(b) = 5) AND (c = 10)) OR ((a > 11) AND (a < 20)))
+-   ->  Seq Scan on mc3p2 mc3p_2
+-         Filter: (((a = 1) AND (abs(b) = 1) AND (c = 1)) OR ((a = 10) AND (abs(b) = 5) AND (c = 10)) OR ((a > 11) AND (a < 20)))
+-   ->  Seq Scan on mc3p5 mc3p_3
+-         Filter: (((a = 1) AND (abs(b) = 1) AND (c = 1)) OR ((a = 10) AND (abs(b) = 5) AND (c = 10)) OR ((a > 11) AND (a < 20)))
+-   ->  Seq Scan on mc3p_default mc3p_4
+-         Filter: (((a = 1) AND (abs(b) = 1) AND (c = 1)) OR ((a = 10) AND (abs(b) = 5) AND (c = 10)) OR ((a > 11) AND (a < 20)))
+-(9 rows)
++                                                              QUERY PLAN                                                               
++---------------------------------------------------------------------------------------------------------------------------------------
++ Gather
++   Workers Planned: 3
++   ->  Parallel Append
++         ->  Parallel Seq Scan on mc3p1 mc3p_1
++               Filter: (((a = 1) AND (abs(b) = 1) AND (c = 1)) OR ((a = 10) AND (abs(b) = 5) AND (c = 10)) OR ((a > 11) AND (a < 20)))
++         ->  Parallel Seq Scan on mc3p2 mc3p_2
++               Filter: (((a = 1) AND (abs(b) = 1) AND (c = 1)) OR ((a = 10) AND (abs(b) = 5) AND (c = 10)) OR ((a > 11) AND (a < 20)))
++         ->  Parallel Seq Scan on mc3p5 mc3p_3
++               Filter: (((a = 1) AND (abs(b) = 1) AND (c = 1)) OR ((a = 10) AND (abs(b) = 5) AND (c = 10)) OR ((a > 11) AND (a < 20)))
++         ->  Parallel Seq Scan on mc3p_default mc3p_4
++               Filter: (((a = 1) AND (abs(b) = 1) AND (c = 1)) OR ((a = 10) AND (abs(b) = 5) AND (c = 10)) OR ((a > 11) AND (a < 20)))
++(11 rows)
+ 
+ explain (costs off) select * from mc3p where (a = 1 and abs(b) = 1 and c = 1) or (a = 10 and abs(b) = 5 and c = 10) or (a > 11 and a < 20) or a < 1;
+                                                                  QUERY PLAN                                                                 
+@@ -953,46 +957,50 @@
+ (11 rows)
+ 
+ explain (costs off) select * from mc3p where a = 1 or abs(b) = 1 or c = 1;
+-                      QUERY PLAN                      
+-------------------------------------------------------
+- Append
+-   ->  Seq Scan on mc3p0 mc3p_1
+-         Filter: ((a = 1) OR (abs(b) = 1) OR (c = 1))
+-   ->  Seq Scan on mc3p1 mc3p_2
+-         Filter: ((a = 1) OR (abs(b) = 1) OR (c = 1))
+-   ->  Seq Scan on mc3p2 mc3p_3
+-         Filter: ((a = 1) OR (abs(b) = 1) OR (c = 1))
+-   ->  Seq Scan on mc3p3 mc3p_4
+-         Filter: ((a = 1) OR (abs(b) = 1) OR (c = 1))
+-   ->  Seq Scan on mc3p4 mc3p_5
+-         Filter: ((a = 1) OR (abs(b) = 1) OR (c = 1))
+-   ->  Seq Scan on mc3p5 mc3p_6
+-         Filter: ((a = 1) OR (abs(b) = 1) OR (c = 1))
+-   ->  Seq Scan on mc3p6 mc3p_7
+-         Filter: ((a = 1) OR (abs(b) = 1) OR (c = 1))
+-   ->  Seq Scan on mc3p7 mc3p_8
+-         Filter: ((a = 1) OR (abs(b) = 1) OR (c = 1))
+-   ->  Seq Scan on mc3p_default mc3p_9
+-         Filter: ((a = 1) OR (abs(b) = 1) OR (c = 1))
+-(19 rows)
++                         QUERY PLAN                         
++------------------------------------------------------------
++ Gather
++   Workers Planned: 4
++   ->  Parallel Append
++         ->  Parallel Seq Scan on mc3p0 mc3p_1
++               Filter: ((a = 1) OR (abs(b) = 1) OR (c = 1))
++         ->  Parallel Seq Scan on mc3p1 mc3p_2
++               Filter: ((a = 1) OR (abs(b) = 1) OR (c = 1))
++         ->  Parallel Seq Scan on mc3p2 mc3p_3
++               Filter: ((a = 1) OR (abs(b) = 1) OR (c = 1))
++         ->  Parallel Seq Scan on mc3p3 mc3p_4
++               Filter: ((a = 1) OR (abs(b) = 1) OR (c = 1))
++         ->  Parallel Seq Scan on mc3p4 mc3p_5
++               Filter: ((a = 1) OR (abs(b) = 1) OR (c = 1))
++         ->  Parallel Seq Scan on mc3p5 mc3p_6
++               Filter: ((a = 1) OR (abs(b) = 1) OR (c = 1))
++         ->  Parallel Seq Scan on mc3p6 mc3p_7
++               Filter: ((a = 1) OR (abs(b) = 1) OR (c = 1))
++         ->  Parallel Seq Scan on mc3p7 mc3p_8
++               Filter: ((a = 1) OR (abs(b) = 1) OR (c = 1))
++         ->  Parallel Seq Scan on mc3p_default mc3p_9
++               Filter: ((a = 1) OR (abs(b) = 1) OR (c = 1))
++(21 rows)
+ 
+ explain (costs off) select * from mc3p where (a = 1 and abs(b) = 1) or (a = 10 and abs(b) = 10);
+-                                  QUERY PLAN                                  
+-------------------------------------------------------------------------------
+- Append
+-   ->  Seq Scan on mc3p0 mc3p_1
+-         Filter: (((a = 1) AND (abs(b) = 1)) OR ((a = 10) AND (abs(b) = 10)))
+-   ->  Seq Scan on mc3p1 mc3p_2
+-         Filter: (((a = 1) AND (abs(b) = 1)) OR ((a = 10) AND (abs(b) = 10)))
+-   ->  Seq Scan on mc3p2 mc3p_3
+-         Filter: (((a = 1) AND (abs(b) = 1)) OR ((a = 10) AND (abs(b) = 10)))
+-   ->  Seq Scan on mc3p3 mc3p_4
+-         Filter: (((a = 1) AND (abs(b) = 1)) OR ((a = 10) AND (abs(b) = 10)))
+-   ->  Seq Scan on mc3p4 mc3p_5
+-         Filter: (((a = 1) AND (abs(b) = 1)) OR ((a = 10) AND (abs(b) = 10)))
+-   ->  Seq Scan on mc3p_default mc3p_6
+-         Filter: (((a = 1) AND (abs(b) = 1)) OR ((a = 10) AND (abs(b) = 10)))
+-(13 rows)
++                                     QUERY PLAN                                     
++------------------------------------------------------------------------------------
++ Gather
++   Workers Planned: 3
++   ->  Parallel Append
++         ->  Parallel Seq Scan on mc3p0 mc3p_1
++               Filter: (((a = 1) AND (abs(b) = 1)) OR ((a = 10) AND (abs(b) = 10)))
++         ->  Parallel Seq Scan on mc3p1 mc3p_2
++               Filter: (((a = 1) AND (abs(b) = 1)) OR ((a = 10) AND (abs(b) = 10)))
++         ->  Parallel Seq Scan on mc3p2 mc3p_3
++               Filter: (((a = 1) AND (abs(b) = 1)) OR ((a = 10) AND (abs(b) = 10)))
++         ->  Parallel Seq Scan on mc3p3 mc3p_4
++               Filter: (((a = 1) AND (abs(b) = 1)) OR ((a = 10) AND (abs(b) = 10)))
++         ->  Parallel Seq Scan on mc3p4 mc3p_5
++               Filter: (((a = 1) AND (abs(b) = 1)) OR ((a = 10) AND (abs(b) = 10)))
++         ->  Parallel Seq Scan on mc3p_default mc3p_6
++               Filter: (((a = 1) AND (abs(b) = 1)) OR ((a = 10) AND (abs(b) = 10)))
++(15 rows)
+ 
+ explain (costs off) select * from mc3p where (a = 1 and abs(b) = 1) or (a = 10 and abs(b) = 9);
+                                  QUERY PLAN                                  
+@@ -2203,36 +2211,42 @@
+ prepare ab_q1 (int, int, int) as
+ select * from ab where a between $1 and $2 and b <= $3;
+ explain (analyze, costs off, summary off, timing off, buffers off) execute ab_q1 (2, 2, 3);
+-                         QUERY PLAN                         
+-------------------------------------------------------------
+- Append (actual rows=0.00 loops=1)
+-   Subplans Removed: 6
+-   ->  Seq Scan on ab_a2_b1 ab_1 (actual rows=0.00 loops=1)
+-         Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
+-   ->  Seq Scan on ab_a2_b2 ab_2 (actual rows=0.00 loops=1)
+-         Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
+-   ->  Seq Scan on ab_a2_b3 ab_3 (actual rows=0.00 loops=1)
+-         Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
+-(8 rows)
++                                QUERY PLAN                                 
++---------------------------------------------------------------------------
++ Gather (actual rows=0.00 loops=1)
++   Workers Planned: 2
++   Workers Launched: 2
++   ->  Parallel Append (actual rows=0.00 loops=3)
++         Subplans Removed: 6
++         ->  Parallel Seq Scan on ab_a2_b1 ab_1 (actual rows=0.00 loops=1)
++               Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
++         ->  Parallel Seq Scan on ab_a2_b2 ab_2 (actual rows=0.00 loops=1)
++               Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
++         ->  Parallel Seq Scan on ab_a2_b3 ab_3 (actual rows=0.00 loops=1)
++               Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
++(11 rows)
+ 
+ explain (analyze, costs off, summary off, timing off, buffers off) execute ab_q1 (1, 2, 3);
+-                         QUERY PLAN                         
+-------------------------------------------------------------
+- Append (actual rows=0.00 loops=1)
+-   Subplans Removed: 3
+-   ->  Seq Scan on ab_a1_b1 ab_1 (actual rows=0.00 loops=1)
+-         Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
+-   ->  Seq Scan on ab_a1_b2 ab_2 (actual rows=0.00 loops=1)
+-         Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
+-   ->  Seq Scan on ab_a1_b3 ab_3 (actual rows=0.00 loops=1)
+-         Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
+-   ->  Seq Scan on ab_a2_b1 ab_4 (actual rows=0.00 loops=1)
+-         Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
+-   ->  Seq Scan on ab_a2_b2 ab_5 (actual rows=0.00 loops=1)
+-         Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
+-   ->  Seq Scan on ab_a2_b3 ab_6 (actual rows=0.00 loops=1)
+-         Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
+-(14 rows)
++                                QUERY PLAN                                 
++---------------------------------------------------------------------------
++ Gather (actual rows=0.00 loops=1)
++   Workers Planned: 2
++   Workers Launched: 2
++   ->  Parallel Append (actual rows=0.00 loops=3)
++         Subplans Removed: 3
++         ->  Parallel Seq Scan on ab_a1_b1 ab_1 (actual rows=0.00 loops=1)
++               Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
++         ->  Parallel Seq Scan on ab_a1_b2 ab_2 (actual rows=0.00 loops=1)
++               Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
++         ->  Parallel Seq Scan on ab_a1_b3 ab_3 (actual rows=0.00 loops=1)
++               Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
++         ->  Parallel Seq Scan on ab_a2_b1 ab_4 (actual rows=0.00 loops=1)
++               Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
++         ->  Parallel Seq Scan on ab_a2_b2 ab_5 (actual rows=0.00 loops=1)
++               Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
++         ->  Parallel Seq Scan on ab_a2_b3 ab_6 (actual rows=0.00 loops=1)
++               Filter: ((a >= $1) AND (a <= $2) AND (b <= $3))
++(17 rows)
+ 
+ deallocate ab_q1;
+ -- Runtime pruning after optimizer pruning
+@@ -2269,37 +2283,43 @@
+ prepare ab_q2 (int, int) as
+ select a from ab where a between $1 and $2 and b < (select 3);
+ explain (analyze, costs off, summary off, timing off, buffers off) execute ab_q2 (2, 2);
+-                              QUERY PLAN                               
+------------------------------------------------------------------------
+- Append (actual rows=0.00 loops=1)
+-   Subplans Removed: 6
++                                 QUERY PLAN                                  
++-----------------------------------------------------------------------------
++ Gather (actual rows=0.00 loops=1)
++   Workers Planned: 2
++   Workers Launched: 2
+    InitPlan 1
+      ->  Result (actual rows=1.00 loops=1)
+-   ->  Seq Scan on ab_a2_b1 ab_1 (actual rows=0.00 loops=1)
+-         Filter: ((a >= $1) AND (a <= $2) AND (b < (InitPlan 1).col1))
+-   ->  Seq Scan on ab_a2_b2 ab_2 (actual rows=0.00 loops=1)
+-         Filter: ((a >= $1) AND (a <= $2) AND (b < (InitPlan 1).col1))
+-   ->  Seq Scan on ab_a2_b3 ab_3 (never executed)
+-         Filter: ((a >= $1) AND (a <= $2) AND (b < (InitPlan 1).col1))
+-(10 rows)
++   ->  Parallel Append (actual rows=0.00 loops=3)
++         Subplans Removed: 6
++         ->  Parallel Seq Scan on ab_a2_b1 ab_1 (actual rows=0.00 loops=1)
++               Filter: ((a >= $1) AND (a <= $2) AND (b < (InitPlan 1).col1))
++         ->  Parallel Seq Scan on ab_a2_b2 ab_2 (actual rows=0.00 loops=1)
++               Filter: ((a >= $1) AND (a <= $2) AND (b < (InitPlan 1).col1))
++         ->  Parallel Seq Scan on ab_a2_b3 ab_3 (never executed)
++               Filter: ((a >= $1) AND (a <= $2) AND (b < (InitPlan 1).col1))
++(13 rows)
+ 
+ -- As above, but swap the PARAM_EXEC Param to the first partition level
+ prepare ab_q3 (int, int) as
+ select a from ab where b between $1 and $2 and a < (select 3);
+ explain (analyze, costs off, summary off, timing off, buffers off) execute ab_q3 (2, 2);
+-                              QUERY PLAN                               
+------------------------------------------------------------------------
+- Append (actual rows=0.00 loops=1)
+-   Subplans Removed: 6
++                                 QUERY PLAN                                  
++-----------------------------------------------------------------------------
++ Gather (actual rows=0.00 loops=1)
++   Workers Planned: 2
++   Workers Launched: 2
+    InitPlan 1
+      ->  Result (actual rows=1.00 loops=1)
+-   ->  Seq Scan on ab_a1_b2 ab_1 (actual rows=0.00 loops=1)
+-         Filter: ((b >= $1) AND (b <= $2) AND (a < (InitPlan 1).col1))
+-   ->  Seq Scan on ab_a2_b2 ab_2 (actual rows=0.00 loops=1)
+-         Filter: ((b >= $1) AND (b <= $2) AND (a < (InitPlan 1).col1))
+-   ->  Seq Scan on ab_a3_b2 ab_3 (never executed)
+-         Filter: ((b >= $1) AND (b <= $2) AND (a < (InitPlan 1).col1))
+-(10 rows)
++   ->  Parallel Append (actual rows=0.00 loops=3)
++         Subplans Removed: 6
++         ->  Parallel Seq Scan on ab_a1_b2 ab_1 (actual rows=0.00 loops=1)
++               Filter: ((b >= $1) AND (b <= $2) AND (a < (InitPlan 1).col1))
++         ->  Parallel Seq Scan on ab_a2_b2 ab_2 (actual rows=0.00 loops=1)
++               Filter: ((b >= $1) AND (b <= $2) AND (a < (InitPlan 1).col1))
++         ->  Parallel Seq Scan on ab_a3_b2 ab_3 (never executed)
++               Filter: ((b >= $1) AND (b <= $2) AND (a < (InitPlan 1).col1))
++(13 rows)
+ 
+ --
+ -- Test runtime pruning with hash partitioned tables
+@@ -2898,28 +2918,31 @@
+ ) ab where a = $1 and b = (select -10);
+ -- Ensure the xy_1 subplan is not pruned.
+ explain (analyze, costs off, summary off, timing off, buffers off) execute ab_q6(1);
+-                       QUERY PLAN                       
+---------------------------------------------------------
+- Append (actual rows=0.00 loops=1)
+-   Subplans Removed: 12
++                            QUERY PLAN                            
++------------------------------------------------------------------
++ Gather (actual rows=0.00 loops=1)
++   Workers Planned: 2
++   Workers Launched: 2
+    InitPlan 1
+      ->  Result (actual rows=1.00 loops=1)
+-   ->  Seq Scan on ab_a1_b1 ab_1 (never executed)
+-         Filter: ((a = $1) AND (b = (InitPlan 1).col1))
+-   ->  Seq Scan on ab_a1_b2 ab_2 (never executed)
+-         Filter: ((a = $1) AND (b = (InitPlan 1).col1))
+-   ->  Seq Scan on ab_a1_b3 ab_3 (never executed)
+-         Filter: ((a = $1) AND (b = (InitPlan 1).col1))
+-   ->  Seq Scan on xy_1 (actual rows=0.00 loops=1)
+-         Filter: ((x = $1) AND (y = (InitPlan 1).col1))
+-         Rows Removed by Filter: 1
+-   ->  Seq Scan on ab_a1_b1 ab_4 (never executed)
+-         Filter: ((a = $1) AND (b = (InitPlan 1).col1))
+-   ->  Seq Scan on ab_a1_b2 ab_5 (never executed)
+-         Filter: ((a = $1) AND (b = (InitPlan 1).col1))
+-   ->  Seq Scan on ab_a1_b3 ab_6 (never executed)
+-         Filter: ((a = $1) AND (b = (InitPlan 1).col1))
+-(19 rows)
++   ->  Parallel Append (actual rows=0.00 loops=3)
++         Subplans Removed: 12
++         ->  Parallel Seq Scan on xy_1 (actual rows=0.00 loops=1)
++               Filter: ((x = $1) AND (y = (InitPlan 1).col1))
++               Rows Removed by Filter: 1
++         ->  Parallel Seq Scan on ab_a1_b1 ab_1 (never executed)
++               Filter: ((a = $1) AND (b = (InitPlan 1).col1))
++         ->  Parallel Seq Scan on ab_a1_b2 ab_2 (never executed)
++               Filter: ((a = $1) AND (b = (InitPlan 1).col1))
++         ->  Parallel Seq Scan on ab_a1_b3 ab_3 (never executed)
++               Filter: ((a = $1) AND (b = (InitPlan 1).col1))
++         ->  Parallel Seq Scan on ab_a1_b1 ab_4 (never executed)
++               Filter: ((a = $1) AND (b = (InitPlan 1).col1))
++         ->  Parallel Seq Scan on ab_a1_b2 ab_5 (never executed)
++               Filter: ((a = $1) AND (b = (InitPlan 1).col1))
++         ->  Parallel Seq Scan on ab_a1_b3 ab_6 (never executed)
++               Filter: ((a = $1) AND (b = (InitPlan 1).col1))
++(22 rows)
+ 
+ -- Ensure we see just the xy_1 row.
+ execute ab_q6(100);
+diff -U3 /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/partition_aggregate.out /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/partition_aggregate.out
+--- /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/partition_aggregate.out	2026-10-07 06:41:12.216347781 +0000
++++ /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/partition_aggregate.out	2026-10-08 08:30:22.153738553 +0000
+@@ -1062,40 +1062,42 @@
+ -- PARTITION KEY, thus we will have a partial aggregation for them.
+ EXPLAIN (COSTS OFF)
+ SELECT a, sum(b), count(*) FROM pagg_tab_ml GROUP BY a HAVING avg(b) < 3 ORDER BY 1, 2, 3;
+-                                   QUERY PLAN                                    
+----------------------------------------------------------------------------------
++                                      QUERY PLAN                                       
++---------------------------------------------------------------------------------------
+  Sort
+    Sort Key: pagg_tab_ml.a, (sum(pagg_tab_ml.b)), (count(*))
+-   ->  Append
+-         ->  HashAggregate
+-               Group Key: pagg_tab_ml.a
+-               Filter: (avg(pagg_tab_ml.b) < '3'::numeric)
+-               ->  Seq Scan on pagg_tab_ml_p1 pagg_tab_ml
+-         ->  Finalize GroupAggregate
+-               Group Key: pagg_tab_ml_2.a
+-               Filter: (avg(pagg_tab_ml_2.b) < '3'::numeric)
+-               ->  Sort
+-                     Sort Key: pagg_tab_ml_2.a
+-                     ->  Append
+-                           ->  Partial HashAggregate
+-                                 Group Key: pagg_tab_ml_2.a
+-                                 ->  Seq Scan on pagg_tab_ml_p2_s1 pagg_tab_ml_2
+-                           ->  Partial HashAggregate
+-                                 Group Key: pagg_tab_ml_3.a
+-                                 ->  Seq Scan on pagg_tab_ml_p2_s2 pagg_tab_ml_3
+-         ->  Finalize GroupAggregate
+-               Group Key: pagg_tab_ml_5.a
+-               Filter: (avg(pagg_tab_ml_5.b) < '3'::numeric)
+-               ->  Sort
+-                     Sort Key: pagg_tab_ml_5.a
+-                     ->  Append
+-                           ->  Partial HashAggregate
+-                                 Group Key: pagg_tab_ml_5.a
+-                                 ->  Seq Scan on pagg_tab_ml_p3_s1 pagg_tab_ml_5
+-                           ->  Partial HashAggregate
+-                                 Group Key: pagg_tab_ml_6.a
+-                                 ->  Seq Scan on pagg_tab_ml_p3_s2 pagg_tab_ml_6
+-(31 rows)
++   ->  Gather
++         Workers Planned: 2
++         ->  Parallel Append
++               ->  HashAggregate
++                     Group Key: pagg_tab_ml.a
++                     Filter: (avg(pagg_tab_ml.b) < '3'::numeric)
++                     ->  Seq Scan on pagg_tab_ml_p1 pagg_tab_ml
++               ->  Finalize GroupAggregate
++                     Group Key: pagg_tab_ml_5.a
++                     Filter: (avg(pagg_tab_ml_5.b) < '3'::numeric)
++                     ->  Sort
++                           Sort Key: pagg_tab_ml_5.a
++                           ->  Append
++                                 ->  Partial HashAggregate
++                                       Group Key: pagg_tab_ml_5.a
++                                       ->  Seq Scan on pagg_tab_ml_p3_s1 pagg_tab_ml_5
++                                 ->  Partial HashAggregate
++                                       Group Key: pagg_tab_ml_6.a
++                                       ->  Seq Scan on pagg_tab_ml_p3_s2 pagg_tab_ml_6
++               ->  Finalize GroupAggregate
++                     Group Key: pagg_tab_ml_2.a
++                     Filter: (avg(pagg_tab_ml_2.b) < '3'::numeric)
++                     ->  Sort
++                           Sort Key: pagg_tab_ml_2.a
++                           ->  Append
++                                 ->  Partial HashAggregate
++                                       Group Key: pagg_tab_ml_2.a
++                                       ->  Seq Scan on pagg_tab_ml_p2_s1 pagg_tab_ml_2
++                                 ->  Partial HashAggregate
++                                       Group Key: pagg_tab_ml_3.a
++                                       ->  Seq Scan on pagg_tab_ml_p2_s2 pagg_tab_ml_3
++(33 rows)
+ 
+ SELECT a, sum(b), count(*) FROM pagg_tab_ml GROUP BY a HAVING avg(b) < 3 ORDER BY 1, 2, 3;
+  a  | sum  | count 
+@@ -1115,31 +1117,33 @@
+ -- PARTITION KEY
+ EXPLAIN (COSTS OFF)
+ SELECT b, sum(a), count(*) FROM pagg_tab_ml GROUP BY b ORDER BY 1, 2, 3;
+-                                QUERY PLAN                                 
+----------------------------------------------------------------------------
++                                        QUERY PLAN                                        
++------------------------------------------------------------------------------------------
+  Sort
+    Sort Key: pagg_tab_ml.b, (sum(pagg_tab_ml.a)), (count(*))
+    ->  Finalize GroupAggregate
+          Group Key: pagg_tab_ml.b
+-         ->  Sort
+-               Sort Key: pagg_tab_ml.b
+-               ->  Append
+-                     ->  Partial HashAggregate
+-                           Group Key: pagg_tab_ml.b
+-                           ->  Seq Scan on pagg_tab_ml_p1 pagg_tab_ml
+-                     ->  Partial HashAggregate
+-                           Group Key: pagg_tab_ml_1.b
+-                           ->  Seq Scan on pagg_tab_ml_p2_s1 pagg_tab_ml_1
+-                     ->  Partial HashAggregate
+-                           Group Key: pagg_tab_ml_2.b
+-                           ->  Seq Scan on pagg_tab_ml_p2_s2 pagg_tab_ml_2
+-                     ->  Partial HashAggregate
+-                           Group Key: pagg_tab_ml_3.b
+-                           ->  Seq Scan on pagg_tab_ml_p3_s1 pagg_tab_ml_3
+-                     ->  Partial HashAggregate
+-                           Group Key: pagg_tab_ml_4.b
+-                           ->  Seq Scan on pagg_tab_ml_p3_s2 pagg_tab_ml_4
+-(22 rows)
++         ->  Gather Merge
++               Workers Planned: 2
++               ->  Sort
++                     Sort Key: pagg_tab_ml.b
++                     ->  Parallel Append
++                           ->  Partial HashAggregate
++                                 Group Key: pagg_tab_ml.b
++                                 ->  Parallel Seq Scan on pagg_tab_ml_p1 pagg_tab_ml
++                           ->  Partial HashAggregate
++                                 Group Key: pagg_tab_ml_3.b
++                                 ->  Parallel Seq Scan on pagg_tab_ml_p3_s1 pagg_tab_ml_3
++                           ->  Partial HashAggregate
++                                 Group Key: pagg_tab_ml_1.b
++                                 ->  Parallel Seq Scan on pagg_tab_ml_p2_s1 pagg_tab_ml_1
++                           ->  Partial HashAggregate
++                                 Group Key: pagg_tab_ml_4.b
++                                 ->  Parallel Seq Scan on pagg_tab_ml_p3_s2 pagg_tab_ml_4
++                           ->  Partial HashAggregate
++                                 Group Key: pagg_tab_ml_2.b
++                                 ->  Parallel Seq Scan on pagg_tab_ml_p2_s2 pagg_tab_ml_2
++(24 rows)
+ 
+ SELECT b, sum(a), count(*) FROM pagg_tab_ml GROUP BY b HAVING avg(a) < 15 ORDER BY 1, 2, 3;
+  b |  sum  | count 
+@@ -1154,32 +1158,34 @@
+ -- Full aggregation at all levels as GROUP BY clause matches with PARTITION KEY
+ EXPLAIN (COSTS OFF)
+ SELECT a, sum(b), count(*) FROM pagg_tab_ml GROUP BY a, b, c HAVING avg(b) > 7 ORDER BY 1, 2, 3;
+-                                 QUERY PLAN                                 
+-----------------------------------------------------------------------------
+- Sort
+-   Sort Key: pagg_tab_ml.a, (sum(pagg_tab_ml.b)), (count(*))
+-   ->  Append
+-         ->  HashAggregate
+-               Group Key: pagg_tab_ml.a, pagg_tab_ml.b, pagg_tab_ml.c
+-               Filter: (avg(pagg_tab_ml.b) > '7'::numeric)
+-               ->  Seq Scan on pagg_tab_ml_p1 pagg_tab_ml
+-         ->  HashAggregate
+-               Group Key: pagg_tab_ml_1.a, pagg_tab_ml_1.b, pagg_tab_ml_1.c
+-               Filter: (avg(pagg_tab_ml_1.b) > '7'::numeric)
+-               ->  Seq Scan on pagg_tab_ml_p2_s1 pagg_tab_ml_1
+-         ->  HashAggregate
+-               Group Key: pagg_tab_ml_2.a, pagg_tab_ml_2.b, pagg_tab_ml_2.c
+-               Filter: (avg(pagg_tab_ml_2.b) > '7'::numeric)
+-               ->  Seq Scan on pagg_tab_ml_p2_s2 pagg_tab_ml_2
+-         ->  HashAggregate
+-               Group Key: pagg_tab_ml_3.a, pagg_tab_ml_3.b, pagg_tab_ml_3.c
+-               Filter: (avg(pagg_tab_ml_3.b) > '7'::numeric)
+-               ->  Seq Scan on pagg_tab_ml_p3_s1 pagg_tab_ml_3
+-         ->  HashAggregate
+-               Group Key: pagg_tab_ml_4.a, pagg_tab_ml_4.b, pagg_tab_ml_4.c
+-               Filter: (avg(pagg_tab_ml_4.b) > '7'::numeric)
+-               ->  Seq Scan on pagg_tab_ml_p3_s2 pagg_tab_ml_4
+-(23 rows)
++                                    QUERY PLAN                                    
++----------------------------------------------------------------------------------
++ Gather Merge
++   Workers Planned: 2
++   ->  Sort
++         Sort Key: pagg_tab_ml.a, (sum(pagg_tab_ml.b)), (count(*))
++         ->  Parallel Append
++               ->  HashAggregate
++                     Group Key: pagg_tab_ml.a, pagg_tab_ml.b, pagg_tab_ml.c
++                     Filter: (avg(pagg_tab_ml.b) > '7'::numeric)
++                     ->  Seq Scan on pagg_tab_ml_p1 pagg_tab_ml
++               ->  HashAggregate
++                     Group Key: pagg_tab_ml_3.a, pagg_tab_ml_3.b, pagg_tab_ml_3.c
++                     Filter: (avg(pagg_tab_ml_3.b) > '7'::numeric)
++                     ->  Seq Scan on pagg_tab_ml_p3_s1 pagg_tab_ml_3
++               ->  HashAggregate
++                     Group Key: pagg_tab_ml_1.a, pagg_tab_ml_1.b, pagg_tab_ml_1.c
++                     Filter: (avg(pagg_tab_ml_1.b) > '7'::numeric)
++                     ->  Seq Scan on pagg_tab_ml_p2_s1 pagg_tab_ml_1
++               ->  HashAggregate
++                     Group Key: pagg_tab_ml_4.a, pagg_tab_ml_4.b, pagg_tab_ml_4.c
++                     Filter: (avg(pagg_tab_ml_4.b) > '7'::numeric)
++                     ->  Seq Scan on pagg_tab_ml_p3_s2 pagg_tab_ml_4
++               ->  HashAggregate
++                     Group Key: pagg_tab_ml_2.a, pagg_tab_ml_2.b, pagg_tab_ml_2.c
++                     Filter: (avg(pagg_tab_ml_2.b) > '7'::numeric)
++                     ->  Seq Scan on pagg_tab_ml_p2_s2 pagg_tab_ml_2
++(25 rows)
+ 
+ SELECT a, sum(b), count(*) FROM pagg_tab_ml GROUP BY a, b, c HAVING avg(b) > 7 ORDER BY 1, 2, 3;
+  a  | sum  | count 
+@@ -1523,20 +1529,22 @@
+ -----------------------------------------------------------------------------
+  Sort
+    Sort Key: pagg_tab_para.x, (sum(pagg_tab_para.y)), (avg(pagg_tab_para.y))
+-   ->  Append
+-         ->  HashAggregate
+-               Group Key: pagg_tab_para.x
+-               Filter: (avg(pagg_tab_para.y) < '7'::numeric)
+-               ->  Seq Scan on pagg_tab_para_p1 pagg_tab_para
+-         ->  HashAggregate
+-               Group Key: pagg_tab_para_1.x
+-               Filter: (avg(pagg_tab_para_1.y) < '7'::numeric)
+-               ->  Seq Scan on pagg_tab_para_p2 pagg_tab_para_1
+-         ->  HashAggregate
+-               Group Key: pagg_tab_para_2.x
+-               Filter: (avg(pagg_tab_para_2.y) < '7'::numeric)
+-               ->  Seq Scan on pagg_tab_para_p3 pagg_tab_para_2
+-(15 rows)
++   ->  Gather
++         Workers Planned: 2
++         ->  Parallel Append
++               ->  HashAggregate
++                     Group Key: pagg_tab_para.x
++                     Filter: (avg(pagg_tab_para.y) < '7'::numeric)
++                     ->  Seq Scan on pagg_tab_para_p1 pagg_tab_para
++               ->  HashAggregate
++                     Group Key: pagg_tab_para_1.x
++                     Filter: (avg(pagg_tab_para_1.y) < '7'::numeric)
++                     ->  Seq Scan on pagg_tab_para_p2 pagg_tab_para_1
++               ->  HashAggregate
++                     Group Key: pagg_tab_para_2.x
++                     Filter: (avg(pagg_tab_para_2.y) < '7'::numeric)
++                     ->  Seq Scan on pagg_tab_para_p3 pagg_tab_para_2
++(17 rows)
+ 
+ SELECT x, sum(y), avg(y), count(*) FROM pagg_tab_para GROUP BY x HAVING avg(y) < 7 ORDER BY 1, 2, 3;
+  x  | sum  |        avg         | count 
+diff -U3 /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/memoize.out /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/memoize.out
+--- /home/ubuntu/pgrust/crates/postgres-18.6-reference/src/test/regress/expected/memoize.out	2026-10-07 06:41:12.211347738 +0000
++++ /home/ubuntu/pgrust/benchmarks/pgx/results/vps-d2a3c460-bb3a8ab54b/regress/results/memoize.out	2026-10-08 08:30:21.402731846 +0000
+@@ -139,23 +139,28 @@
+ SELECT COUNT(*), AVG(t1.twenty) FROM tenk1 t1 LEFT JOIN
+ LATERAL (SELECT t1.two+1 AS c1, t2.unique1 AS c2 FROM tenk1 t2) s ON TRUE
+ WHERE s.c1 = s.c2 AND t1.unique1 < 1000;', false);
+-                                       explain_memoize                                        
+-----------------------------------------------------------------------------------------------
+- Aggregate (actual rows=1.00 loops=N)
+-   ->  Nested Loop (actual rows=1000.00 loops=N)
+-         ->  Seq Scan on tenk1 t1 (actual rows=1000.00 loops=N)
+-               Filter: (unique1 < 1000)
+-               Rows Removed by Filter: 9000
+-         ->  Memoize (actual rows=1.00 loops=N)
+-               Cache Key: (t1.two + 1)
+-               Cache Mode: binary
+-               Hits: 998  Misses: 2  Evictions: Zero  Overflows: 0  Memory Usage: NkB
+-               ->  Index Only Scan using tenk1_unique1 on tenk1 t2 (actual rows=1.00 loops=N)
+-                     Filter: ((t1.two + 1) = unique1)
+-                     Rows Removed by Filter: 9999
+-                     Heap Fetches: N
+-                     Index Searches: N
+-(14 rows)
++                                              explain_memoize                                              
++-----------------------------------------------------------------------------------------------------------
++ Finalize Aggregate (actual rows=1.00 loops=N)
++   ->  Gather (actual rows=2.00 loops=N)
++         Workers Planned: 1
++         Workers Launched: 1
++         ->  Partial Aggregate (actual rows=1.00 loops=N)
++               ->  Nested Loop (actual rows=500.00 loops=N)
++                     ->  Parallel Seq Scan on tenk1 t1 (actual rows=500.00 loops=N)
++                           Filter: (unique1 < 1000)
++                           Rows Removed by Filter: 4500
++                     ->  Memoize (actual rows=1.00 loops=N)
++                           Cache Key: (t1.two + 1)
++                           Cache Mode: binary
++                           Hits: 992  Misses: 2  Evictions: Zero  Overflows: 0  Memory Usage: NkB
++                           Worker 0:  Hits: 4  Misses: 2  Evictions: Zero  Overflows: 0  Memory Usage: NkB
++                           ->  Index Only Scan using tenk1_unique1 on tenk1 t2 (actual rows=1.00 loops=N)
++                                 Filter: ((t1.two + 1) = unique1)
++                                 Rows Removed by Filter: 9999
++                                 Heap Fetches: N
++                                 Index Searches: N
++(19 rows)
+ 
+ -- And check we get the expected results.
+ SELECT COUNT(*), AVG(t1.twenty) FROM tenk1 t1 LEFT JOIN

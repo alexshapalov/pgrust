@@ -1,0 +1,79 @@
+{
+  "benchmark": "skipidle-check",
+  "git_commit": "bb3a8ab54b367354c519eccb86bbd4f35ee92ca5",
+  "settings": [
+    "pgrust.autovacuum_skip_idle_databases=off",
+    "autovacuum_naptime=5s",
+    "autovacuum=on",
+    "max_connections=40"
+  ],
+  "idle": 50,
+  "busy": 5,
+  "checks": {
+    "first_visit": {
+      "seconds": 2.1,
+      "visited": 5,
+      "of": 5,
+      "state": {
+        "busy_0": [
+          1,
+          1,
+          0
+        ],
+        "busy_1": [
+          1,
+          1,
+          0
+        ],
+        "busy_2": [
+          1,
+          1,
+          0
+        ],
+        "busy_3": [
+          1,
+          1,
+          0
+        ],
+        "busy_4": [
+          1,
+          1,
+          0
+        ]
+      }
+    },
+    "revisit_after_write": {
+      "seconds": 6.2,
+      "visited": 5,
+      "of": 5,
+      "state": {
+        "busy_0": [
+          2,
+          2,
+          0
+        ],
+        "busy_1": [
+          2,
+          2,
+          0
+        ],
+        "busy_2": [
+          2,
+          2,
+          0
+        ],
+        "busy_3": [
+          2,
+          2,
+          0
+        ],
+        "busy_4": [
+          2,
+          2,
+          0
+        ]
+      }
+    }
+  },
+  "ok": true
+}
