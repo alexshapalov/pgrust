@@ -71,6 +71,15 @@ for step in "${STEPS[@]}"; do
         done ;;
     agents)
         $PY "$HERE/linux/agent-workload.py" --out "$OUT/agent-workload" ;;
+    cow-recordsize)
+        # Same 1 GB clone test on datasets with smaller records: scattered
+        # updates in a clone copy whole records shared with the template.
+        for rs in ${PGX_RECORDSIZES:-16K 8K}; do
+            ds=tank/pgx-rs$rs
+            sudo -n zfs create -o recordsize=$rs "$ds" && sudo -n chown "$(id -u):$(id -g)" "/$ds"
+            $PY "$HERE/cow.py" --workdir "/$ds" --sizes 1500 --methods clone --clones 3 --out "$OUT/cow-recordsize-$rs"
+            sudo -n zfs destroy -r "$ds"
+        done ;;
     cowbig)
         $PY "$HERE/cow.py" --sizes "${PGX_COW_BIG:-1500,3000}" --methods clone --clones 3 --out "$OUT/cow-big"
         $PY "$HERE/cow.py" --sizes 1500 --methods copy --clones 2 --out "$OUT/cow-big-copy" ;;
