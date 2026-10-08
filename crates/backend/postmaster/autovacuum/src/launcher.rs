@@ -3,6 +3,7 @@
 //! the process-global slots in shmem.rs.
 
 use std::cell::{Cell, RefCell};
+use std::collections::HashMap;
 use std::sync::atomic::Ordering::Relaxed;
 
 use init_small::globals as g;
@@ -621,6 +622,18 @@ fn do_start_worker() -> PgResult<StartOutcome> {
     let mut for_multi_wrap = false;
     let mut skipit = false;
     let current_time = adt_timestamp::GetCurrentTimestamp();
+    // adl_next_worker per database, built once per decision. The loop below
+    // used to search DATABASE_LIST linearly for every database: O(N^2) per
+    // launcher wake, and the launcher wakes N/naptime times a second, so at
+    // 1000 databases this search was most of the launcher's idle CPU. First
+    // match wins, as with the linear find.
+    let scheduled_map: HashMap<Oid, TimestampTz> = DATABASE_LIST.with_borrow(|l| {
+        let mut m = HashMap::with_capacity(l.len());
+        for d in l {
+            m.entry(d.adl_datid).or_insert(d.adl_next_worker);
+        }
+        m
+    });
 
     for tmp in &dblist {
         if TransactionIdPrecedes(tmp.adw_frozenxid, xid_force_limit) {
@@ -651,11 +664,7 @@ fn do_start_worker() -> PgResult<StartOutcome> {
 
         // Skip databases scheduled within [now, now + naptime).
         skipit = false;
-        let scheduled = DATABASE_LIST.with_borrow(|l| {
-            l.iter()
-                .find(|d| d.adl_datid == tmp.adw_datid)
-                .map(|d| d.adl_next_worker)
-        });
+        let scheduled = scheduled_map.get(&tmp.adw_datid).copied();
         if let Some(next_worker) = scheduled {
             if !adt_timestamp::TimestampDifferenceExceeds(next_worker, current_time, 0)
                 && !adt_timestamp::TimestampDifferenceExceeds(
