@@ -77,12 +77,17 @@ pub struct PgStat_StatTabEntry {
     pub total_autoanalyze_time: PgStat_Counter,
 }
 
-#[derive(Clone, Copy, Debug)]
+// The largest inline variant sizes EVERY slot of SHARED_STATS (the
+// pending.rs floor-census rule): PgStat_Backend carries three per-backend
+// IO matrices (~2.9 KB) while a relation entry is ~0.23 KB, and relation
+// entries are the ones that scale with databases x tables. Backend entries
+// (one per proc slot) are boxed so a relation slot costs ~0.3 KB, not ~3 KB.
+#[derive(Clone, Debug)]
 pub enum SharedEntry {
     Relation(PgStat_StatTabEntry),
     Database(PgStat_StatDBEntry),
     Function(crate::function::PgStat_StatFuncEntry),
-    Backend(crate::backend::PgStat_Backend),
+    Backend(Box<crate::backend::PgStat_Backend>),
     ReplSlot(crate::replslot::PgStat_StatReplSlotEntry),
     Subscription(crate::subscription::PgStat_StatSubEntry),
 }
@@ -245,7 +250,7 @@ pub(crate) fn ensure_entry_for_pending(key: PgStat_HashKey) {
 
 pub(crate) fn copy_entry(src: PgStat_HashKey, dst: PgStat_HashKey) {
     let mut store = pgsync::lock(&SHARED_STATS);
-    if let Some(&e) = store.get(&src) {
+    if let Some(e) = store.get(&src).cloned() {
         store.insert(dst, e);
     }
 }
@@ -268,7 +273,7 @@ pub(crate) fn update_backend_entry(
     let mut store = pgsync::lock(&SHARED_STATS);
     let SharedEntry::Backend(entry) = store
         .entry(key)
-        .or_insert(SharedEntry::Backend(Default::default()))
+        .or_insert_with(|| SharedEntry::Backend(Box::default()))
     else {
         unreachable!("backend key holds non-backend shared entry")
     };
@@ -354,7 +359,7 @@ pub(crate) fn build_snapshot() {
         debug_assert!(snap.stats.is_empty());
         let my_dboid = init_small::globals::MyDatabaseId();
         let store = pgsync::lock(&SHARED_STATS);
-        for (&key, &entry) in store.iter() {
+        for (&key, entry) in store.iter() {
             // database stats are accessed_across_databases in C
             if key.dboid != my_dboid
                 && key.dboid != InvalidOid
@@ -362,7 +367,7 @@ pub(crate) fn build_snapshot() {
             {
                 continue;
             }
-            snap.stats.insert(key, Some(entry));
+            snap.stats.insert(key, Some(entry.clone()));
         }
         snap.snapshot_timestamp = timestamp_seams::get_current_timestamp::call();
         snap.mode = PGSTAT_FETCH_CONSISTENCY_SNAPSHOT;
@@ -398,7 +403,7 @@ pub(crate) fn fetch_entry(key: PgStat_HashKey) -> Option<SharedEntry> {
     }
 
     if consistency > PGSTAT_FETCH_CONSISTENCY_NONE {
-        let cached = SNAPSHOT.with(|s| s.borrow().stats.get(&key).copied());
+        let cached = SNAPSHOT.with(|s| s.borrow().stats.get(&key).cloned());
         if let Some(entry) = cached {
             return entry;
         }
@@ -407,12 +412,12 @@ pub(crate) fn fetch_entry(key: PgStat_HashKey) -> Option<SharedEntry> {
         }
     }
 
-    let entry = pgsync::lock(&SHARED_STATS).get(&key).copied();
+    let entry = pgsync::lock(&SHARED_STATS).get(&key).cloned();
     if consistency == PGSTAT_FETCH_CONSISTENCY_CACHE {
         SNAPSHOT.with(|s| {
             let mut snap = s.borrow_mut();
             snap.mode = PGSTAT_FETCH_CONSISTENCY_CACHE;
-            snap.stats.insert(key, entry);
+            snap.stats.insert(key, entry.clone());
         });
     }
     entry
@@ -453,7 +458,7 @@ pub(crate) fn export_entries(mut f: impl FnMut(PgStat_HashKey, SharedEntry)) {
     // happen while the store is locked.
     let entries: Vec<_> = {
         let store = pgsync::lock(&SHARED_STATS);
-        store.iter().map(|(&key, &entry)| (key, entry)).collect()
+        store.iter().map(|(&key, entry)| (key, entry.clone())).collect()
     };
     for (key, entry) in entries {
         f(key, entry);
@@ -566,3 +571,20 @@ pub fn pgstat_reset_of_kind(kind: PgStat_Kind) {
         ),
     }
 }
+
+#[cfg(test)]
+mod slot_size_tests {
+    use super::*;
+
+    // Every SHARED_STATS slot is sized by the largest SharedEntry variant and
+    // relation entries scale with databases x tables: keep the slot near the
+    // relation entry's own size (boxing PgStat_Backend took it from ~2.9 KB).
+    #[test]
+    fn shared_entry_slot_stays_small() {
+        let slot = core::mem::size_of::<SharedEntry>();
+        let rel = core::mem::size_of::<PgStat_StatTabEntry>();
+        assert!(slot <= 2 * rel, "SharedEntry is {slot} bytes, relation entry {rel}");
+        assert!(slot <= 512, "SharedEntry is {slot} bytes");
+    }
+}
+

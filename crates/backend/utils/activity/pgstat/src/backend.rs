@@ -146,7 +146,7 @@ pub fn pgstat_create_backend(proc_number: i32) {
 
 pub fn pgstat_fetch_stat_backend(proc_number: i32) -> Option<PgStat_Backend> {
     match crate::shmem::fetch_entry(backend_key(proc_number)) {
-        Some(crate::shmem::SharedEntry::Backend(b)) => Some(b),
+        Some(crate::shmem::SharedEntry::Backend(b)) => Some(*b),
         Some(_) => unreachable!("backend key holds non-backend shared entry"),
         None => None,
     }

@@ -462,7 +462,7 @@ pub(crate) fn read_statsfile_body(buf: &[u8]) -> Option<()> {
                     PGSTAT_KIND_SUBSCRIPTION => {
                         take_payload(&mut c).map(SharedEntry::Subscription)
                     }
-                    PGSTAT_KIND_BACKEND => take_payload(&mut c).map(SharedEntry::Backend),
+                    PGSTAT_KIND_BACKEND => take_payload(&mut c).map(|b| SharedEntry::Backend(Box::new(b))),
                     PGSTAT_KIND_REPLSLOT => take_payload(&mut c).map(SharedEntry::ReplSlot),
                     // C stores a fixed kind's 'S' record as an inert hash
                     // entry nothing ever fetches by that key; consume its
