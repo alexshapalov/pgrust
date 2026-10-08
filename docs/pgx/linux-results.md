@@ -331,7 +331,8 @@ script on the stated host):
 - A fresh copy-on-write branch uses ~2 MB of disk for a 1 GB template and
   13.6 MB for a 10 GB one. COW branches initially use hundreds of times
   less physical storage than full-copy branches.
-- 10,000 database create/drop cycles in one runtime end at 109 MB.
+- 30,000 database create/use/drop cycles in one runtime end at 111 MB
+  (~0.2 KB retained per cycle; not perfectly flat).
 - 500 simultaneous new-database requests: 0 errors.
 
 **31. Numbers safe to show customers:**
@@ -439,3 +440,8 @@ Benchmark harness, results and documentation are in the same branch
 `linux-analyze.md` · `linux-query-performance.md` · `agent-workloads.md` ·
 `zfs-cow.md` · `linux-limits.md` · `linux-noisy-neighbor.md` ·
 `linux-pricing-economics.md` · `pgrun-interface.md`
+
+v0.1 freeze: `v0.1-baseline.md` (final numbers) · `v0.1-readiness.md`
+(ready / limitations / approved use) · `compatibility-gate.md` ·
+`pgrun-integration.md` · reproduction index
+`benchmarks/pgx/linux/README.md`

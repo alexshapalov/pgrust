@@ -65,6 +65,11 @@ Framework work dominates every lifecycle; the database is 0–15% slower under
 PGX for these, consistent with the per-statement gap in
 `linux-query-performance.md`, and faster for node-postgres.
 
+These are results for the tested lifecycle workloads: whole-tool wall time
+on small schemas, where framework work dominates. They do not show that
+PGX is as fast as PostgreSQL in general. Single statements and large
+scans are slower (`linux-query-performance.md`).
+
 ## Resources
 
 | | PG 18 | PGX |
