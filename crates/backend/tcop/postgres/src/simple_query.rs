@@ -326,6 +326,9 @@ fn memctx_dump() -> PgResult<()> {
         "memctx: l2cache entries={} bytes={} hits={} misses={} inserts={} herd_waits={} (process-wide)",
         l2.entries, l2.bytes, l2.hits, l2.misses, l2.inserts, l2.herd_waits
     ))?;
+    for line in ::l2cache::census_lines(12) {
+        say(format!("memctx: {line}"))?;
+    }
     say(format!(
         "memctx: process-wide context blocks={} bytes",
         ::mcx::global_footprint::bytes()

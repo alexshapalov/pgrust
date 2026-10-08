@@ -536,6 +536,52 @@ pub fn stats() -> L2Stats {
     }
 }
 
+/// Debug census for `pgrust: memctx`: live entries grouped by
+/// (kind, cache id or "rel", shared catalog?), with how many sit at a
+/// superseded generation (stranded until evicted) and how many distinct
+/// databases hold entries. Walks every shard under its lock; debug only.
+pub fn census_lines(top: usize) -> Vec<String> {
+    use std::collections::{HashMap as Map, HashSet};
+    let mut groups: Map<(u8, u32, bool), (usize, usize, usize)> = Map::new();
+    let mut dbs: HashSet<Oid> = HashSet::new();
+    let (mut total, mut stale) = (0usize, 0usize);
+    for s in shards().iter() {
+        let map = s.map.lock().unwrap();
+        for (k, b) in map.iter() {
+            let shared = k.db == types_core::InvalidOid;
+            if !shared {
+                dbs.insert(k.db);
+            }
+            let cur = if k.kind == KIND_CAT {
+                current_gen(Domain::Cat(k.id as i32))
+            } else {
+                current_gen(Domain::Rel(k.id))
+            };
+            let g = groups.entry((k.kind, if k.kind == KIND_CAT { k.id } else { u32::MAX }, shared)).or_default();
+            for (gen, _, sz) in b.entries.iter() {
+                total += 1;
+                g.0 += 1;
+                g.2 += *sz;
+                if *gen < cur {
+                    stale += 1;
+                    g.1 += 1;
+                }
+            }
+        }
+    }
+    let mut v: Vec<_> = groups.into_iter().collect();
+    v.sort_by(|a, b| b.1 .0.cmp(&a.1 .0));
+    let mut out = vec![format!(
+        "l2census entries={total} stale={stale} databases_with_entries={}",
+        dbs.len()
+    )];
+    for ((kind, id, shared), (n, st, by)) in v.into_iter().take(top) {
+        let what = if kind == KIND_CAT { format!("cat id={id}") } else { "rel".to_string() };
+        out.push(format!("l2census   {what} shared={shared} entries={n} stale={st} bytes={by}"));
+    }
+    out
+}
+
 /// Look up `key` at generation `gen`. `matches` performs full logical-key
 /// comparison (hash collisions share a bucket).
 pub fn lookup(
