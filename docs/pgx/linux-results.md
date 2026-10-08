@@ -26,7 +26,7 @@ numbers are quoted. Raw data: `benchmarks/pgx/results/vps-d2a3c460-<build>/`.
 |---|---|---|
 | Memory after 10,000 database lifecycles | 85 → 262 MB, linear (~11 KB per lifecycle) | 94 → 109 MB, last quarter 0.2–0.6 KB per lifecycle |
 | Memory, 1000 idle databases | 669 MB | 128–155 MB (213 MB if each was queried once) |
-| Idle CPU, 1000 idle databases | 6.5 % of a core | 0.33 % (profile default) |
+| Idle CPU, 1000 idle databases | 6.5 % of a core | 0.33–0.43 % (profile default) |
 | Bulk INSERT…SELECT / UPDATE of 3M rows | +290 MB to refused / +400 MB | flat (≤ 89 MB / 11 MB) |
 | Warm / cold mint p50 | 7 / 72 ms | 6.2 / 74 ms (unchanged; disk-bound) |
 | 500 simultaneous new databases | 90 of 500 failed after an earlier burst | 0 errors, drains in 12.6–13.8 s |
@@ -110,7 +110,10 @@ the pool to the burst that must be served warm.
 0.33 % of one core with the profile defaults
 (`pgrust.autovacuum_skip_idle_databases = on`, `autovacuum_naptime = 300`),
 against 5.4–6.7 % with stock autovacuum and 0.22 % with autovacuum off.
-FINAL_IDLE_PENDING (`linux-analyze.md`)
+On the final build it measured 0.43 % (±0.1 between runs; 0.72 % at
+naptime 60). Right after all 1000 databases have been written, idle CPU
+is 1.5–2.9 % while autovacuum makes its first pass over them
+(`linux-analyze.md`).
 
 **12. Does ANALYZE-on-change preserve good plans?**
 Plans hold up without it at branch scale. With autovacuum off, a branch
@@ -140,10 +143,21 @@ forced ANALYZE.
 Yes: 219 / 231 byte-exact on every final build, and the 12 differences are
 EXPLAIN-plan text only, with 0 result differences. One fix in this work
 (`daf827c0ff` / `67269453b2`) briefly broke 14 tests; the suite caught it
-and `d48f587da0` fixed it before anything else was built on it.
-PROFILE_REGRESS_PENDING
+and `d48f587da0` fixed it before anything else was built on it. Also
+219 / 231 with the final profile defaults (skip-idle autovacuum, naptime
+300).
 
-**15. Rails?** RAILS_PENDING
+**15. Rails?** Yes. Rails 8.1.4 + pg 1.7.0 on Ruby 3.3.8, 3/3 runs:
+
+- `db:prepare` runs the migrations: FKs, unique and composite indexes,
+  jsonb with a GIN index.
+- `bin/rails test` with fixtures: jsonb queries, joins, `RecordNotUnique`
+  and `InvalidForeignKey` from the database, a nested transaction rolled
+  back to a savepoint, `insert_all` / `update_all`, cascade delete.
+- A schema-change migration, then tests again, then `db:schema:load` from
+  the dumped `schema.rb`, then tests again.
+
+Every phase is within 0–5 % of PostgreSQL 18 (`agent-workloads.md`).
 
 **16. Django?** Yes. Django 5.2.9 + psycopg 3, 3/3 runs: migrate with 20
 models (FKs, unique, composite, JSON indexes, M2M), `manage.py test` (it
@@ -313,9 +327,8 @@ script on the stated host):
 - Branch creation: say "a new branch database is ready in under 100 ms on
   the engine". A PGRun end-to-end number must come from the end-to-end
   benchmark (Q26), not from mint timings. Do not say "6 ms branches".
-- Compatibility: Django, Prisma, SQLAlchemy and node-postgres lifecycles
-  pass; the regression suite passes 219 of 231 with no wrong results
-  RAILS_CUSTOMER_PENDING.
+- Compatibility: Rails, Django, Prisma, SQLAlchemy and node-postgres lifecycles
+  pass; the regression suite passes 219 of 231 with no wrong results.
 - Isolation: per-branch memory and connection limits, and one branch's
   runaway query does not error other branches.
 - Storage: branches start at a few MB regardless of template size.
@@ -387,7 +400,7 @@ Benchmark harness, results and documentation are in the same branch
 | Lifecycle memory retention (`dda9c1be6f`, `b736a6d0ec`, `48398cc0b5`) | 11 KB per lifecycle, linear; 262 MB after 10k | 0.2–0.6 KB; 109 MB after 10k |
 | Huge pages off (`680fab7c8a`) | idle profile 83 MB; 100-active 1,265 MB | 46 MB; 844 MB |
 | Stats slot boxing + relcache sharing (`e9322867b6`, `ad235e24cb`) | 1000 idle DBs 640 MB; 100 active 808 MB | 128 MB; 283 MB |
-| Skip-idle autovacuum + naptime 300 (`28c83164ab` … `6fe0b1ad65`, `696318b79e`) | 1000 idle DBs 5.4–6.7 % of a core | 0.33 % |
+| Skip-idle autovacuum + naptime 300 (`28c83164ab` … `6fe0b1ad65`, `696318b79e`) | 1000 idle DBs 5.4–6.7 % of a core | 0.33–0.43 % |
 | Mint request table (`a95801a13b`) | 90 / 500 connections failed on a second burst | 0 |
 | DML per-row memory (`ea6d055cb2` … `d48f587da0`) | 3M-row INSERT…SELECT refused at 256 MB; UPDATE +400 MB | +89 MB; +11 MB |
 | Sort out-of-memory (`dde6c13de4`) | refusal surfaced as XX000 panic | 53200 |

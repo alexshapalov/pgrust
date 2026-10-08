@@ -82,6 +82,9 @@ separate servers would need ≥ 16.6 GB before any data or connections.
 | skip-idle, naptime 300 | `dedfdf9ca5` / `0131cc9b12` | **0.33 %** |
 | autovacuum off | `dedfdf9ca5` | 0.22 % |
 | skip-idle, naptime 300, every DB touched once | `0131cc9b12` | 1.45 % |
+| skip-idle, naptime 60, starvation fix | `bb3a8ab54b` (+ `6fe0b1ad65`) | 0.72 % |
+| skip-idle, naptime 300, starvation fix | `bb3a8ab54b` | 0.43 % |
+| skip-idle, naptime 300, starvation fix, every DB touched once | `bb3a8ab54b` | 2.91 % |
 
 - The default launcher wakes once per `naptime / N` and visits a database
   each time; at 1000 databases that is a visit every 60 ms, almost all of
@@ -94,7 +97,13 @@ separate servers would need ≥ 16.6 GB before any data or connections.
 - Naptime 300 with skip-idle costs 0.33 % at 1000 — within 0.11 points of
   autovacuum off, with autovacuum still running for databases that change.
 - Touched databases have changed counters until autovacuum has visited
-  them once, which is the 1.45 %; it falls as visits complete.
+  them once, which is the 1.45 % (2.91 % with the starvation fix, which
+  now really visits every written database: before it, some were never
+  visited). It falls as the visits complete. One 300 s naptime cycle
+  covers all 1000.
+- The starvation fix also spreads idle skips evenly. That brought
+  naptime 60 down from 1.21 % to 0.72 %; naptime 300 measured 0.43 %
+  against 0.33 % before, within this run-to-run spread.
 
 Run-to-run variation at 300–500 databases is large (e.g. skip-idle naptime
 60 at 500: 0.40–1.20 % across passes) because a window may or may not
