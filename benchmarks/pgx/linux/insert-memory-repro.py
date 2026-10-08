@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Does INSERT ... SELECT ... FROM generate_series hold memory per row?
+"""Does INSERT ... SELECT (or a whole-table UPDATE) hold memory per row?
 
 PostgreSQL resets per-tuple memory for every row, so peak memory of a bulk
 INSERT ... SELECT should not grow with the row count (generate_series
@@ -25,10 +25,13 @@ VARIANTS = {
     "jsonb": "INSERT INTO t(a, j) SELECT g, jsonb_build_object('n', g) FROM generate_series(1, %d) g",
     "md5+jsonb": "INSERT INTO t(a, s, j) SELECT g, md5(g::text), jsonb_build_object('n', g, 's', md5(g::text)) FROM generate_series(1, %d) g",
     "select-only": "SELECT count(*) FROM (SELECT md5(g::text), jsonb_build_object('n', g, 's', md5(g::text)) FROM generate_series(1, %d) g) x",
+    # (setup, measured statement): the table is filled first, then every row is rewritten
+    "update": ("INSERT INTO t(a) SELECT g FROM generate_series(1, %d) g",
+               "UPDATE t SET s = md5(a::text), j = jsonb_build_object('n', a, 's', md5(a::text))"),
 }
 
 
-def run(args, engine, sql, port):
+def run(args, engine, sql, port, setup=None):
     ws = pb.Workspace(engine)
     srv = pb.Server(ws, port).launch()
     try:
@@ -36,6 +39,8 @@ def run(args, engine, sql, port):
         c = pb.PgConn(ws.sockdir, port, timeout=1800)
         c.query("CREATE TABLE t(a int, s text, j jsonb)")
         c.query("SET work_mem = '64MB'")
+        if setup:
+            c.query(setup)
         pid = srv.proc.pid
         base = pb.memory_sample(pid).get(pb.MEM_KEY, 0)
         peak = [base]
@@ -78,7 +83,9 @@ def main():
     for e in args.engines.split(","):
         for v in args.variants.split(","):
             for n in (int(x) for x in args.rows.split(",")):
-                r = run(args, engines[e](), VARIANTS[v] % n, args.port)
+                q = VARIANTS[v]
+                r = (run(args, engines[e](), q[1], args.port, setup=q[0] % n) if isinstance(q, tuple)
+                     else run(args, engines[e](), q % n, args.port))
                 r.update(engine=e, variant=v, n=n)
                 doc["rows"].append(r)
                 print("%-9s %-12s %8d rows  peak growth %7.1f MB  (%.1fs)" % (e, v, n, r["growth_mb"], r["seconds"]),

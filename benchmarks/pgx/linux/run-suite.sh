@@ -96,6 +96,8 @@ for step in "${STEPS[@]}"; do
         $PY "$HERE/churn.py" --cycles "${PGX_CHURN_CYCLES:-30}" --guc pgrust.autovacuum_skip_idle_databases=on --out "$OUT/churn-skipidle" ;;
     churn-avoff)
         $PY "$HERE/churn.py" --cycles "${PGX_CHURN_CYCLES:-30}" --guc autovacuum=off --out "$OUT/churn-autovacuum-off" ;;
+    insertmem)
+        $PY "$HERE/linux/insert-memory-repro.py" --out "$OUT/insert-memory" ;;
     workloads)
         $PY "$HERE/linux/limits.py" --mode workloads --out "$OUT/limits" ;;
     cpuagent)
