@@ -44,13 +44,62 @@ Second pass, `vps-d2a3c460-1781903578/cow/`, 5 clones per size:
 - Bulk inserts cost ~1.1–1.2× their logical size in pool space.
 - Small writes cost more: ZFS writes whole 128 KB records, and a few
   scattered pages dirty whole records of cloned files (copy-on-write at
-  record grain). A smaller `recordsize` (16K) would cut small-write
-  amplification at the cost of more metadata and lower sequential
-  throughput; it has not been measured here. Compression would reduce all
-  of these and was deliberately left off for exact numbers.
-- Scattered updates, an index build and a rewriting migration inside fresh
-  clones are measured by `cow.py` since `54dad8b80d` (results in the next
-  COW run).
+  record grain); measured below. Compression would reduce all of these
+  and was deliberately left off for exact numbers.
+
+## Larger templates and agent-style writes (passes 4 and 5)
+
+`cow.py` with 50 tables per template (10 for 10 GB), 3 clones each, at the
+dataset's default `recordsize = 128K`. Agent writes run in a fresh clone:
+1000 single-row UPDATEs at random rows across all tables; one
+`CREATE INDEX`; one `ALTER TABLE … ALTER COLUMN … TYPE` that rewrites a
+table. Results: `vps-d2a3c460-83fbf8d06e/cow-big/`,
+`vps-d2a3c460-dedfdf9ca5/cow-10g/`.
+
+| Template (logical) | Build | Clone mint p50 | Physical per clone | First real query | 1000 scattered updates | CREATE INDEX | Rewriting ALTER |
+|---|---|---|---|---|---|---|---|
+| 1.0 GB | 196 s | 135 ms | 2.3 MB | 13 ms | +452 MB | +3.8 MB | +23 MB |
+| 2.0 GB | 382 s | 198 ms | 3.7 MB | 22 ms | +420 MB | +5.7 MB | +43 MB |
+| 5.2 GB | 991 s | 417 ms | 7.0 MB | 53 ms | +505 MB | +12 MB | +103 MB |
+| 10.1 GB (10 tables) | 1,873 s | 674 ms | 13.6 MB | 921 ms | +496 MB | +113 MB | +1,058 MB |
+
+- A fresh branch of a 10 GB template costs 13.6 MB of new pool space and
+  mints in 0.67 s; a full copy would cost the full 10 GB.
+- Clone time grows with template size (it is per-file and per-block-pointer
+  work): 135 ms at 1 GB → 674 ms at 10 GB.
+- The 10 GB template has 1 GB tables, so its first query (a full scan) and
+  its index/rewrite costs are those of a 1 GB table, not a property of
+  cloning: a rewrite writes a new copy of the table.
+- **Scattered small writes are the expensive case**: 1000 random
+  single-row updates dirty ~1000 distinct 128 KB records and cost
+  420–505 MB (≈ 0.45 MB per updated row), independent of template size.
+
+### recordsize
+
+The same 1 GB template on datasets with smaller records
+(`vps-d2a3c460-dedfdf9ca5/cow-recordsize-{16K,8K}/`):
+
+| recordsize | Clone mint p50 | Physical per clone | 1000 scattered updates | CREATE INDEX | Rewriting ALTER | +1 / +10 / +100 MB inserted |
+|---|---|---|---|---|---|---|
+| 128K | 135 ms | 2.3 MB | +452 MB | +3.8 MB | +23 MB | +2.5 / +14 / +133 MB |
+| 16K | 369 ms | 11.1 MB | +65 MB | +2.5 MB | +21 MB | noisy (see below) |
+| 8K | 893 ms | 20.4 MB | +33 MB | +2.4 MB | +21 MB | +1.1 / +12.5 / +133 MB |
+
+- Smaller records cut scattered-write amplification 7× (16K) and 14× (8K)
+  — at 8K, PostgreSQL's page size, one dirty page costs one record.
+- They make every clone slower and larger: a clone references every
+  block of the template, and 8K records mean 16× more block pointers than
+  128K (mint 135 → 893 ms, 2.3 → 20.4 MB).
+- The 16K insert series read +140 / +313 / −9 MB — the pool figure moved
+  with frees from the preceding run still draining; the scattered,
+  index and rewrite figures in the same run are consistent with the 8K
+  run. Not re-run.
+- Choice depends on the branch's life: short agent branches that touch
+  few rows and are dropped favour 128K (fast, small clones; the write
+  amplification is bounded by what is touched); long-lived branches with
+  many scattered updates favour 16K. The PGX bench keeps 128K. A
+  per-template dataset (recordsize set at template creation) would allow
+  both; not built.
 
 ## Why a cold mint costs ~60 ms on this host
 
