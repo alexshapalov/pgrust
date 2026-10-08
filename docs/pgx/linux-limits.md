@@ -56,9 +56,11 @@ Kernel log for the second case:
   `oom_kill`. Restart = start the runtime again on the same data directory
   (crash recovery replays WAL; ephemeral databases are swept by the
   janitor at start). The PGX profile runs `fsync = off`: a killed process
-  loses nothing the OS already has, but a host crash can lose recent writes
-  of any database in the runtime — acceptable for disposable branches, not
-  for templates, which must be sealed (checkpointed) before use.
+  loses nothing the OS already has, but after a host crash nothing in the
+  runtime is guaranteed intact — templates included, since with fsync off
+  even a checkpoint does not reach the disk. Branches are disposable;
+  templates must be restorable from durable golden storage (the planned
+  object-storage copy) and re-verified after a host crash.
 
 ## Recommended production setting
 
