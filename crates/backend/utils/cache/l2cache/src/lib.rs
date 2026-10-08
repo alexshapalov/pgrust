@@ -713,6 +713,26 @@ pub fn purge_database(db: Oid) -> (usize, usize) {
     (n_removed, bytes_removed)
 }
 
+/// Drop every generation cached under one key. For a shared-catalog entry
+/// that names a database (`pg_database` by oid): `purge_database` keeps
+/// shared entries, and a dropped database's oid is never looked up again, so
+/// without this each lifecycle left its row behind until the global budget
+/// evicted it (~2 entries per created database). Returns
+/// `(entries_removed, bytes_removed)`.
+pub fn purge_key(key: L2Key) -> (usize, usize) {
+    let shard = shard_of(&key);
+    let mut map = shard.map.lock().unwrap();
+    let Some(b) = map.remove(&key) else {
+        return (0, 0);
+    };
+    let n = b.entries.len();
+    let bytes: usize = b.entries.iter().map(|(_, _, sz)| *sz).sum();
+    shard.count.fetch_sub(n, Ordering::Relaxed);
+    ENTRIES.fetch_sub(n, Ordering::Relaxed);
+    BYTES.fetch_sub(bytes, Ordering::Relaxed);
+    (n, bytes)
+}
+
 /// Test/debug: drop every entry (does not touch generations or views).
 pub fn clear_all() {
     for s in shards().iter() {
@@ -972,6 +992,21 @@ mod tests {
         let (n2, b2) = evict_shard(&mut map, &count, budget);
         assert_eq!((n2, b2), (0, 0));
         assert_eq!(count.load(Ordering::Relaxed), budget);
+    }
+
+    #[test]
+    fn purge_key_drops_all_generations_of_one_key() {
+        let k = L2Key { kind: KIND_CAT, id: 21, db: types_core::InvalidOid, hash: 0xDEAD_0021 };
+        let other = L2Key { hash: 0xDEAD_0022, ..k };
+        let v: L2Value = Arc::new(1u32);
+        insert(k, 1, Arc::clone(&v), 100, |_| true);
+        insert(k, 2, Arc::new(2u32), 100, |_| true);
+        insert(other, 1, Arc::clone(&v), 100, |_| true);
+        assert_eq!(purge_key(k), (2, 200));
+        assert!(lookup(k, 2, |_| true).is_none());
+        assert!(lookup(other, 1, |_| true).is_some());
+        assert_eq!(purge_key(k), (0, 0));
+        purge_key(other);
     }
 
     #[test]

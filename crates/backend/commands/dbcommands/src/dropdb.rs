@@ -382,6 +382,20 @@ fn dropdb_guts(
     // pgrust-only: the process-wide shared catalog cache keys entries by
     // database and has no other way to learn that this one is gone.
     l2cache::purge_database(db_id);
+    // Its pg_database row is cached under the shared (InvalidOid) key, which
+    // purge_database leaves alone; nothing ever looks up this oid again.
+    l2cache::purge_key(l2cache::L2Key {
+        kind: l2cache::KIND_CAT,
+        id: cache_syscache::DATABASEOID as u32,
+        db: InvalidOid,
+        hash: cache_syscache::GetSysCacheHashValue(
+            cache_syscache::DATABASEOID,
+            cache_syscache::SysCacheKey::Value(datum::Datum::from_oid(db_id)),
+            cache_syscache::SysCacheKey::UNUSED,
+            cache_syscache::SysCacheKey::UNUSED,
+            cache_syscache::SysCacheKey::UNUSED,
+        )?,
+    });
 
     if request_checkpoint {
         checkpointer::RequestCheckpoint(
