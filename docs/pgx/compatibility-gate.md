@@ -33,7 +33,7 @@ read-only, at connect and at every Safe Copy refresh:
 
 | Input | How | Why it matters |
 |---|---|---|
-| Server version | `SHOW server_version_num` | PGX is PostgreSQL 18 (it reports `server_version_num` 180003). Older sources are dumped with pg_dump 18 and the restore (rule 3) decides; features newer than 18 do not exist. |
+| Server version | `SHOW server_version_num` | PGX reports PostgreSQL 18.6 (`server_version_num` 180006). Older sources are dumped with pg_dump 18 and the restore (rule 3) decides; features newer than 18 do not exist. |
 | Installed extensions | `SELECT extname, extversion FROM pg_extension` | PGX cannot load C extensions (no `dlopen`, by design). Only its built-in modules exist. |
 | Schema constructs | `pg_dump --schema-only` restored into a scratch PGX database | The authoritative test: does the schema load at all? |
 | Data types | `pg_attribute` → `pg_type` for user tables | Types from unavailable extensions (PostGIS `geometry`, …) |
