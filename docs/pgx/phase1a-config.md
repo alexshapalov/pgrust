@@ -80,6 +80,13 @@ overlapped with them.
 `configs/pgx-ephemeral.conf` = parallel off + runtime off + `shared_buffers=16MB`
 + `wal_buffers=64kB` + `max_connections=20` + replication off + durability off.
 
+Added after the Linux density work: `pgrust.autovacuum_skip_idle_databases =
+on` and `autovacuum_naptime = 300`. One runtime holding 1000 idle databases
+goes from 5.4 % of a core to 0.33 % idle CPU, and databases that change are
+still vacuumed and analyzed (`linux-analyze.md`; the setting needs build
+`6fe0b1ad65` or later). The Linux regression runs (219/231) used the profile
+before these two lines were added.
+
 Left out on purpose:
 
 | Setting | Saves | Why not |
