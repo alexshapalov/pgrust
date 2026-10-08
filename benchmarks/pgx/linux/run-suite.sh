@@ -60,7 +60,7 @@ for step in "${STEPS[@]}"; do
     mintbreak)
         $PY "$HERE/linux/mint-breakdown.py" --out "$OUT/mint-breakdown" ;;
     querybench)
-        $PY "$HERE/linux/query-bench.py" --out "$OUT/query-bench" ;;
+        $PY "$HERE/linux/query-bench.py" --engines "${PGX_QB_ENGINES:-postgres,postgres-nodurable,pgrust,pgx}" --out "$OUT/query-bench" ;;
     analyze)
         $PY "$HERE/linux/analyze-policy.py" --out "$OUT/analyze-policy" ;;
     scale-naptime)
