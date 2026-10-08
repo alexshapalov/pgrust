@@ -143,8 +143,11 @@ end
 RB
 
 # The schema change the workload applies after the first test run.
-mkdir -p ../rails-change
-cat > ../rails-change/20990101000000_add_due_at_and_priority.rb <<'RB'
+rm -rf ../rails-change && mkdir -p ../rails-change
+# stamped a minute after the generated migrations (Rails rejects timestamps
+# in the future)
+CHANGE_TS=$(date -u -d '+1 min' +%Y%m%d%H%M%S)
+cat > "../rails-change/${CHANGE_TS}_add_due_at_and_priority.rb" <<'RB'
 class AddDueAtAndPriority < ActiveRecord::Migration[ActiveRecord::Migration.current_version]
   def change
     add_column :tasks, :due_at, :datetime

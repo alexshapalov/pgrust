@@ -33,6 +33,7 @@ nodejs, node-pg and python3-sqlalchemy (Debian/Ubuntu packages).
 """
 
 import argparse
+import glob
 import json
 import os
 import shutil
@@ -423,8 +424,8 @@ def one_engine(args, label, engine_key, port):
                              ("test_after_load", ["bin/rails", "test"])]
                     for name, cmd in steps:
                         if name == "schema_change":
-                            shutil.copy(os.path.join(change, "20990101000000_add_due_at_and_priority.rb"),
-                                        os.path.join(app, "db", "migrate"))
+                            for mig in glob.glob(os.path.join(change, "*_add_due_at_and_priority.rb")):
+                                shutil.copy(mig, os.path.join(app, "db", "migrate"))
                             shutil.copy(os.path.join(change, "schema_change_test.rb"),
                                         os.path.join(app, "test", "models"))
                         d, rc, o = run_cmd(cmd, app, renv)
