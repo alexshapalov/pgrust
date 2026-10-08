@@ -1,0 +1,47 @@
+{
+  "benchmark": "cpu-noisy",
+  "git_commit": "dedfdf9ca5a6a4af290303a6cd7d5682390ae4db",
+  "settings": [
+    "max_connections=80",
+    "statement_timeout=0"
+  ],
+  "workload": "agent",
+  "same_db": true,
+  "conn_limit": 10,
+  "label": "one-agent-50conns-limit10",
+  "cpus": 4,
+  "noisy_sql": "SELECT sum((g::bigint * g) % 7) FROM generate_series(1, 20000000) g",
+  "levels": [
+    {
+      "noisy_clients": 50,
+      "quiet_latency_ms": {
+        "n": 3061,
+        "min": 0.41,
+        "p50": 0.85,
+        "p95": 3.27,
+        "p99": 5.44,
+        "max": 22.33,
+        "mean": 1.27
+      },
+      "quiet_errors": 0,
+      "quiet_error_examples": [],
+      "new_connection_ms": {
+        "n": 77,
+        "min": 3.74,
+        "p50": 8.03,
+        "p95": 22.9,
+        "p99": 30.94,
+        "max": 37.62,
+        "mean": 10.2
+      },
+      "new_connection_errors": 0,
+      "host_cpu_busy_percent": 60.3,
+      "server_cpu_percent_of_one_core": 230.7,
+      "load1": 3.51,
+      "noisy_queries_completed": 633,
+      "noisy_errors": [],
+      "noisy_refused": 40,
+      "pss_mb": 253.9
+    }
+  ]
+}

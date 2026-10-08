@@ -1,0 +1,300 @@
+{
+  "benchmark": "scale",
+  "git_commit": "dedfdf9ca5a6a4af290303a6cd7d5682390ae4db",
+  "conf": "/home/ubuntu/pgrust/configs/pgx-ephemeral.conf",
+  "settings": [
+    "pgrust.ephemeral_db_prefix=tdb_",
+    "pgrust.ephemeral_db_mint_roles=postgres",
+    "pgrust.ephemeral_db_grace=86400",
+    "max_connections=130"
+  ],
+  "template": {
+    "tables": 50,
+    "rows_per_table": 200
+  },
+  "idle": [
+    {
+      "databases": 0,
+      "mint_ms": null,
+      "footprint_bytes": 88751104,
+      "rss_bytes": 92823552,
+      "threads": 8,
+      "fds": 135,
+      "datadir_apparent_bytes": 74996736,
+      "idle_window_s": 60,
+      "idle_cpu_percent_per_10s": [
+        0.0998,
+        0.0998,
+        0.0998,
+        0.0998,
+        0.0998,
+        0.1997
+      ],
+      "idle_cpu_percent_mean": 0.1164,
+      "idle_cpu_percent_last_minute": 0.1164,
+      "idle_disk_written_bytes": 93675,
+      "idle_wakeups": 63,
+      "on_cpu": {
+        "window_s": 10,
+        "busy_share_by_thread": {}
+      }
+    },
+    {
+      "databases": 100,
+      "mint_ms": {
+        "n": 100000.0,
+        "min": 64.8,
+        "p50": 72.1,
+        "p95": 82.1,
+        "p99": 92.0,
+        "max": 134.9,
+        "mean": 73.5
+      },
+      "footprint_bytes": 97050624,
+      "rss_bytes": 101126144,
+      "threads": 8,
+      "fds": 42,
+      "datadir_apparent_bytes": 1751711744,
+      "idle_window_s": 60,
+      "idle_cpu_percent_per_10s": [
+        0.0998,
+        0.8985,
+        0.8985,
+        1.0981,
+        1.0983,
+        0.9984
+      ],
+      "idle_cpu_percent_mean": 0.8486,
+      "idle_cpu_percent_last_minute": 0.8486,
+      "idle_disk_written_bytes": 285828,
+      "idle_wakeups": 296,
+      "on_cpu": {
+        "window_s": 10,
+        "busy_share_by_thread": {
+          "pg:autovacuum l": 0.002,
+          "postgres": 0.001,
+          "pg:memwatchdog": 0.001,
+          "pg:bgworker": 0.001
+        }
+      }
+    },
+    {
+      "databases": 300,
+      "mint_ms": {
+        "n": 200000.0,
+        "min": 55.5,
+        "p50": 60.5,
+        "p95": 74.9,
+        "p99": 86.7,
+        "max": 117.2,
+        "mean": 62.4
+      },
+      "footprint_bytes": 103868416,
+      "rss_bytes": 107941888,
+      "threads": 8,
+      "fds": 45,
+      "datadir_apparent_bytes": 5102982144,
+      "idle_window_s": 60,
+      "idle_cpu_percent_per_10s": [
+        2.7955,
+        2.6956,
+        2.9953,
+        3.095,
+        2.995,
+        2.7958
+      ],
+      "idle_cpu_percent_mean": 2.8954,
+      "idle_cpu_percent_last_minute": 2.8954,
+      "idle_disk_written_bytes": 710747,
+      "idle_wakeups": 1053,
+      "on_cpu": {
+        "window_s": 10,
+        "busy_share_by_thread": {
+          "postgres": 0.003,
+          "pg:autovacuum l": 0.002,
+          "pg:bgworker": 0.001
+        }
+      }
+    },
+    {
+      "databases": 500,
+      "mint_ms": {
+        "n": 200000.0,
+        "min": 56.6,
+        "p50": 62.2,
+        "p95": 72.6,
+        "p99": 83.5,
+        "max": 93.7,
+        "mean": 63.4
+      },
+      "footprint_bytes": 112441344,
+      "rss_bytes": 116510720,
+      "threads": 8,
+      "fds": 40,
+      "datadir_apparent_bytes": 8454104064,
+      "idle_window_s": 60,
+      "idle_cpu_percent_per_10s": [
+        5.0924,
+        4.992,
+        5.0904,
+        5.1919,
+        4.4931,
+        4.3938
+      ],
+      "idle_cpu_percent_mean": 4.8756,
+      "idle_cpu_percent_last_minute": 4.8756,
+      "idle_disk_written_bytes": 354928,
+      "idle_wakeups": 1829,
+      "on_cpu": {
+        "window_s": 10,
+        "busy_share_by_thread": {
+          "postgres": 0.005,
+          "pg:autovacuum l": 0.005,
+          "pg:bgworker": 0.001
+        }
+      }
+    },
+    {
+      "databases": 1000,
+      "mint_ms": {
+        "n": 500000.0,
+        "min": 56.0,
+        "p50": 62.7,
+        "p95": 72.4,
+        "p99": 83.4,
+        "max": 95.2,
+        "mean": 63.8
+      },
+      "footprint_bytes": 133970944,
+      "rss_bytes": 138043392,
+      "threads": 8,
+      "fds": 41,
+      "datadir_apparent_bytes": 16832073728,
+      "idle_window_s": 300,
+      "idle_cpu_percent_per_10s": [
+        5.4911,
+        5.89,
+        6.1901,
+        5.8911,
+        5.89,
+        5.9895,
+        5.7912,
+        5.7913,
+        5.9879,
+        5.7895,
+        5.2911,
+        5.7911,
+        5.4916,
+        5.6907,
+        5.1906,
+        5.0921,
+        5.0918,
+        5.092,
+        5.0911,
+        4.992,
+        5.1915,
+        4.9912,
+        5.1914,
+        4.992,
+        4.8918,
+        4.9915,
+        5.0904,
+        5.0918,
+        4.9922,
+        4.992
+      ],
+      "idle_cpu_percent_mean": 5.3977,
+      "idle_cpu_percent_last_minute": 5.0083,
+      "idle_disk_written_bytes": 420847,
+      "idle_wakeups": 9034,
+      "on_cpu": {
+        "window_s": 10,
+        "busy_share_by_thread": {
+          "pg:autovacuum l": 0.011,
+          "postgres": 0.004,
+          "pg:bgwriter": 0.001,
+          "pg:memwatchdog": 0.001,
+          "pg:bgworker": 0.001
+        }
+      }
+    }
+  ],
+  "active": [
+    {
+      "databases": 1000,
+      "active": 5,
+      "queries": 9215,
+      "errors": 0,
+      "error_examples": [],
+      "latency_ms": {
+        "n": 9215000.0,
+        "min": 0.41,
+        "p50": 0.64,
+        "p95": 1.18,
+        "p99": 1.66,
+        "max": 16.28,
+        "mean": 0.71
+      },
+      "footprint_bytes": 142042112,
+      "threads": 13,
+      "cpu_percent_of_one_core": 30.8
+    },
+    {
+      "databases": 1000,
+      "active": 20,
+      "queries": 36455,
+      "errors": 0,
+      "error_examples": [],
+      "latency_ms": {
+        "n": 36455000.0,
+        "min": 0.38,
+        "p50": 0.64,
+        "p95": 1.6,
+        "p99": 2.44,
+        "max": 50.98,
+        "mean": 0.81
+      },
+      "footprint_bytes": 166224896,
+      "threads": 28,
+      "cpu_percent_of_one_core": 97.3
+    },
+    {
+      "databases": 1000,
+      "active": 50,
+      "queries": 78004,
+      "errors": 0,
+      "error_examples": [],
+      "latency_ms": {
+        "n": 78004000.0,
+        "min": 0.41,
+        "p50": 1.53,
+        "p95": 7.59,
+        "p99": 12.51,
+        "max": 120.95,
+        "mean": 2.38
+      },
+      "footprint_bytes": 215345152,
+      "threads": 58,
+      "cpu_percent_of_one_core": 201.9
+    },
+    {
+      "databases": 1000,
+      "active": 100,
+      "queries": 69615,
+      "errors": 0,
+      "error_examples": [],
+      "latency_ms": {
+        "n": 69615000.0,
+        "min": 0.45,
+        "p50": 15.62,
+        "p95": 35.9,
+        "p99": 45.77,
+        "max": 391.43,
+        "mean": 16.82
+      },
+      "footprint_bytes": 296538112,
+      "threads": 108,
+      "cpu_percent_of_one_core": 200.8
+    }
+  ]
+}

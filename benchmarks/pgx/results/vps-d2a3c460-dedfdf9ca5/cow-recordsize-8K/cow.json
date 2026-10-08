@@ -1,0 +1,94 @@
+{
+  "benchmark": "cow",
+  "git_commit": "dedfdf9ca5a6a4af290303a6cd7d5682390ae4db",
+  "conf": "/home/ubuntu/pgrust/configs/pgx-ephemeral.conf",
+  "platform": "linux",
+  "filesystem": "tank/pgx-rs8K    47G   96K   47G   1% /tank/pgx-rs8K\ntank/pgx-rs8K on /tank/pgx-rs8K type zfs (rw,noatime,xattr,noacl,casesensitive)",
+  "zfs_dataset": "tank/pgx-rs8K",
+  "runs": [
+    {
+      "method": "clone",
+      "target_mb": 1500,
+      "template": {
+        "tables": 50,
+        "rows_per_table": 104298,
+        "logical_bytes": 1057686031,
+        "build_s": 195.46373764700547,
+        "seal_s": 7.970669144997373
+      },
+      "clone": {
+        "count": 3,
+        "samples": [
+          {
+            "mint_to_select1_s": 0.984164099994814,
+            "first_real_query_s": 0.0147796119999839
+          },
+          {
+            "mint_to_select1_s": 0.6748998279945226,
+            "first_real_query_s": 0.013603782004793175
+          },
+          {
+            "mint_to_select1_s": 0.8930848760064691,
+            "first_real_query_s": 0.012653148995013908
+          }
+        ],
+        "bclone_used_delta_bytes": 1057898496,
+        "bclone_saved_per_clone_bytes": 1057898496.0,
+        "mint_to_select1_ms_median": 893.0848760064691,
+        "first_real_query_ms_median": 13.603782004793175,
+        "logical_bytes_per_clone": 1057686031,
+        "physical_bytes_per_clone": 21435733.333333332
+      },
+      "writes_insert": [
+        {
+          "inserted_mb_nominal": 1,
+          "cumulative_nominal_mb": 1,
+          "insert_s": 0.18648846000724006,
+          "cumulative_logical_growth_bytes": 1204224,
+          "cumulative_physical_growth_bytes": 1159168
+        },
+        {
+          "inserted_mb_nominal": 10,
+          "cumulative_nominal_mb": 11,
+          "insert_s": 1.591654011994251,
+          "cumulative_logical_growth_bytes": 12967936,
+          "cumulative_physical_growth_bytes": 13074432
+        },
+        {
+          "inserted_mb_nominal": 100,
+          "cumulative_nominal_mb": 111,
+          "insert_s": 20.078825706004864,
+          "cumulative_logical_growth_bytes": 129908736,
+          "cumulative_physical_growth_bytes": 139107328
+        }
+      ],
+      "write_update_one_table": {
+        "table_total_bytes_before": 21020672,
+        "logical_growth_bytes": 19316736,
+        "physical_growth_bytes": 40697856
+      },
+      "agent_writes": {
+        "scattered_updates_1000": {
+          "seconds": 1.408,
+          "logical_growth_bytes": 319488,
+          "physical_growth_bytes": 34852864
+        },
+        "create_index": {
+          "seconds": 0.134,
+          "logical_growth_bytes": 2359296,
+          "physical_growth_bytes": 2494464
+        },
+        "migration_rewrite": {
+          "seconds": 0.419,
+          "logical_growth_bytes": -65536,
+          "physical_growth_bytes": 21590016
+        }
+      },
+      "delete": {
+        "count": 2,
+        "drop_ms_median": 126.5535060010734,
+        "physical_bytes_returned_per_clone": 13170688.0
+      }
+    }
+  ]
+}

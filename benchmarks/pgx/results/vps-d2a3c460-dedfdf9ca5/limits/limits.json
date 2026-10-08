@@ -1,0 +1,162 @@
+{
+  "benchmark": "memory-limits",
+  "git_commit": "dedfdf9ca5a6a4af290303a6cd7d5682390ae4db",
+  "conf": "/home/ubuntu/pgrust/configs/pgx-ephemeral.conf",
+  "cases": [
+    {
+      "case": "none",
+      "settings": [
+        "max_connections=50"
+      ],
+      "sessions": [
+        {
+          "database": "solo",
+          "rows": 30000000,
+          "ok": true,
+          "result": "[['30000000']]",
+          "seconds": 8.63,
+          "select1_after": true
+        }
+      ],
+      "base_pss_mb": 63.8,
+      "peak_pss_mb": 1746.1,
+      "bystander": {
+        "queries": 166,
+        "errors": 0,
+        "error_examples": [],
+        "max_ms": 71.1
+      },
+      "new_connection_after": true,
+      "server_alive": true,
+      "panic_in_log": false,
+      "limit_hints_in_log": 0
+    },
+    {
+      "case": "session",
+      "settings": [
+        "max_connections=50",
+        "pgrust.session_memory_limit=256"
+      ],
+      "sessions": [
+        {
+          "database": "solo",
+          "rows": 30000000,
+          "ok": false,
+          "error": "SERROR VERROR C53200 Mout of memory DFailed on request of size 20 in memory context \"tuplestore tuples\". HThe session reached pgrust.session_memory_limit. Fmcxt.c L0  ",
+          "seconds": 0.82,
+          "select1_after": true
+        }
+      ],
+      "base_pss_mb": 64.1,
+      "peak_pss_mb": 382.7,
+      "bystander": {
+        "queries": 17,
+        "errors": 0,
+        "error_examples": [],
+        "max_ms": 0.6
+      },
+      "new_connection_after": true,
+      "server_alive": true,
+      "panic_in_log": false,
+      "limit_hints_in_log": 1
+    },
+    {
+      "case": "database",
+      "settings": [
+        "max_connections=50",
+        "pgrust.database_memory_limit=512"
+      ],
+      "sessions": [
+        {
+          "database": "other",
+          "rows": 5000000,
+          "ok": true,
+          "result": "[['5000000']]",
+          "seconds": 1.32,
+          "select1_after": true
+        },
+        {
+          "database": "shared",
+          "rows": 5000000,
+          "ok": false,
+          "error": "SERROR VERROR C53200 Mout of memory DFailed on request of size 33554432 in memory context \"AggContext\". HThe sessions of this database together reached pgrust.database_memory_limit. Fmcxt.c L0  ",
+          "seconds": 0.82,
+          "select1_after": true
+        },
+        {
+          "database": "shared",
+          "rows": 5000000,
+          "ok": true,
+          "result": "[['5000000']]",
+          "seconds": 1.42,
+          "select1_after": true
+        }
+      ],
+      "base_pss_mb": 64.0,
+      "peak_pss_mb": 800.7,
+      "bystander": {
+        "queries": 28,
+        "errors": 0,
+        "error_examples": [],
+        "max_ms": 2.2
+      },
+      "new_connection_after": true,
+      "server_alive": true,
+      "panic_in_log": false,
+      "limit_hints_in_log": 1
+    },
+    {
+      "case": "runtime",
+      "settings": [
+        "max_connections=50",
+        "pgrust.runtime_memory_limit=2048"
+      ],
+      "sessions": [
+        {
+          "database": "r1",
+          "rows": 20000000,
+          "ok": false,
+          "error": "SERROR VERROR C53200 Mout of memory DFailed on request of size 20 in memory context \"tuplestore tuples\". HThe server reached pgrust.runtime_memory_limit. Fmcxt.c L0  ",
+          "seconds": 1.44,
+          "select1_after": true
+        },
+        {
+          "database": "r2",
+          "rows": 20000000,
+          "ok": false,
+          "error": "SERROR VERROR C53200 Mout of memory DFailed on request of size 134217728 in memory context \"AggContext\". HThe server reached pgrust.runtime_memory_limit. Fmcxt.c L0  ",
+          "seconds": 3.63,
+          "select1_after": true
+        },
+        {
+          "database": "r3",
+          "rows": 20000000,
+          "ok": false,
+          "error": "SERROR VERROR C53200 Mout of memory DFailed on request of size 268435456 in memory context \"tuplestore\". HThe server reached pgrust.runtime_memory_limit. Fmcxt.c L0  ",
+          "seconds": 1.86,
+          "select1_after": true
+        },
+        {
+          "database": "r4",
+          "rows": 20000000,
+          "ok": true,
+          "result": "[['20000000']]",
+          "seconds": 5.52,
+          "select1_after": true
+        }
+      ],
+      "base_pss_mb": 64.9,
+      "peak_pss_mb": 2006.7,
+      "bystander": {
+        "queries": 108,
+        "errors": 0,
+        "error_examples": [],
+        "max_ms": 13.3
+      },
+      "new_connection_after": true,
+      "server_alive": true,
+      "panic_in_log": false,
+      "limit_hints_in_log": 3
+    }
+  ]
+}

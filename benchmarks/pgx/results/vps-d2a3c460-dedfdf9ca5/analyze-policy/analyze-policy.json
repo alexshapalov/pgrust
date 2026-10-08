@@ -1,0 +1,453 @@
+{
+  "benchmark": "analyze-policy",
+  "git_commit": "dedfdf9ca5a6a4af290303a6cd7d5682390ae4db",
+  "levels": [
+    {
+      "growth_percent": 0,
+      "stale": {
+        "status_new_count": {
+          "top": "Aggregate",
+          "estimated_rows": 1,
+          "actual_rows": 1,
+          "filter_node_est_actual": [
+            2033,
+            2000
+          ],
+          "scans": [],
+          "joins": [],
+          "median_ms": 1.21
+        },
+        "status_new_join": {
+          "top": "HashAggregate",
+          "estimated_rows": 20,
+          "actual_rows": 1,
+          "filter_node_est_actual": [
+            2033,
+            2000
+          ],
+          "scans": [
+            "Seq Scan on accounts"
+          ],
+          "joins": [
+            "Hash Join"
+          ],
+          "median_ms": 6.02
+        },
+        "recent_by_account": {
+          "top": "Limit",
+          "estimated_rows": 50,
+          "actual_rows": 50,
+          "filter_node_est_actual": [
+            2033,
+            2000
+          ],
+          "scans": [
+            "Bitmap Heap Scan on orders",
+            "Bitmap Index Scan on orders_account",
+            "Bitmap Index Scan on orders_status"
+          ],
+          "joins": [],
+          "median_ms": 1.03
+        }
+      },
+      "analyzed": {
+        "status_new_count": {
+          "top": "Aggregate",
+          "estimated_rows": 1,
+          "actual_rows": 1,
+          "filter_node_est_actual": [
+            1920,
+            2000
+          ],
+          "scans": [],
+          "joins": [],
+          "median_ms": 1.26
+        },
+        "status_new_join": {
+          "top": "HashAggregate",
+          "estimated_rows": 20,
+          "actual_rows": 1,
+          "filter_node_est_actual": [
+            1920,
+            2000
+          ],
+          "scans": [
+            "Seq Scan on accounts"
+          ],
+          "joins": [
+            "Hash Join"
+          ],
+          "median_ms": 6.01
+        },
+        "recent_by_account": {
+          "top": "Limit",
+          "estimated_rows": 46,
+          "actual_rows": 50,
+          "filter_node_est_actual": [
+            1920,
+            2000
+          ],
+          "scans": [
+            "Bitmap Heap Scan on orders",
+            "Bitmap Index Scan on orders_account",
+            "Bitmap Index Scan on orders_status"
+          ],
+          "joins": [],
+          "median_ms": 1.11
+        }
+      }
+    },
+    {
+      "growth_percent": 10,
+      "stale": {
+        "status_new_count": {
+          "top": "Aggregate",
+          "estimated_rows": 1,
+          "actual_rows": 1,
+          "filter_node_est_actual": [
+            2238,
+            22000
+          ],
+          "scans": [],
+          "joins": [],
+          "median_ms": 5.57
+        },
+        "status_new_join": {
+          "top": "HashAggregate",
+          "estimated_rows": 20,
+          "actual_rows": 20,
+          "filter_node_est_actual": [
+            2238,
+            22000
+          ],
+          "scans": [
+            "Seq Scan on accounts"
+          ],
+          "joins": [
+            "Hash Join"
+          ],
+          "median_ms": 14.06
+        },
+        "recent_by_account": {
+          "top": "Limit",
+          "estimated_rows": 50,
+          "actual_rows": 50,
+          "filter_node_est_actual": [
+            2238,
+            22000
+          ],
+          "scans": [
+            "Bitmap Heap Scan on orders",
+            "Bitmap Index Scan on orders_account",
+            "Bitmap Index Scan on orders_status"
+          ],
+          "joins": [],
+          "median_ms": 1.72
+        }
+      },
+      "analyzed": {
+        "status_new_count": {
+          "top": "Aggregate",
+          "estimated_rows": 1,
+          "actual_rows": 1,
+          "filter_node_est_actual": [
+            21289,
+            22000
+          ],
+          "scans": [],
+          "joins": [],
+          "median_ms": 5.21
+        },
+        "status_new_join": {
+          "top": "HashAggregate",
+          "estimated_rows": 20,
+          "actual_rows": 20,
+          "filter_node_est_actual": [
+            21289,
+            22000
+          ],
+          "scans": [
+            "Seq Scan on accounts"
+          ],
+          "joins": [
+            "Hash Join"
+          ],
+          "median_ms": 12.45
+        },
+        "recent_by_account": {
+          "top": "Limit",
+          "estimated_rows": 50,
+          "actual_rows": 50,
+          "filter_node_est_actual": null,
+          "scans": [],
+          "joins": [],
+          "median_ms": 4.84
+        }
+      }
+    },
+    {
+      "growth_percent": 25,
+      "stale": {
+        "status_new_count": {
+          "top": "Aggregate",
+          "estimated_rows": 1,
+          "actual_rows": 1,
+          "filter_node_est_actual": [
+            2542,
+            52000
+          ],
+          "scans": [],
+          "joins": [],
+          "median_ms": 12.24
+        },
+        "status_new_join": {
+          "top": "HashAggregate",
+          "estimated_rows": 20,
+          "actual_rows": 20,
+          "filter_node_est_actual": [
+            2542,
+            52000
+          ],
+          "scans": [
+            "Seq Scan on accounts"
+          ],
+          "joins": [
+            "Hash Join"
+          ],
+          "median_ms": 26.39
+        },
+        "recent_by_account": {
+          "top": "Limit",
+          "estimated_rows": 50,
+          "actual_rows": 50,
+          "filter_node_est_actual": [
+            2542,
+            52000
+          ],
+          "scans": [
+            "Bitmap Heap Scan on orders",
+            "Bitmap Index Scan on orders_account",
+            "Bitmap Index Scan on orders_status"
+          ],
+          "joins": [],
+          "median_ms": 3.09
+        }
+      },
+      "analyzed": {
+        "status_new_count": {
+          "top": "Aggregate",
+          "estimated_rows": 1,
+          "actual_rows": 1,
+          "filter_node_est_actual": [
+            52100,
+            52000
+          ],
+          "scans": [],
+          "joins": [],
+          "median_ms": 11.97
+        },
+        "status_new_join": {
+          "top": "HashAggregate",
+          "estimated_rows": 20,
+          "actual_rows": 20,
+          "filter_node_est_actual": [
+            52100,
+            52000
+          ],
+          "scans": [
+            "Seq Scan on accounts"
+          ],
+          "joins": [
+            "Hash Join"
+          ],
+          "median_ms": 24.57
+        },
+        "recent_by_account": {
+          "top": "Limit",
+          "estimated_rows": 50,
+          "actual_rows": 50,
+          "filter_node_est_actual": null,
+          "scans": [],
+          "joins": [],
+          "median_ms": 2.52
+        }
+      }
+    },
+    {
+      "growth_percent": 50,
+      "stale": {
+        "status_new_count": {
+          "top": "Aggregate",
+          "estimated_rows": 1,
+          "actual_rows": 1,
+          "filter_node_est_actual": [
+            3050,
+            102000
+          ],
+          "scans": [],
+          "joins": [],
+          "median_ms": 20.61
+        },
+        "status_new_join": {
+          "top": "HashAggregate",
+          "estimated_rows": 20,
+          "actual_rows": 20,
+          "filter_node_est_actual": [
+            3050,
+            102000
+          ],
+          "scans": [
+            "Seq Scan on accounts"
+          ],
+          "joins": [
+            "Hash Join"
+          ],
+          "median_ms": 50.39
+        },
+        "recent_by_account": {
+          "top": "Limit",
+          "estimated_rows": 50,
+          "actual_rows": 50,
+          "filter_node_est_actual": [
+            3050,
+            102000
+          ],
+          "scans": [
+            "Bitmap Heap Scan on orders",
+            "Bitmap Index Scan on orders_account",
+            "Bitmap Index Scan on orders_status"
+          ],
+          "joins": [],
+          "median_ms": 4.34
+        }
+      },
+      "analyzed": {
+        "status_new_count": {
+          "top": "Aggregate",
+          "estimated_rows": 1,
+          "actual_rows": 1,
+          "filter_node_est_actual": [
+            102520,
+            102000
+          ],
+          "scans": [],
+          "joins": [],
+          "median_ms": 21.41
+        },
+        "status_new_join": {
+          "top": "HashAggregate",
+          "estimated_rows": 20,
+          "actual_rows": 20,
+          "filter_node_est_actual": [
+            102520,
+            102000
+          ],
+          "scans": [
+            "Seq Scan on accounts"
+          ],
+          "joins": [
+            "Hash Join"
+          ],
+          "median_ms": 52.0
+        },
+        "recent_by_account": {
+          "top": "Limit",
+          "estimated_rows": 50,
+          "actual_rows": 50,
+          "filter_node_est_actual": null,
+          "scans": [],
+          "joins": [],
+          "median_ms": 4.51
+        }
+      }
+    },
+    {
+      "growth_percent": 100,
+      "stale": {
+        "status_new_count": {
+          "top": "Aggregate",
+          "estimated_rows": 1,
+          "actual_rows": 1,
+          "filter_node_est_actual": [
+            4067,
+            202000
+          ],
+          "scans": [],
+          "joins": [],
+          "median_ms": 76.07
+        },
+        "status_new_join": {
+          "top": "HashAggregate",
+          "estimated_rows": 20,
+          "actual_rows": 20,
+          "filter_node_est_actual": [
+            4067,
+            202000
+          ],
+          "scans": [
+            "Seq Scan on accounts"
+          ],
+          "joins": [
+            "Hash Join"
+          ],
+          "median_ms": 109.39
+        },
+        "recent_by_account": {
+          "top": "Limit",
+          "estimated_rows": 50,
+          "actual_rows": 50,
+          "filter_node_est_actual": [
+            4067,
+            202000
+          ],
+          "scans": [
+            "Bitmap Heap Scan on orders",
+            "Bitmap Index Scan on orders_account",
+            "Bitmap Index Scan on orders_status"
+          ],
+          "joins": [],
+          "median_ms": 7.54
+        }
+      },
+      "analyzed": {
+        "status_new_count": {
+          "top": "Aggregate",
+          "estimated_rows": 1,
+          "actual_rows": 1,
+          "filter_node_est_actual": [
+            201413,
+            202000
+          ],
+          "scans": [],
+          "joins": [],
+          "median_ms": 73.85
+        },
+        "status_new_join": {
+          "top": "HashAggregate",
+          "estimated_rows": 20,
+          "actual_rows": 20,
+          "filter_node_est_actual": [
+            201413,
+            202000
+          ],
+          "scans": [
+            "Seq Scan on accounts"
+          ],
+          "joins": [
+            "Hash Join"
+          ],
+          "median_ms": 118.49
+        },
+        "recent_by_account": {
+          "top": "Limit",
+          "estimated_rows": 50,
+          "actual_rows": 50,
+          "filter_node_est_actual": null,
+          "scans": [],
+          "joins": [],
+          "median_ms": 6.28
+        }
+      }
+    }
+  ]
+}
