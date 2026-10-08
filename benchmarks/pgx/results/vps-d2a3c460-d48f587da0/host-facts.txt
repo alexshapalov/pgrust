@@ -1,0 +1,44 @@
+Thu Oct  8 07:28:08 UTC 2026
+Linux vps-d2a3c460 7.0.0-14-generic #14-Ubuntu SMP PREEMPT_DYNAMIC Mon Apr 13 11:09:53 UTC 2026 x86_64 GNU/Linux
+4
+               total        used        free      shared  buff/cache   available
+Mem:      8122355712  1246466048  2787540992    22409216  4619386880  6875889664
+Swap:              0           0           0
+Filesystem       1B-blocks        Used   Available Use% Mounted on
+/dev/sda1      25960402944 12593086464 13350539264  49% /
+NAME     SIZE TYPE FSTYPE     PARTLABEL       MOUNTPOINTS
+sda       75G disk                            
+├─sda1    25G part ext4       cloudimg-rootfs /
+├─sda2  48.9G part zfs_member pgx-zfs         
+├─sda13 1023M part ext4                       /boot
+├─sda14    4M part                            
+└─sda15  106M part vfat                       /boot/efi
+  pool: tank
+ state: ONLINE
+config:
+
+	NAME                              STATE     READ WRITE CKSUM
+	tank                              ONLINE       0     0     0
+	  /dev/disk/by-partlabel/pgx-zfs  ONLINE       0     0     0
+
+errors: No known data errors
+tank  size                           48.5G                          -
+tank  allocated                      164M                           -
+tank  ashift                         12                             local
+tank  expandsize                     -                              -
+tank  dedup_table_size               0                              -
+tank  feature@allocation_classes     enabled                        local
+tank  feature@block_cloning          active                         local
+tank  feature@block_cloning_endian   active                         local
+NAME            PROPERTY      VALUE           SOURCE
+tank            compression   off             local
+tank            recordsize    128K            default
+tank            atime         off             local
+tank            primarycache  all             default
+tank/pgx-bench  compression   off             inherited from tank
+tank/pgx-bench  recordsize    128K            default
+tank/pgx-bench  atime         off             inherited from tank
+tank/pgx-bench  primarycache  all             default
+1073741824
+1
+always [madvise] never

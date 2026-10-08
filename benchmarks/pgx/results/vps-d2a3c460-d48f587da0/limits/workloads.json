@@ -1,0 +1,135 @@
+{
+  "benchmark": "memory-limit-workloads",
+  "git_commit": "d48f587da0c4c0d5f4430969831e9d843c9ae672",
+  "settings": [
+    "max_connections=20",
+    "pgrust.session_memory_limit=256",
+    "work_mem=2GB",
+    "maintenance_work_mem=2GB",
+    "temp_buffers=64MB"
+  ],
+  "workloads": [
+    {
+      "workload": "sort",
+      "ok": false,
+      "sqlstate": "53200",
+      "error": "SERROR VERROR C53200 Mout of memory DFailed on request of size 72000000 in memory context \"TupleSort main\". HThe session reached pgrust.session_memory_limit. Fmcxt.c L0  ",
+      "hint": "reached pgrust.session_memory_limit",
+      "seconds": 1.33,
+      "select1_after": true,
+      "peak_pss_mb": 246.9,
+      "server_alive": true
+    },
+    {
+      "workload": "hash_join",
+      "ok": false,
+      "sqlstate": "53200",
+      "error": "SERROR VERROR C53200 Mout of memory DFailed on request of size 65 in memory context \"HashBatchContext\". HThe session reached pgrust.session_memory_limit. Fmcxt.c L0  ",
+      "hint": "reached pgrust.session_memory_limit",
+      "seconds": 2.06,
+      "select1_after": true,
+      "peak_pss_mb": 298.3,
+      "server_alive": true
+    },
+    {
+      "workload": "hash_aggregate",
+      "ok": false,
+      "sqlstate": "53200",
+      "error": "SERROR VERROR C53200 Mout of memory DFailed on request of size 143998272 in memory context \"ExecutorState\". HThe session reached pgrust.session_memory_limit. Fmcxt.c L0  ",
+      "hint": "reached pgrust.session_memory_limit",
+      "seconds": 2.34,
+      "select1_after": true,
+      "peak_pss_mb": 293.3,
+      "server_alive": true
+    },
+    {
+      "workload": "cte",
+      "ok": false,
+      "sqlstate": "53200",
+      "error": "SERROR VERROR C53200 Mout of memory DFailed on request of size 116 in memory context \"tuplestore tuples\". HThe session reached pgrust.session_memory_limit. Fmcxt.c L0  ",
+      "hint": "reached pgrust.session_memory_limit",
+      "seconds": 1.27,
+      "select1_after": true,
+      "peak_pss_mb": 275.9,
+      "server_alive": true
+    },
+    {
+      "workload": "json_aggregation",
+      "ok": false,
+      "sqlstate": "53200",
+      "error": "SERROR VERROR C53200 Mout of memory DFailed on request of size 268435456 in memory context \"AggContext\". HThe session reached pgrust.session_memory_limit. Fmcxt.c L0  ",
+      "hint": "reached pgrust.session_memory_limit",
+      "seconds": 1.95,
+      "select1_after": true,
+      "peak_pss_mb": 256.6,
+      "server_alive": true
+    },
+    {
+      "workload": "array_agg",
+      "ok": false,
+      "sqlstate": "53200",
+      "error": "SERROR VERROR C53200 Mout of memory DFailed on request of size 36 in memory context \"ExprContext\". HThe session reached pgrust.session_memory_limit. Fmcxt.c L0  ",
+      "hint": "reached pgrust.session_memory_limit",
+      "seconds": 1.17,
+      "select1_after": true,
+      "peak_pss_mb": 271.2,
+      "server_alive": true
+    },
+    {
+      "workload": "copy_out",
+      "ok": true,
+      "seconds": 3.33,
+      "select1_after": true,
+      "peak_pss_mb": 59.9,
+      "server_alive": true
+    },
+    {
+      "workload": "copy_in",
+      "ok": true,
+      "seconds": 6.75,
+      "select1_after": true,
+      "peak_pss_mb": 125.4,
+      "server_alive": true
+    },
+    {
+      "workload": "large_insert",
+      "ok": true,
+      "seconds": 4.63,
+      "select1_after": true,
+      "peak_pss_mb": 60.0,
+      "server_alive": true
+    },
+    {
+      "workload": "create_index",
+      "ok": true,
+      "seconds": 5.04,
+      "select1_after": true,
+      "peak_pss_mb": 292.3,
+      "server_alive": true
+    },
+    {
+      "workload": "migration_rewrite",
+      "ok": true,
+      "seconds": 6.54,
+      "select1_after": true,
+      "peak_pss_mb": 60.3,
+      "server_alive": true
+    },
+    {
+      "workload": "temp_spill",
+      "ok": true,
+      "seconds": 4.07,
+      "select1_after": true,
+      "peak_pss_mb": 61.8,
+      "server_alive": true
+    }
+  ],
+  "bystander": {
+    "queries": 830,
+    "errors": 0,
+    "error_examples": [],
+    "max_ms": 24.6
+  },
+  "panic_in_log": false,
+  "internal_errors": 0
+}
