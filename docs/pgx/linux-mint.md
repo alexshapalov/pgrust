@@ -76,7 +76,7 @@ Every burst completed without errors (500 concurrent clients included).
   anyway. On storage with faster file creation that cap would become the
   limit; it is a constant, not a setting, today.
 - The practical rule: size the pool to the burst you want served warm.
-  A pool of 32 spares costs ~32 × 0.55 MB of memory and ~32 × 2 MB of pool
+  A pool of 32 spares costs ~32 × 0.13 MB of memory (`linux-density.md`) and ~32 × 2 MB of pool
   space.
 
 ### Bug found and fixed by this test
