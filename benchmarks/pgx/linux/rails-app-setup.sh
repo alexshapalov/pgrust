@@ -14,8 +14,9 @@ rails new "$DIR" --minimal --database=postgresql --skip-git --skip-docker --skip
 cd "$DIR"
 # gems go beside the app (shared by every copy the workload makes); the
 # absolute path is recorded in the app's .bundle/config
-bundle config set --local path "$(cd .. && pwd)/bundle"
-bundle install --quiet
+BUNDLE=$(command -v bundle || command -v bundle3.3)   # Ubuntu's ruby-full ships bundle3.3
+"$BUNDLE" config set --local path "$(cd .. && pwd)/bundle"
+"$BUNDLE" install --quiet
 cat > config/database.yml <<'YML'
 default: &default
   adapter: postgresql
