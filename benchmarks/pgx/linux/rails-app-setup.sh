@@ -110,7 +110,8 @@ class WorkloadTest < ActiveSupport::TestCase
   end
 
   test "foreign key violation" do
-    assert_raises(ActiveRecord::InvalidForeignKey) { Task.create!(project_id: -1, title: "x", position: 1) }
+    # skip the belongs_to validation so the database's FK is what refuses it
+    assert_raises(ActiveRecord::InvalidForeignKey) { Task.new(project_id: -1, title: "x", position: 1).save!(validate: false) }
   end
 
   test "nested transaction rolls back to savepoint" do
