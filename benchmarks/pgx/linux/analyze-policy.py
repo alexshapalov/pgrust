@@ -105,7 +105,7 @@ def main():
             c = connect(db)
             if g:
                 n = 200000 * g // 100
-                c.query("INSERT INTO orders SELECT 1000000 + s, (s % 20000) + 1, 'new', s % 997 FROM generate_series(1, %d) s" % n)
+                c.query("INSERT INTO orders SELECT 1000000 + s, (s %% 20000) + 1, 'new', s %% 997 FROM generate_series(1, %d) s" % n)
             row = {"growth_percent": g, "stale": {}, "analyzed": {}}
             for state in ("stale", "analyzed"):
                 if state == "analyzed":
