@@ -60,7 +60,10 @@ did all 5 in 2 s. The launcher now records when it skipped each database
 and uses that time as if a worker had visited.
 `benchmarks/pgx/linux/skipidle-check.py` (suite step `skipidle`) checks
 that written databases are vacuumed and analyzed, and visited again after
-new writes. Pass 8 verifies the fix.
+new writes. Pass 8 (build `bb3a8ab54b`), 50 idle + 5 written databases,
+naptime 5 s: with skip-idle, 5/5 written databases vacuumed and analyzed
+in 4 s and visited again 6 s after new writes. The stock launcher's
+control run did the same in 2 s and 6 s.
 
 ## 2. Does a branch need ANALYZE?
 
