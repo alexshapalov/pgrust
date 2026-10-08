@@ -96,6 +96,9 @@ for step in "${STEPS[@]}"; do
         $PY "$HERE/churn.py" --cycles "${PGX_CHURN_CYCLES:-30}" --guc pgrust.autovacuum_skip_idle_databases=on --out "$OUT/churn-skipidle" ;;
     churn-avoff)
         $PY "$HERE/churn.py" --cycles "${PGX_CHURN_CYCLES:-30}" --guc autovacuum=off --out "$OUT/churn-autovacuum-off" ;;
+    skipidle)
+        $PY "$HERE/linux/skipidle-check.py" --out "$OUT/skipidle" --skip-idle off
+        $PY "$HERE/linux/skipidle-check.py" --out "$OUT/skipidle" ;;
     insertmem)
         $PY "$HERE/linux/insert-memory-repro.py" --out "$OUT/insert-memory" ;;
     workloads)

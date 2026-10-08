@@ -52,6 +52,13 @@ thread_local! {
     static LAST_VISIT_MODS: RefCell<std::collections::HashMap<Oid, i64>> =
         RefCell::new(std::collections::HashMap::new());
     static SKIPPED_IDLE: Cell<u64> = const { Cell::new(0) };
+    // When each database was last passed over as idle (launcher thread
+    // only). The worker that a skip replaces would have set the database's
+    // last_autovac_time; do_start_worker's oldest-first choice uses this
+    // time instead, or a never-visited idle database (last_autovac_time 0)
+    // would win every choice and starve the databases that do change.
+    static LAST_SKIPPED_AT: RefCell<std::collections::HashMap<Oid, TimestampTz>> =
+        RefCell::new(std::collections::HashMap::new());
     // get_database_list result reused between launcher wakes while
     // pgrust.autovacuum_skip_idle_databases is on (see database_list).
     static DBLIST_CACHE: RefCell<Option<(std::time::Instant, Vec<AvwDbase>)>> = const { RefCell::new(None) };
@@ -680,9 +687,16 @@ fn do_start_worker() -> PgResult<StartOutcome> {
             continue;
         }
 
-        if avdb.is_none() || entry.last_autovac_time < avdb_last_autovac {
+        let last_autovac = if skip_idle_databases() {
+            LAST_SKIPPED_AT
+                .with_borrow(|m| m.get(&tmp.adw_datid).copied())
+                .map_or(entry.last_autovac_time, |t| t.max(entry.last_autovac_time))
+        } else {
+            entry.last_autovac_time
+        };
+        if avdb.is_none() || last_autovac < avdb_last_autovac {
             avdb = Some(tmp);
-            avdb_last_autovac = entry.last_autovac_time;
+            avdb_last_autovac = last_autovac;
         }
     }
 
@@ -704,15 +718,14 @@ fn do_start_worker() -> PgResult<StartOutcome> {
                     LAST_VISIT_MODS.with_borrow(|m| m.get(&avdb.adw_datid).copied().unwrap_or(0) == mods);
                 if unchanged {
                     SKIPPED_IDLE.set(SKIPPED_IDLE.get() + 1);
+                    LAST_SKIPPED_AT.with_borrow_mut(|m| {
+                        prune_dropped(m, &dblist);
+                        m.insert(avdb.adw_datid, current_time);
+                    });
                     return Ok(StartOutcome::SkippedIdle(avdb.adw_datid));
                 }
                 LAST_VISIT_MODS.with_borrow_mut(|m| {
-                    // Forget dropped databases (cheap: the list is in hand).
-                    if m.len() > dblist.len() * 2 + 64 {
-                        let live: std::collections::HashSet<Oid> =
-                            dblist.iter().map(|d| d.adw_datid).collect();
-                        m.retain(|k, _| live.contains(k));
-                    }
+                    prune_dropped(m, &dblist);
                     m.insert(avdb.adw_datid, mods);
                 });
             }
@@ -736,6 +749,15 @@ fn do_start_worker() -> PgResult<StartOutcome> {
     }
 
     Ok(if OidIsValid(retval) { StartOutcome::Launched(retval) } else { StartOutcome::None })
+}
+
+/// Forget dropped databases in a launcher-private per-database map once it
+/// outgrows the live list (cheap: the list is in hand).
+fn prune_dropped<V>(m: &mut std::collections::HashMap<Oid, V>, dblist: &[AvwDbase]) {
+    if m.len() > dblist.len() * 2 + 64 {
+        let live: std::collections::HashSet<Oid> = dblist.iter().map(|d| d.adw_datid).collect();
+        m.retain(|k, _| live.contains(k));
+    }
 }
 
 fn skip_idle_databases() -> bool {
