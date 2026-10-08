@@ -18,6 +18,8 @@ the two dumps summed by call site, in bytes and blocks per database.
 Symbolication: macOS `atos`; Linux `addr2line`, with the load base read from
 /proc/<pid>/maps (the tracker reports slide 0 there). Output also in
 /tmp/leaktrace.json. Usage: alloc-trace.py [dbs per cycle] [measured cycles]
+EXTRA_GUCS="name=value ...": extra server settings (shared_catalog_cache=off
+removes the shared cache's eviction noise from the measurement).
 TRACE_MODE=density: instead of churn, keep the measured databases idle and
 attribute the live bytes each idle database holds.
 """
@@ -28,7 +30,7 @@ BIN = os.path.join(pb.REPO, "target-track/release/postgres")
 os.environ["PGRUST_ALLOC_TRACK"] = "all,dump"
 gucs = ["pgrust.ephemeral_db_prefix=tdb_", "pgrust.ephemeral_db_mint_roles=postgres",
         "pgrust.ephemeral_db_grace=%d" % (86400 if os.environ.get("TRACE_MODE") == "density" else 2),
-        "max_connections=40"]
+        "max_connections=40"] + os.environ.get("EXTRA_GUCS", "").split()
 args = []
 for g in gucs: args += ["-c", g]
 ws = pb.Workspace(pb.Engine("pgrust", BIN, args, os.path.join(pb.REPO, "configs/pgx-ephemeral.conf")))
