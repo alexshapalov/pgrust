@@ -24,7 +24,7 @@ numbers are quoted. Raw data: `benchmarks/pgx/results/vps-d2a3c460-<build>/`.
 
 | | Before this work | Now |
 |---|---|---|
-| Memory after 10,000 database lifecycles | 85 → 262 MB, linear (~11 KB per lifecycle) | 94 → 109 MB, last quarter 0.2–0.6 KB per lifecycle |
+| Memory after 10,000 database lifecycles | 85 → 262 MB, linear (~11 KB per lifecycle) | 94 → 109 MB; 126 MB at 30,000, still ~0.9 KB per lifecycle |
 | Memory, 1000 idle databases | 669 MB | 128–155 MB (213 MB if each was queried once) |
 | Idle CPU, 1000 idle databases | 6.5 % of a core | 0.33–0.43 % (profile default) |
 | Bulk INSERT…SELECT / UPDATE of 3M rows | +290 MB to refused / +400 MB | flat (≤ 89 MB / 11 MB) |
@@ -37,11 +37,17 @@ numbers are quoted. Raw data: `benchmarks/pgx/results/vps-d2a3c460-<build>/`.
 ### Memory
 
 **1. Does memory plateau under long-lived database churn?**
-Nearly. On the final builds 10,000 create → use → drop lifecycles take the
-runtime from 94 MB (after the first 100) to 109 MB. The last-quarter
-slope is 0.018–0.060 MB per 100 lifecycles (0.2–0.6 KB each), ≤ 6 MB per
-100,000 lifecycles. Before the fixes it was linear at 1.1 MB per 100. CHURN30K_PENDING
-(`linux-churn.md`)
+Not fully. Growth is small but has not stopped. On the final build
+(`60fca8427f`) 30,000 create → use → drop lifecycles take the runtime from
+93 MB (after the first 100) to 109 MB at 10,000 and 126 MB at 30,000.
+After the first quarter the slope stays at 0.065–0.093 MB per 100
+lifecycles (~0.9 KB each) and does not fall: ~9 MB per 10,000 lifecycles,
+~90 MB per 100,000. The 10,000-lifecycle runs on earlier builds (B, C)
+flattened to 0.006 MB per 100; the slope came back with the later builds
+(D–F) and is not yet attributed. Before the fixes growth was linear at
+1.1 MB per 100 (~11 KB each), so this is ~12× less, but a long-lived
+runtime still needs a ceiling: the memory watchdog or a planned restart.
+(`linux-churn.md`, run F)
 
 **2. What caused the previous lifecycle growth?**
 Per-session state that outlived its session (`lifecycle-memory.md`):
@@ -57,8 +63,9 @@ after the fixes. What remains in the tracker (~2.7 KB of autovacuum-worker
 relcache) does not show in the release churn runs.
 
 **3. Retained memory per lifecycle now?**
-0.2–0.6 KB in the last quarter of a 10,000-lifecycle run (release build),
-against ~11 KB before.
+~0.9 KB, steady from 7,500 to 30,000 lifecycles (release build), against
+~11 KB before. 10,000-lifecycle runs showed 0.2–0.6 KB in their last
+quarter; the longer run shows the rate does not keep falling.
 
 **4. PGX idle runtime memory?**
 45.8 MB PSS for the PGX profile alone (16.8 MB anonymous + 29 MB of binary
@@ -345,8 +352,11 @@ the same method.
 
 **33. What remains unsolved?**
 
-- **Churn plateau:** the residual 0.2–0.6 KB per lifecycle on the final
-  build. CHURN30K_STATUS
+- **Churn plateau:** the final build still retains ~0.9 KB per lifecycle
+  at 30,000 lifecycles (~90 MB per 100,000), linear after the first
+  7,500. Earlier builds flattened at 10,000, so something added with the
+  density or DML work retains it; not yet attributed (next step: an
+  `alloc-trace.py` run on the final build).
 - **Cold mint:** ~60 ms of per-file ZFS cloning (600 files). Faster needs
   fewer files per template or a filesystem-level snapshot clone. That is an
   architectural choice, not a contained fix.
@@ -397,7 +407,7 @@ Benchmark harness, results and documentation are in the same branch
 
 | Optimization | Before | After |
 |---|---|---|
-| Lifecycle memory retention (`dda9c1be6f`, `b736a6d0ec`, `48398cc0b5`) | 11 KB per lifecycle, linear; 262 MB after 10k | 0.2–0.6 KB; 109 MB after 10k |
+| Lifecycle memory retention (`dda9c1be6f`, `b736a6d0ec`, `48398cc0b5`) | 11 KB per lifecycle, linear; 262 MB after 10k | ~0.9 KB, still linear; 109 MB after 10k, 126 MB after 30k |
 | Huge pages off (`680fab7c8a`) | idle profile 83 MB; 100-active 1,265 MB | 46 MB; 844 MB |
 | Stats slot boxing + relcache sharing (`e9322867b6`, `ad235e24cb`) | 1000 idle DBs 640 MB; 100 active 808 MB | 128 MB; 283 MB |
 | Skip-idle autovacuum + naptime 300 (`28c83164ab` … `6fe0b1ad65`, `696318b79e`) | 1000 idle DBs 5.4–6.7 % of a core | 0.33–0.43 % |

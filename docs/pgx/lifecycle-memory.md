@@ -21,6 +21,10 @@ shared, bounded state filling up (the process-wide catalog cache is the
 largest bounded consumer in the trace); it has not been itemized. After it,
 the last 2,500 lifecycles moved the footprint by less than 1 MB.
 
+Later builds (density and DML work, `dedfdf9ca5` onward) start lower but
+do not stay flat: a 30,000-lifecycle run on the final build keeps growing
+~0.9 KB per lifecycle (`linux-churn.md`, run F). Not yet attributed.
+
 Tracked live bytes per lifecycle (tracker build, debug-size allocations,
 50 databases × 6 measured cycles):
 
