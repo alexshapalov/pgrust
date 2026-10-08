@@ -20,6 +20,8 @@ each workload runs --repeats times, each in a fresh database:
   node_pg   node-postgres: connect, create schema, 500 parameterized inserts
             (prepared statements over the extended protocol), a transaction
             with SAVEPOINT/ROLLBACK TO, COPY-free bulk insert, queries.
+  rails     a real Rails app (rails-app-setup.sh): db:prepare, tests with
+            fixtures, a schema-change migration, tests, db:schema:load, tests
   rails_sql the statement sequence ActiveRecord issues for db:schema:load
             and a migration (schema_migrations, ar_internal_metadata,
             bigserial PKs, FKs, indexes, advisory lock), replayed as SQL.
@@ -400,6 +402,37 @@ def one_engine(args, label, engine_key, port):
                     if rc != 0:
                         rec.update(ok=False, failed_phase="run", output_tail=o[-1200:])
                     os.unlink(f.name)
+                elif wl == "rails":
+                    # a real Rails app (rails-app-setup.sh), test environment
+                    # against this database: db:prepare (runs the migrations),
+                    # tests with fixtures, a schema-change migration, tests
+                    # again, then db:schema:load from the dumped schema.rb
+                    # and tests once more.
+                    rdir = tempfile.mkdtemp(prefix="rails-")
+                    app = os.path.join(rdir, "app")
+                    shutil.copytree(args.rails_dir, app, symlinks=True)
+                    change = os.path.join(os.path.dirname(args.rails_dir.rstrip("/")), "rails-change")
+                    url = "postgres://postgres@localhost:%d/%s?host=%s" % (port, db, ws.sockdir)
+                    renv = dict(env, DATABASE_URL=url, RAILS_ENV="test", DISABLE_DATABASE_ENVIRONMENT_CHECK="1",
+                                PARALLEL_WORKERS="1")
+                    steps = [("db_prepare", ["bin/rails", "db:prepare"]),
+                             ("test", ["bin/rails", "test"]),
+                             ("schema_change", ["bin/rails", "db:migrate"]),
+                             ("test_again", ["bin/rails", "test"]),
+                             ("schema_load", ["bin/rails", "db:schema:load"]),
+                             ("test_after_load", ["bin/rails", "test"])]
+                    for name, cmd in steps:
+                        if name == "schema_change":
+                            shutil.copy(os.path.join(change, "20990101000000_add_due_at_and_priority.rb"),
+                                        os.path.join(app, "db", "migrate"))
+                            shutil.copy(os.path.join(change, "schema_change_test.rb"),
+                                        os.path.join(app, "test", "models"))
+                        d, rc, o = run_cmd(cmd, app, renv)
+                        rec["phases"][name + "_s"] = round(d, 3)
+                        if rc != 0 or (name.startswith("test") and " 0 failures, 0 errors" not in o):
+                            rec.update(ok=False, failed_phase=name, output_tail=o[-1500:])
+                            break
+                    shutil.rmtree(rdir, ignore_errors=True)
                 elif wl == "rails_sql":
                     c = pb.PgConn(ws.sockdir, port, database=db, timeout=600)
                     t1 = time.perf_counter()
@@ -450,6 +483,8 @@ def main():
     ap.add_argument("--conf", default=os.path.join(pb.REPO, "configs", "pgx-ephemeral.conf"))
     ap.add_argument("--engines", default="postgres,pgx")
     ap.add_argument("--workloads", default="django,node_pg,sqlalchemy,prisma,rails_sql")
+    ap.add_argument("--rails-dir", default=os.path.expanduser("~/rails-bench/app"),
+                    help="app built by rails-app-setup.sh (its rails-change/ dir sits beside it)")
     ap.add_argument("--repeats", type=int, default=3)
     ap.add_argument("--models", type=int, default=20)
     ap.add_argument("--tests", type=int, default=60)
