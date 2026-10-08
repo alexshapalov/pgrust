@@ -16,15 +16,16 @@ costs on Linux/ZFS. They are not production capacity numbers: the load
 generator shares the same four vCPUs as the server. Maximum-capacity tests
 belong on 8–16+ cores with a separate load generator.
 
-**Builds.** Final engine build `6fe0b1ad65` (all fixes below); profile
-defaults `696318b79e`. Earlier passes are named by build where their
+**Builds.** Final engine build `727f31e49f` (all fixes below; most
+measurements are on `6fe0b1ad65`, which differs only by the last churn
+fix); profile defaults `696318b79e`. Earlier passes are named by build where their
 numbers are quoted. Raw data: `benchmarks/pgx/results/vps-d2a3c460-<build>/`.
 
 ## Summary
 
 | | Before this work | Now |
 |---|---|---|
-| Memory after 10,000 database lifecycles | 85 → 262 MB, linear (~11 KB per lifecycle) | 94 → 109 MB; 126 MB at 30,000, still ~0.9 KB per lifecycle |
+| Memory after 10,000 database lifecycles | 85 → 262 MB, linear (~11 KB per lifecycle) | 95 → 108 MB; 111 MB at 30,000, ~0.2 KB per lifecycle |
 | Memory, 1000 idle databases | 669 MB | 128–155 MB (213 MB if each was queried once) |
 | Idle CPU, 1000 idle databases | 6.5 % of a core | 0.33–0.43 % (profile default) |
 | Bulk INSERT…SELECT / UPDATE of 3M rows | +290 MB to refused / +400 MB | flat (≤ 89 MB / 11 MB) |
@@ -37,17 +38,15 @@ numbers are quoted. Raw data: `benchmarks/pgx/results/vps-d2a3c460-<build>/`.
 ### Memory
 
 **1. Does memory plateau under long-lived database churn?**
-Not fully. Growth is small but has not stopped. On the final build
-(`60fca8427f`) 30,000 create → use → drop lifecycles take the runtime from
-93 MB (after the first 100) to 109 MB at 10,000 and 126 MB at 30,000.
-After the first quarter the slope stays at 0.065–0.093 MB per 100
-lifecycles (~0.9 KB each) and does not fall: ~9 MB per 10,000 lifecycles,
-~90 MB per 100,000. The 10,000-lifecycle runs on earlier builds (B, C)
-flattened to 0.006 MB per 100; the slope came back with the later builds
-(D–F) and is not yet attributed. Before the fixes growth was linear at
-1.1 MB per 100 (~11 KB each), so this is ~12× less, but a long-lived
-runtime still needs a ceiling: the memory watchdog or a planned restart.
-(`linux-churn.md`, run F)
+Close to it, after one more fix. A 30,000-lifecycle run on `60fca8427f`
+(run F) did not flatten: ~0.9 KB per lifecycle, 93 → 126 MB. The cause
+was the shared catalog cache keeping each dropped database's `pg_database`
+row (fixed in `727f31e49f`, below). On the fixed build (run G) 30,000
+create → use → drop lifecycles go from 95 MB (after the first 100) to
+108 MB at 10,000 and 111 MB at 30,000. The slope falls each quarter, to
+0.014–0.020 MB per 100 lifecycles over the last half (~0.2 KB each,
+~2 MB per 10,000). Before all the fixes growth was linear at 1.1 MB per
+100 (~11 KB each). (`linux-churn.md`, runs F and G)
 
 **2. What caused the previous lifecycle growth?**
 Per-session state that outlived its session (`lifecycle-memory.md`):
@@ -56,16 +55,22 @@ Per-session state that outlived its session (`lifecycle-memory.md`):
 - the snapshot manager's per-thread state;
 - janitor bookkeeping for dropped databases;
 - statistics and connection-cache entries for dropped databases;
-- huge pages that mimalloc requested by default.
+- huge pages that mimalloc requested by default;
+- the shared catalog cache keeping each dropped database's `pg_database`
+  row: DROP DATABASE purged the database's own entries but not the shared
+  one keyed by its oid, ~2 entries per lifecycle until the 262k-entry cap
+  (`727f31e49f`, found with a cache census in `pgrust: memctx`).
 
 The tracker build measured retention per lifecycle at 20.5 KB → 4.9 KB
 after the fixes. What remains in the tracker (~2.7 KB of autovacuum-worker
 relcache) does not show in the release churn runs.
 
 **3. Retained memory per lifecycle now?**
-~0.9 KB, steady from 7,500 to 30,000 lifecycles (release build), against
-~11 KB before. 10,000-lifecycle runs showed 0.2–0.6 KB in their last
-quarter; the longer run shows the rate does not keep falling.
+~0.2 KB over the last half of a 30,000-lifecycle run (release build,
+`727f31e49f`), against ~0.9 KB before the `pg_database` fix and ~11 KB
+before any fix. The tracker build with the shared cache off puts the rest
+at ~0.17 KB: small per-session strings (data-directory and database path)
+and query-descriptor slots. Not fixed.
 
 **4. PGX idle runtime memory?**
 45.8 MB PSS for the PGX profile alone (16.8 MB anonymous + 29 MB of binary
@@ -152,7 +157,7 @@ EXPLAIN-plan text only, with 0 result differences. One fix in this work
 (`daf827c0ff` / `67269453b2`) briefly broke 14 tests; the suite caught it
 and `d48f587da0` fixed it before anything else was built on it. Also
 219 / 231 with the final profile defaults (skip-idle autovacuum, naptime
-300).
+300), and again on `727f31e49f`.
 
 **15. Rails?** Yes. Rails 8.1.4 + pg 1.7.0 on Ruby 3.3.8, 3/3 runs:
 
@@ -352,11 +357,9 @@ the same method.
 
 **33. What remains unsolved?**
 
-- **Churn plateau:** the final build still retains ~0.9 KB per lifecycle
-  at 30,000 lifecycles (~90 MB per 100,000), linear after the first
-  7,500. Earlier builds flattened at 10,000, so something added with the
-  density or DML work retains it; not yet attributed (next step: an
-  `alloc-trace.py` run on the final build).
+- **Churn residue:** ~0.2 KB per lifecycle remains on the final build
+  (~20 MB per 100,000), mostly small per-session strings. Bounded growth
+  for practical purposes, not zero.
 - **Cold mint:** ~60 ms of per-file ZFS cloning (600 files). Faster needs
   fewer files per template or a filesystem-level snapshot clone. That is an
   architectural choice, not a contained fix.
@@ -390,6 +393,7 @@ the same method.
 | `5a3090e793` | a never-written database counts as visited |
 | `23ede965a7` | launcher schedule lookup is a map, not a linear search per database |
 | `6fe0b1ad65` | skip-idle no longer starves databases that change |
+| `727f31e49f` | DROP DATABASE evicts the dropped database's `pg_database` row from the shared catalog cache (`4cefb2fc05`: cache census in `pgrust: memctx`) |
 | `040abf2d27` | opt-in per-stage mint timing |
 | `b2180ac15b`, `95f7c542bf` | `pgrust_runtime_status()` with pool and mint counters |
 | `c9a2a024cc` | `pgrust.ephemeral_db_connection_limit` |
@@ -407,7 +411,7 @@ Benchmark harness, results and documentation are in the same branch
 
 | Optimization | Before | After |
 |---|---|---|
-| Lifecycle memory retention (`dda9c1be6f`, `b736a6d0ec`, `48398cc0b5`) | 11 KB per lifecycle, linear; 262 MB after 10k | ~0.9 KB, still linear; 109 MB after 10k, 126 MB after 30k |
+| Lifecycle memory retention (`dda9c1be6f`, `b736a6d0ec`, `48398cc0b5`, `727f31e49f`) | 11 KB per lifecycle, linear; 262 MB after 10k | ~0.2 KB; 108 MB after 10k, 111 MB after 30k |
 | Huge pages off (`680fab7c8a`) | idle profile 83 MB; 100-active 1,265 MB | 46 MB; 844 MB |
 | Stats slot boxing + relcache sharing (`e9322867b6`, `ad235e24cb`) | 1000 idle DBs 640 MB; 100 active 808 MB | 128 MB; 283 MB |
 | Skip-idle autovacuum + naptime 300 (`28c83164ab` … `6fe0b1ad65`, `696318b79e`) | 1000 idle DBs 5.4–6.7 % of a core | 0.33–0.43 % |
@@ -426,6 +430,7 @@ Benchmark harness, results and documentation are in the same branch
 | memory-heavy workloads | three DML paths kept a tuple per row | `ea6d055cb2`, `67269453b2`, `daf827c0ff` |
 | regression suite | the first version of those fixes reused a virtual slot's buffer across rows, which corrupted partitioned multi-row INSERT | `d48f587da0` |
 | `skipidle-check.py` | skip-idle starved written databases | `6fe0b1ad65` |
+| 30k-lifecycle churn + cache census | shared catalog cache kept every dropped database's `pg_database` row (~0.9 KB per lifecycle) | `727f31e49f` |
 
 ## Documents
 

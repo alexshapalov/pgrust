@@ -1,0 +1,1433 @@
+{
+  "benchmark": "regress",
+  "engine": {
+    "name": "pgrust",
+    "binary": "/home/ubuntu/pgrust/target/release/postgres",
+    "env": {
+      "PGRUST_PGSHAREDIR": "/usr/share/postgresql/18",
+      "PGRUST_TZDIR": "/usr/share/zoneinfo",
+      "RUST_MIN_STACK": "33554432"
+    },
+    "args": [
+      "-D",
+      "$DATADIR",
+      "-k",
+      "$SOCKDIR",
+      "-p",
+      "$PORT",
+      "-c",
+      "listen_addresses=",
+      "-c",
+      "io_method=sync",
+      "-c",
+      "max_stack_depth=60000"
+    ],
+    "stack_limit_bytes": 67092480,
+    "conf_file": null
+  },
+  "git_commit": "727f31e49f7a5540b027513bc9c3d81d03f4d85c",
+  "corpus": "crates/postgres-18.6-reference/src/test/regress",
+  "schedule": "crates/postgres-18.6-reference/src/test/regress/parallel_schedule",
+  "pg_regress": "/usr/lib/postgresql/18/lib/pgxs/src/test/regress/pg_regress",
+  "dlpath": "/usr/local/pgsql/lib",
+  "regress_library_found": true,
+  "summary": {
+    "scheduled": 231,
+    "reported": 231,
+    "byte_exact_pass": 219,
+    "order_only_diff": 0,
+    "real_diff": 12,
+    "not_reported": [],
+    "pg_regress_exit_code": 1,
+    "server_died_during_run": false,
+    "elapsed_s": 32.1
+  },
+  "tests": [
+    {
+      "test": "test_setup",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 323
+    },
+    {
+      "test": "boolean",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 182
+    },
+    {
+      "test": "char",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 107
+    },
+    {
+      "test": "name",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 153
+    },
+    {
+      "test": "varchar",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 160
+    },
+    {
+      "test": "text",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 112
+    },
+    {
+      "test": "int2",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 144
+    },
+    {
+      "test": "int4",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 158
+    },
+    {
+      "test": "int8",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 166
+    },
+    {
+      "test": "oid",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 163
+    },
+    {
+      "test": "float4",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 173
+    },
+    {
+      "test": "float8",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 249
+    },
+    {
+      "test": "bit",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 231
+    },
+    {
+      "test": "numeric",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 610
+    },
+    {
+      "test": "txid",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 146
+    },
+    {
+      "test": "uuid",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 261
+    },
+    {
+      "test": "enum",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 289
+    },
+    {
+      "test": "money",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 150
+    },
+    {
+      "test": "rangetypes",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 713
+    },
+    {
+      "test": "pg_lsn",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 165
+    },
+    {
+      "test": "regproc",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 133
+    },
+    {
+      "test": "strings",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 336
+    },
+    {
+      "test": "md5",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 79
+    },
+    {
+      "test": "numerology",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 206
+    },
+    {
+      "test": "point",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 163
+    },
+    {
+      "test": "lseg",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 90
+    },
+    {
+      "test": "line",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 111
+    },
+    {
+      "test": "box",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 419
+    },
+    {
+      "test": "path",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 135
+    },
+    {
+      "test": "polygon",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 313
+    },
+    {
+      "test": "circle",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 62
+    },
+    {
+      "test": "date",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 127
+    },
+    {
+      "test": "time",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 119
+    },
+    {
+      "test": "timetz",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 79
+    },
+    {
+      "test": "timestamp",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 441
+    },
+    {
+      "test": "timestamptz",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 493
+    },
+    {
+      "test": "interval",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 299
+    },
+    {
+      "test": "inet",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 221
+    },
+    {
+      "test": "macaddr",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 82
+    },
+    {
+      "test": "macaddr8",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 179
+    },
+    {
+      "test": "multirangetypes",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 470
+    },
+    {
+      "test": "geometry",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 326
+    },
+    {
+      "test": "horology",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 252
+    },
+    {
+      "test": "tstypes",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 168
+    },
+    {
+      "test": "regex",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 1166
+    },
+    {
+      "test": "type_sanity",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 307
+    },
+    {
+      "test": "opr_sanity",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 556
+    },
+    {
+      "test": "misc_sanity",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 47
+    },
+    {
+      "test": "comments",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 56
+    },
+    {
+      "test": "expressions",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 190
+    },
+    {
+      "test": "unicode",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 119
+    },
+    {
+      "test": "xid",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 204
+    },
+    {
+      "test": "mvcc",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 157
+    },
+    {
+      "test": "database",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 1114
+    },
+    {
+      "test": "stats_import",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 400
+    },
+    {
+      "test": "encoding",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 241
+    },
+    {
+      "test": "euc_kr",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 52
+    },
+    {
+      "test": "copy",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 213
+    },
+    {
+      "test": "copyselect",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 58
+    },
+    {
+      "test": "copydml",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 88
+    },
+    {
+      "test": "copyencoding",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 42
+    },
+    {
+      "test": "insert",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 689
+    },
+    {
+      "test": "insert_conflict",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 356
+    },
+    {
+      "test": "create_function_c",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 22
+    },
+    {
+      "test": "create_misc",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 157
+    },
+    {
+      "test": "create_operator",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 54
+    },
+    {
+      "test": "create_procedure",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 125
+    },
+    {
+      "test": "create_table",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 650
+    },
+    {
+      "test": "create_type",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 114
+    },
+    {
+      "test": "create_schema",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 72
+    },
+    {
+      "test": "create_index",
+      "byte_exact": false,
+      "order_only_diff": false,
+      "ms": 1359
+    },
+    {
+      "test": "create_index_spgist",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 572
+    },
+    {
+      "test": "create_view",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 648
+    },
+    {
+      "test": "index_including",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 433
+    },
+    {
+      "test": "index_including_gist",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 457
+    },
+    {
+      "test": "create_aggregate",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 232
+    },
+    {
+      "test": "create_function_sql",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 500
+    },
+    {
+      "test": "create_cast",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 110
+    },
+    {
+      "test": "constraints",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 1627
+    },
+    {
+      "test": "triggers",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 2265
+    },
+    {
+      "test": "select",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 268
+    },
+    {
+      "test": "inherit",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 2326
+    },
+    {
+      "test": "typed_table",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 234
+    },
+    {
+      "test": "vacuum",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 1029
+    },
+    {
+      "test": "drop_if_exists",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 337
+    },
+    {
+      "test": "updatable_views",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 1845
+    },
+    {
+      "test": "roleattributes",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 276
+    },
+    {
+      "test": "create_am",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 437
+    },
+    {
+      "test": "hash_func",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 182
+    },
+    {
+      "test": "errors",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 172
+    },
+    {
+      "test": "infinite_recurse",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 479
+    },
+    {
+      "test": "sanity_check",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 235
+    },
+    {
+      "test": "select_into",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 438
+    },
+    {
+      "test": "select_distinct",
+      "byte_exact": false,
+      "order_only_diff": false,
+      "ms": 378
+    },
+    {
+      "test": "select_distinct_on",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 214
+    },
+    {
+      "test": "select_implicit",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 123
+    },
+    {
+      "test": "select_having",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 159
+    },
+    {
+      "test": "subselect",
+      "byte_exact": false,
+      "order_only_diff": false,
+      "ms": 790
+    },
+    {
+      "test": "union",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 515
+    },
+    {
+      "test": "case",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 195
+    },
+    {
+      "test": "join",
+      "byte_exact": false,
+      "order_only_diff": false,
+      "ms": 1602
+    },
+    {
+      "test": "aggregates",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 1222
+    },
+    {
+      "test": "transactions",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 642
+    },
+    {
+      "test": "random",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 320
+    },
+    {
+      "test": "portals",
+      "byte_exact": false,
+      "order_only_diff": false,
+      "ms": 509
+    },
+    {
+      "test": "arrays",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 738
+    },
+    {
+      "test": "btree_index",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 2016
+    },
+    {
+      "test": "hash_index",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 2165
+    },
+    {
+      "test": "update",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 1135
+    },
+    {
+      "test": "delete",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 172
+    },
+    {
+      "test": "namespace",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 342
+    },
+    {
+      "test": "prepared_xacts",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 80
+    },
+    {
+      "test": "brin",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 2176
+    },
+    {
+      "test": "gin",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 2268
+    },
+    {
+      "test": "gist",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 2059
+    },
+    {
+      "test": "spgist",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 1942
+    },
+    {
+      "test": "privileges",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 2756
+    },
+    {
+      "test": "init_privs",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 79
+    },
+    {
+      "test": "security_label",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 196
+    },
+    {
+      "test": "collate",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 506
+    },
+    {
+      "test": "matview",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 1678
+    },
+    {
+      "test": "lock",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 678
+    },
+    {
+      "test": "replica_identity",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 1009
+    },
+    {
+      "test": "rowsecurity",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 2476
+    },
+    {
+      "test": "object_address",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 501
+    },
+    {
+      "test": "tablesample",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 290
+    },
+    {
+      "test": "groupingsets",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 1158
+    },
+    {
+      "test": "drop_operator",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 254
+    },
+    {
+      "test": "password",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 783
+    },
+    {
+      "test": "identity",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 1924
+    },
+    {
+      "test": "generated_stored",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 2353
+    },
+    {
+      "test": "join_hash",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 2090
+    },
+    {
+      "test": "brin_bloom",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 144
+    },
+    {
+      "test": "brin_multi",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 433
+    },
+    {
+      "test": "create_table_like",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 947
+    },
+    {
+      "test": "alter_generic",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 569
+    },
+    {
+      "test": "alter_operator",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 246
+    },
+    {
+      "test": "misc",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 361
+    },
+    {
+      "test": "async",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 68
+    },
+    {
+      "test": "dbsize",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 101
+    },
+    {
+      "test": "merge",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 969
+    },
+    {
+      "test": "misc_functions",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 412
+    },
+    {
+      "test": "sysviews",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 358
+    },
+    {
+      "test": "tsrf",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 200
+    },
+    {
+      "test": "tid",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 173
+    },
+    {
+      "test": "tidscan",
+      "byte_exact": false,
+      "order_only_diff": false,
+      "ms": 170
+    },
+    {
+      "test": "tidrangescan",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 66
+    },
+    {
+      "test": "collate.utf8",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 214
+    },
+    {
+      "test": "collate.icu.utf8",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 1115
+    },
+    {
+      "test": "incremental_sort",
+      "byte_exact": false,
+      "order_only_diff": false,
+      "ms": 474
+    },
+    {
+      "test": "create_role",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 361
+    },
+    {
+      "test": "without_overlaps",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 1654
+    },
+    {
+      "test": "generated_virtual",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 1277
+    },
+    {
+      "test": "rules",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 694
+    },
+    {
+      "test": "psql",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 668
+    },
+    {
+      "test": "psql_crosstab",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 67
+    },
+    {
+      "test": "psql_pipeline",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 95
+    },
+    {
+      "test": "amutils",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 49
+    },
+    {
+      "test": "stats_ext",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 3273
+    },
+    {
+      "test": "collate.linux.utf8",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 23
+    },
+    {
+      "test": "collate.windows.win1252",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 23
+    },
+    {
+      "test": "select_parallel",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 570
+    },
+    {
+      "test": "write_parallel",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 67
+    },
+    {
+      "test": "vacuum_parallel",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 131
+    },
+    {
+      "test": "maintain_every",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 45
+    },
+    {
+      "test": "publication",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 877
+    },
+    {
+      "test": "subscription",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 120
+    },
+    {
+      "test": "select_views",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 571
+    },
+    {
+      "test": "portals_p2",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 223
+    },
+    {
+      "test": "foreign_key",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 2809
+    },
+    {
+      "test": "cluster",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 1024
+    },
+    {
+      "test": "dependency",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 501
+    },
+    {
+      "test": "guc",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 397
+    },
+    {
+      "test": "bitmapops",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 835
+    },
+    {
+      "test": "combocid",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 102
+    },
+    {
+      "test": "tsearch",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 980
+    },
+    {
+      "test": "tsdicts",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 693
+    },
+    {
+      "test": "foreign_data",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 1696
+    },
+    {
+      "test": "window",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 981
+    },
+    {
+      "test": "xmlmap",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 365
+    },
+    {
+      "test": "functional_deps",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 543
+    },
+    {
+      "test": "advisory_lock",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 251
+    },
+    {
+      "test": "indirect_toast",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 474
+    },
+    {
+      "test": "equivclass",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 538
+    },
+    {
+      "test": "json",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 233
+    },
+    {
+      "test": "jsonb",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 446
+    },
+    {
+      "test": "json_encoding",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 33
+    },
+    {
+      "test": "jsonpath",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 160
+    },
+    {
+      "test": "jsonpath_encoding",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 67
+    },
+    {
+      "test": "jsonb_jsonpath",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 355
+    },
+    {
+      "test": "sqljson",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 278
+    },
+    {
+      "test": "sqljson_queryfuncs",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 267
+    },
+    {
+      "test": "sqljson_jsontable",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 195
+    },
+    {
+      "test": "plancache",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 412
+    },
+    {
+      "test": "limit",
+      "byte_exact": false,
+      "order_only_diff": false,
+      "ms": 339
+    },
+    {
+      "test": "plpgsql",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 1798
+    },
+    {
+      "test": "copy2",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 681
+    },
+    {
+      "test": "temp",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 981
+    },
+    {
+      "test": "domain",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 1209
+    },
+    {
+      "test": "rangefuncs",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 1026
+    },
+    {
+      "test": "prepare",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 75
+    },
+    {
+      "test": "conversion",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 437
+    },
+    {
+      "test": "truncate",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 989
+    },
+    {
+      "test": "alter_table",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 3341
+    },
+    {
+      "test": "sequence",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 771
+    },
+    {
+      "test": "polymorphism",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 1000
+    },
+    {
+      "test": "rowtypes",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 725
+    },
+    {
+      "test": "returning",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 556
+    },
+    {
+      "test": "largeobject",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 545
+    },
+    {
+      "test": "with",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 862
+    },
+    {
+      "test": "xml",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 1361
+    },
+    {
+      "test": "partition_join",
+      "byte_exact": false,
+      "order_only_diff": false,
+      "ms": 2102
+    },
+    {
+      "test": "partition_prune",
+      "byte_exact": false,
+      "order_only_diff": false,
+      "ms": 1767
+    },
+    {
+      "test": "reloptions",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 186
+    },
+    {
+      "test": "hash_part",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 140
+    },
+    {
+      "test": "indexing",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 2428
+    },
+    {
+      "test": "partition_aggregate",
+      "byte_exact": false,
+      "order_only_diff": false,
+      "ms": 1048
+    },
+    {
+      "test": "partition_info",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 267
+    },
+    {
+      "test": "tuplesort",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 1151
+    },
+    {
+      "test": "explain",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 200
+    },
+    {
+      "test": "memoize",
+      "byte_exact": false,
+      "order_only_diff": false,
+      "ms": 386
+    },
+    {
+      "test": "stats",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 2902
+    },
+    {
+      "test": "predicate",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 150
+    },
+    {
+      "test": "numa",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 18
+    },
+    {
+      "test": "compression",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 250
+    },
+    {
+      "test": "compression_pglz",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 22
+    },
+    {
+      "test": "oidjoins",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 350
+    },
+    {
+      "test": "event_trigger",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 433
+    },
+    {
+      "test": "event_trigger_login",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 39
+    },
+    {
+      "test": "fast_default",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 349
+    },
+    {
+      "test": "tablespace",
+      "byte_exact": true,
+      "order_only_diff": false,
+      "ms": 738
+    }
+  ]
+}

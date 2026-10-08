@@ -15,7 +15,8 @@ each cycle with no ephemeral databases left. Host: `linux-host.md`.
 | C | fixed, autovacuum idle-skip on | 83.8 | 124.2 | 148.5 | 151.5 | 156.7 | 159.0 | **159.8 MB** |
 | D | + density fixes `dedfdf9ca5` | 82.1 | 94.5 | 98.1 | 99.4 | 103.8 | 108.6 | **108.8 MB** |
 | E | + DML per-row fixes `d48f587da0` | 66.7 | 94.3 | 99.0 | 100.2 | 103.3 | 107.9 | **108.6 MB** |
-| F | final `60fca8427f`, 300 cycles | 82.1 | 93.5 | — | — | 101.6 | — | **108.8 MB** |
+| F | `60fca8427f`, 300 cycles | 82.1 | 93.5 | — | — | 101.6 | — | **108.8 MB** |
+| G | + `pg_database` cache fix `727f31e49f`, 300 cycles | — | 95.2 | — | — | 103.0 | — | **108.4 MB** |
 
 Growth per 100-database cycle (least-squares slope per quarter):
 
@@ -27,16 +28,19 @@ Growth per 100-database cycle (least-squares slope per quarter):
 | D | 0.11 | 0.15 | 0.18 | **0.018 MB** |
 | E | 0.35 | 0.13 | 0.19 | **0.060 MB** |
 
-Run F, 30,000 lifecycles on the final build (engine `6fe0b1ad65`, profile
-`696318b79e`: autovacuum skip-idle on, naptime 300):
+Runs F and G, 30,000 lifecycles (profile `696318b79e`: autovacuum
+skip-idle on, naptime 300). F is engine `6fe0b1ad65`; G adds `727f31e49f`.
 
 | Cycles | 1–75 | 76–150 | 151–225 | 226–300 |
 |---|---|---|---|---|
-| Mean footprint | 101.3 | 109.8 | 116.0 | 122.6 MB |
-| Slope per 100-database cycle | 0.159 | 0.065 | 0.087 | **0.093 MB** |
+| F mean footprint | 101.3 | 109.8 | 116.0 | 122.6 MB |
+| F slope per 100-database cycle | 0.159 | 0.065 | 0.087 | **0.093 MB** |
+| G mean footprint | 100.7 | 107.6 | 109.4 | 111.0 MB |
+| G slope per 100-database cycle | 0.129 | 0.053 | 0.014 | **0.020 MB** |
 
-Footprint after 50 / 100 / 150 / 200 / 250 / 300 cycles: 101.6 / 108.8 /
-112.9 / 117.2 / 121.7 / 126.1 MB.
+Footprint after 50 / 100 / 150 / 200 / 250 / 300 cycles:
+F 101.6 / 108.8 / 112.9 / 117.2 / 121.7 / 126.1 MB;
+G 103.0 / 108.4 / 108.2 / 109.0 / 111.3 / 111.4 MB.
 
 - **Builds B and C plateau.** Two independent runs on the fixed build flatten to
   ~0.006–0.007 MB per 100 lifecycles over the last quarter: ~60–70 bytes per
@@ -46,14 +50,19 @@ Footprint after 50 / 100 / 150 / 200 / 250 / 300 cycles: 101.6 / 108.8 /
   relcache cores interned; `linux-density.md`), end ~46–51 MB lower: 109
   MB after 10,000 lifecycles. Their last-quarter slope (0.018–0.060 MB
   per cycle) looked close to flat.
-- **Run F shows the later builds do not plateau.** Over 30,000 lifecycles
-  the slope settles at 0.065–0.093 MB per cycle (~0.9 KB per lifecycle)
-  after the first quarter and does not decline: 109 MB at 10,000, 126 MB
-  at 30,000, ~90 MB more per 100,000. Runs B and C, on the build before
-  the density work, were flat at 10,000; so something in `999a78baff..`
-  `60fca8427f` retains a little per lifecycle. Not attributed yet. Until
-  it is, a long-lived runtime relies on the memory watchdog or a planned
-  restart.
+- **Run F showed the later builds did not plateau**: 0.065–0.093 MB per
+  cycle (~0.9 KB per lifecycle) after the first quarter, 126 MB at 30,000.
+  A census of the shared catalog cache (`pgrust: memctx`, `4cefb2fc05`)
+  found one group growing: cache 21 (`pg_database` by oid), shared, all
+  stale, ~2 entries per lifecycle (324 → 14,529 over 72 cycles). DROP
+  DATABASE purged the database's own cache entries but not this shared one,
+  and nothing looks up a dropped oid again, so they stayed until the
+  262k-entry cap. `727f31e49f` evicts it on drop.
+- **Run G, with the fix**: 111 MB at 30,000 lifecycles; the slope falls
+  each quarter to 0.014–0.020 MB per cycle (~0.2 KB per lifecycle, ~2 MB
+  per 10,000). The tracker build with the shared cache off puts the rest
+  at ~0.17 KB: per-session data-directory and database-path strings and
+  query-descriptor slots. Not fixed.
 - Most of the early rise happens in the first ten cycles, consistent with
   shared, bounded state filling up (not itemized).
 - Threads stay at 9 and open files between 37 and 45 in every run; the data
@@ -87,4 +96,5 @@ from these deltas.
 `vps-d2a3c460-999a78baff/churn/` (B), `.../churn-skipidle/` (C),
 `.../lifecycle/`, `vps-d2a3c460-dedfdf9ca5/churn/` (D),
 `vps-d2a3c460-d48f587da0/churn/` (E),
-`vps-d2a3c460-60fca8427f/churn-30k/` (F).
+`vps-d2a3c460-60fca8427f/churn-30k/` (F),
+`vps-d2a3c460-727f31e49f/churn-30k/` (G).
