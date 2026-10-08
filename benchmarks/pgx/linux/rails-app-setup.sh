@@ -22,7 +22,7 @@ default: &default
   adapter: postgresql
   encoding: unicode
   pool: 5
-  url: <%= ENV.fetch("DATABASE_URL") %>
+  url: <%= ENV.fetch("DATABASE_URL", "postgres://localhost/setup_only") %>
 development:
   <<: *default
 test:
