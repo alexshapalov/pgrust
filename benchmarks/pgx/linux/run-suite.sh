@@ -80,6 +80,9 @@ for step in "${STEPS[@]}"; do
             $PY "$HERE/cow.py" --workdir "/$ds" --sizes 1500 --methods clone --clones 3 --out "$OUT/cow-recordsize-$rs"
             sudo -n zfs destroy -r "$ds"
         done ;;
+    cow10g)
+        # ~10 GB logical in 10 tables (50 tables took over 30 min to load here).
+        $PY "$HERE/cow.py" --sizes "${PGX_COW_10G:-15000}" --tables 10 --methods clone --clones 2 --out "$OUT/cow-10g" ;;
     cowbig)
         $PY "$HERE/cow.py" --sizes "${PGX_COW_BIG:-1500,3000}" --methods clone --clones 3 --out "$OUT/cow-big"
         $PY "$HERE/cow.py" --sizes 1500 --methods copy --clones 2 --out "$OUT/cow-big-copy" ;;
