@@ -196,6 +196,16 @@ def main():
             common + ["-c", "fsync=off", "-c", "synchronous_commit=off", "-c", "full_page_writes=off"])),
         "pgrust": ("pgrust-default", lambda: pb.Engine("pgrust", args.binary, common)),
         "pgx": ("pgx-profile", lambda: pb.Engine("pgrust", args.binary, common, args.profile)),
+        # The profile's 16 MB buffer pool against PostgreSQL's 128 MB default:
+        # separates engine speed from the profile's density choice.
+        "pgx-sb128": ("pgx-profile-sb128", lambda: pb.Engine("pgrust", args.binary,
+                                                             common + ["-c", "shared_buffers=128MB"], args.profile)),
+        # And the profile with the parallel runtime back on.
+        "pgx-runtime": ("pgx-profile-runtime", lambda: pb.Engine("pgrust", args.binary,
+                                                                 common + ["-c", "shared_buffers=128MB", "-c", "pgrust.runtime=on",
+                                                                           "-c", "max_parallel_workers=4",
+                                                                           "-c", "max_parallel_workers_per_gather=2"],
+                                                                 args.profile)),
     }
     doc = {"benchmark": "query-bench", "git_commit": pb.git("rev-parse", "HEAD"), "iterations": args.iterations,
            "clients": args.clients, "runs": []}
