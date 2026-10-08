@@ -1,0 +1,570 @@
+{
+  "benchmark": "agent-workload",
+  "git_commit": "60fca8427f6e5a74ff3848959a6fdd83ea9e9ba5",
+  "models": 20,
+  "tests": 60,
+  "engines": [
+    {
+      "label": "postgres18",
+      "runs": [
+        {
+          "workload": "django",
+          "repeat": 0,
+          "phases": {
+            "time_to_db_s": 0.099,
+            "makemigrations_s": 0.891,
+            "migrate_s": 1.48,
+            "test_s": 2.38,
+            "schema_change_s": 1.561,
+            "test_again_s": 2.355,
+            "cleanup_s": 0.031
+          },
+          "ok": true,
+          "peak_pss_mb": 58.8,
+          "pool_alloc_delta_mb": 36.4,
+          "total_s": 8.797
+        },
+        {
+          "workload": "django",
+          "repeat": 1,
+          "phases": {
+            "time_to_db_s": 0.04,
+            "makemigrations_s": 0.74,
+            "migrate_s": 1.449,
+            "test_s": 2.273,
+            "schema_change_s": 1.552,
+            "test_again_s": 2.457,
+            "cleanup_s": 0.031
+          },
+          "ok": true,
+          "peak_pss_mb": 59.7,
+          "pool_alloc_delta_mb": 19.1,
+          "total_s": 8.542
+        },
+        {
+          "workload": "django",
+          "repeat": 2,
+          "phases": {
+            "time_to_db_s": 0.04,
+            "makemigrations_s": 0.7,
+            "migrate_s": 1.398,
+            "test_s": 2.33,
+            "schema_change_s": 1.552,
+            "test_again_s": 2.373,
+            "cleanup_s": 0.038
+          },
+          "ok": true,
+          "peak_pss_mb": 59.5,
+          "pool_alloc_delta_mb": 11.9,
+          "total_s": 8.431
+        },
+        {
+          "workload": "node_pg",
+          "repeat": 0,
+          "phases": {
+            "time_to_db_s": 0.04,
+            "run_s": 0.793,
+            "cleanup_s": 0.019
+          },
+          "ok": true,
+          "peak_pss_mb": 47.8,
+          "pool_alloc_delta_mb": 8.0,
+          "total_s": 0.852
+        },
+        {
+          "workload": "node_pg",
+          "repeat": 1,
+          "phases": {
+            "time_to_db_s": 0.042,
+            "run_s": 0.739,
+            "cleanup_s": 0.019
+          },
+          "ok": true,
+          "peak_pss_mb": 47.8,
+          "pool_alloc_delta_mb": 8.0,
+          "total_s": 0.8
+        },
+        {
+          "workload": "node_pg",
+          "repeat": 2,
+          "phases": {
+            "time_to_db_s": 0.04,
+            "run_s": 0.694,
+            "cleanup_s": 0.018
+          },
+          "ok": true,
+          "peak_pss_mb": 48.0,
+          "pool_alloc_delta_mb": 8.0,
+          "total_s": 0.752
+        },
+        {
+          "workload": "sqlalchemy",
+          "repeat": 0,
+          "phases": {
+            "time_to_db_s": 0.036,
+            "run_s": 1.007,
+            "cleanup_s": 0.023
+          },
+          "ok": true,
+          "peak_pss_mb": 54.8,
+          "pool_alloc_delta_mb": 6.1,
+          "total_s": 1.066
+        },
+        {
+          "workload": "sqlalchemy",
+          "repeat": 1,
+          "phases": {
+            "time_to_db_s": 0.039,
+            "run_s": 0.967,
+            "cleanup_s": 0.022
+          },
+          "ok": true,
+          "peak_pss_mb": 53.6,
+          "pool_alloc_delta_mb": 6.1,
+          "total_s": 1.028
+        },
+        {
+          "workload": "sqlalchemy",
+          "repeat": 2,
+          "phases": {
+            "time_to_db_s": 0.046,
+            "run_s": 0.986,
+            "cleanup_s": 0.019
+          },
+          "ok": true,
+          "peak_pss_mb": 53.6,
+          "pool_alloc_delta_mb": 6.0,
+          "total_s": 1.051
+        },
+        {
+          "workload": "prisma",
+          "repeat": 0,
+          "phases": {
+            "time_to_db_s": 0.044,
+            "migrate_init_s": 3.134,
+            "generate_s": 2.636,
+            "client_s": 0.553,
+            "migrate_change_s": 2.806,
+            "generate_again_s": 2.634,
+            "client_again_s": 0.561,
+            "cleanup_s": 0.02
+          },
+          "ok": true,
+          "peak_pss_mb": 56.2,
+          "pool_alloc_delta_mb": 8.5,
+          "total_s": 12.388
+        },
+        {
+          "workload": "prisma",
+          "repeat": 1,
+          "phases": {
+            "time_to_db_s": 0.037,
+            "migrate_init_s": 2.831,
+            "generate_s": 2.545,
+            "client_s": 0.531,
+            "migrate_change_s": 2.647,
+            "generate_again_s": 2.526,
+            "client_again_s": 0.616,
+            "cleanup_s": 0.02
+          },
+          "ok": true,
+          "peak_pss_mb": 55.6,
+          "pool_alloc_delta_mb": 8.5,
+          "total_s": 11.753
+        },
+        {
+          "workload": "prisma",
+          "repeat": 2,
+          "phases": {
+            "time_to_db_s": 0.045,
+            "migrate_init_s": 2.821,
+            "generate_s": 2.716,
+            "client_s": 0.584,
+            "migrate_change_s": 2.789,
+            "generate_again_s": 2.67,
+            "client_again_s": 0.571,
+            "cleanup_s": 0.019
+          },
+          "ok": true,
+          "peak_pss_mb": 59.6,
+          "pool_alloc_delta_mb": 8.6,
+          "total_s": 12.215
+        },
+        {
+          "workload": "rails_sql",
+          "repeat": 0,
+          "phases": {
+            "time_to_db_s": 0.045,
+            "schema_load_migrate_test_s": 0.031,
+            "cleanup_s": 0.02
+          },
+          "ok": true,
+          "peak_pss_mb": 45.4,
+          "pool_alloc_delta_mb": 6.3,
+          "total_s": 0.096
+        },
+        {
+          "workload": "rails_sql",
+          "repeat": 1,
+          "phases": {
+            "time_to_db_s": 0.037,
+            "schema_load_migrate_test_s": 0.036,
+            "cleanup_s": 0.022
+          },
+          "ok": true,
+          "peak_pss_mb": 45.5,
+          "pool_alloc_delta_mb": 6.3,
+          "total_s": 0.095
+        },
+        {
+          "workload": "rails_sql",
+          "repeat": 2,
+          "phases": {
+            "time_to_db_s": 0.042,
+            "schema_load_migrate_test_s": 0.031,
+            "cleanup_s": 0.019
+          },
+          "ok": true,
+          "peak_pss_mb": 45.5,
+          "pool_alloc_delta_mb": 6.3,
+          "total_s": 0.092
+        },
+        {
+          "workload": "rails",
+          "repeat": 0,
+          "phases": {
+            "time_to_db_s": 0.035,
+            "db_prepare_s": 2.247,
+            "test_s": 4.459,
+            "schema_change_s": 1.971,
+            "test_again_s": 4.273,
+            "schema_load_s": 1.934,
+            "test_after_load_s": 2.331,
+            "cleanup_s": 0.02
+          },
+          "ok": true,
+          "peak_pss_mb": 51.6,
+          "pool_alloc_delta_mb": 6.9,
+          "total_s": 17.27
+        },
+        {
+          "workload": "rails",
+          "repeat": 1,
+          "phases": {
+            "time_to_db_s": 0.043,
+            "db_prepare_s": 2.057,
+            "test_s": 4.524,
+            "schema_change_s": 2.005,
+            "test_again_s": 4.576,
+            "schema_load_s": 2.027,
+            "test_after_load_s": 2.438,
+            "cleanup_s": 0.023
+          },
+          "ok": true,
+          "peak_pss_mb": 52.5,
+          "pool_alloc_delta_mb": 7.2,
+          "total_s": 17.693
+        },
+        {
+          "workload": "rails",
+          "repeat": 2,
+          "phases": {
+            "time_to_db_s": 0.046,
+            "db_prepare_s": 2.136,
+            "test_s": 4.401,
+            "schema_change_s": 2.11,
+            "test_again_s": 4.734,
+            "schema_load_s": 1.996,
+            "test_after_load_s": 2.38,
+            "cleanup_s": 0.023
+          },
+          "ok": true,
+          "peak_pss_mb": 57.4,
+          "pool_alloc_delta_mb": 6.7,
+          "total_s": 17.826
+        }
+      ]
+    },
+    {
+      "label": "pgx-profile",
+      "runs": [
+        {
+          "workload": "django",
+          "repeat": 0,
+          "phases": {
+            "time_to_db_s": 0.084,
+            "makemigrations_s": 0.693,
+            "migrate_s": 1.613,
+            "test_s": 2.512,
+            "schema_change_s": 1.797,
+            "test_again_s": 2.73,
+            "cleanup_s": 0.03
+          },
+          "ok": true,
+          "peak_pss_mb": 87.4,
+          "pool_alloc_delta_mb": 32.8,
+          "total_s": 9.459
+        },
+        {
+          "workload": "django",
+          "repeat": 1,
+          "phases": {
+            "time_to_db_s": 0.048,
+            "makemigrations_s": 0.682,
+            "migrate_s": 1.624,
+            "test_s": 2.461,
+            "schema_change_s": 1.732,
+            "test_again_s": 2.61,
+            "cleanup_s": 0.035
+          },
+          "ok": true,
+          "peak_pss_mb": 89.5,
+          "pool_alloc_delta_mb": 5.6,
+          "total_s": 9.192
+        },
+        {
+          "workload": "django",
+          "repeat": 2,
+          "phases": {
+            "time_to_db_s": 0.055,
+            "makemigrations_s": 0.716,
+            "migrate_s": 1.645,
+            "test_s": 2.611,
+            "schema_change_s": 1.677,
+            "test_again_s": 2.795,
+            "cleanup_s": 0.029
+          },
+          "ok": true,
+          "peak_pss_mb": 88.6,
+          "pool_alloc_delta_mb": 5.7,
+          "total_s": 9.528
+        },
+        {
+          "workload": "node_pg",
+          "repeat": 0,
+          "phases": {
+            "time_to_db_s": 0.05,
+            "run_s": 0.602,
+            "cleanup_s": 0.015
+          },
+          "ok": true,
+          "peak_pss_mb": 87.8,
+          "pool_alloc_delta_mb": 2.5,
+          "total_s": 0.667
+        },
+        {
+          "workload": "node_pg",
+          "repeat": 1,
+          "phases": {
+            "time_to_db_s": 0.046,
+            "run_s": 0.622,
+            "cleanup_s": 0.018
+          },
+          "ok": true,
+          "peak_pss_mb": 87.1,
+          "pool_alloc_delta_mb": 2.5,
+          "total_s": 0.686
+        },
+        {
+          "workload": "node_pg",
+          "repeat": 2,
+          "phases": {
+            "time_to_db_s": 0.051,
+            "run_s": 0.691,
+            "cleanup_s": 0.015
+          },
+          "ok": true,
+          "peak_pss_mb": 86.4,
+          "pool_alloc_delta_mb": 2.5,
+          "total_s": 0.757
+        },
+        {
+          "workload": "sqlalchemy",
+          "repeat": 0,
+          "phases": {
+            "time_to_db_s": 0.043,
+            "run_s": 1.071,
+            "cleanup_s": 0.016
+          },
+          "ok": true,
+          "peak_pss_mb": 87.1,
+          "pool_alloc_delta_mb": 0.5,
+          "total_s": 1.13
+        },
+        {
+          "workload": "sqlalchemy",
+          "repeat": 1,
+          "phases": {
+            "time_to_db_s": 0.048,
+            "run_s": 1.135,
+            "cleanup_s": 0.015
+          },
+          "ok": true,
+          "peak_pss_mb": 94.1,
+          "pool_alloc_delta_mb": 0.6,
+          "total_s": 1.198
+        },
+        {
+          "workload": "sqlalchemy",
+          "repeat": 2,
+          "phases": {
+            "time_to_db_s": 0.042,
+            "run_s": 1.183,
+            "cleanup_s": 0.014
+          },
+          "ok": true,
+          "peak_pss_mb": 93.7,
+          "pool_alloc_delta_mb": 0.5,
+          "total_s": 1.239
+        },
+        {
+          "workload": "prisma",
+          "repeat": 0,
+          "phases": {
+            "time_to_db_s": 0.048,
+            "migrate_init_s": 3.16,
+            "generate_s": 3.096,
+            "client_s": 0.567,
+            "migrate_change_s": 3.124,
+            "generate_again_s": 2.533,
+            "client_again_s": 0.67,
+            "cleanup_s": 0.019
+          },
+          "ok": true,
+          "peak_pss_mb": 96.6,
+          "pool_alloc_delta_mb": 2.2,
+          "total_s": 13.217
+        },
+        {
+          "workload": "prisma",
+          "repeat": 1,
+          "phases": {
+            "time_to_db_s": 0.054,
+            "migrate_init_s": 3.022,
+            "generate_s": 2.574,
+            "client_s": 0.555,
+            "migrate_change_s": 2.914,
+            "generate_again_s": 2.6,
+            "client_again_s": 0.593,
+            "cleanup_s": 0.017
+          },
+          "ok": true,
+          "peak_pss_mb": 98.8,
+          "pool_alloc_delta_mb": 2.3,
+          "total_s": 12.329
+        },
+        {
+          "workload": "prisma",
+          "repeat": 2,
+          "phases": {
+            "time_to_db_s": 0.043,
+            "migrate_init_s": 2.908,
+            "generate_s": 2.681,
+            "client_s": 0.593,
+            "migrate_change_s": 2.967,
+            "generate_again_s": 2.449,
+            "client_again_s": 0.559,
+            "cleanup_s": 0.015
+          },
+          "ok": true,
+          "peak_pss_mb": 98.7,
+          "pool_alloc_delta_mb": 2.3,
+          "total_s": 12.215
+        },
+        {
+          "workload": "rails_sql",
+          "repeat": 0,
+          "phases": {
+            "time_to_db_s": 0.046,
+            "schema_load_migrate_test_s": 0.061,
+            "cleanup_s": 0.015
+          },
+          "ok": true,
+          "peak_pss_mb": 92.3,
+          "pool_alloc_delta_mb": 0.8,
+          "total_s": 0.122
+        },
+        {
+          "workload": "rails_sql",
+          "repeat": 1,
+          "phases": {
+            "time_to_db_s": 0.041,
+            "schema_load_migrate_test_s": 0.073,
+            "cleanup_s": 0.018
+          },
+          "ok": true,
+          "peak_pss_mb": 92.4,
+          "pool_alloc_delta_mb": 0.9,
+          "total_s": 0.132
+        },
+        {
+          "workload": "rails_sql",
+          "repeat": 2,
+          "phases": {
+            "time_to_db_s": 0.042,
+            "schema_load_migrate_test_s": 0.059,
+            "cleanup_s": 0.017
+          },
+          "ok": true,
+          "peak_pss_mb": 92.4,
+          "pool_alloc_delta_mb": 0.9,
+          "total_s": 0.118
+        },
+        {
+          "workload": "rails",
+          "repeat": 0,
+          "phases": {
+            "time_to_db_s": 0.046,
+            "db_prepare_s": 2.03,
+            "test_s": 4.472,
+            "schema_change_s": 2.156,
+            "test_again_s": 4.777,
+            "schema_load_s": 1.992,
+            "test_after_load_s": 2.439,
+            "cleanup_s": 0.027
+          },
+          "ok": true,
+          "peak_pss_mb": 106.8,
+          "pool_alloc_delta_mb": 6.8,
+          "total_s": 17.939
+        },
+        {
+          "workload": "rails",
+          "repeat": 1,
+          "phases": {
+            "time_to_db_s": 0.047,
+            "db_prepare_s": 2.131,
+            "test_s": 4.398,
+            "schema_change_s": 2.114,
+            "test_again_s": 4.605,
+            "schema_load_s": 2.118,
+            "test_after_load_s": 2.444,
+            "cleanup_s": 0.019
+          },
+          "ok": true,
+          "peak_pss_mb": 97.3,
+          "pool_alloc_delta_mb": 6.9,
+          "total_s": 17.876
+        },
+        {
+          "workload": "rails",
+          "repeat": 2,
+          "phases": {
+            "time_to_db_s": 0.047,
+            "db_prepare_s": 2.156,
+            "test_s": 4.379,
+            "schema_change_s": 1.955,
+            "test_again_s": 4.833,
+            "schema_load_s": 2.073,
+            "test_after_load_s": 2.352,
+            "cleanup_s": 0.024
+          },
+          "ok": true,
+          "peak_pss_mb": 106.6,
+          "pool_alloc_delta_mb": 6.5,
+          "total_s": 17.819
+        }
+      ]
+    }
+  ]
+}
