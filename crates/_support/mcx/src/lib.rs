@@ -2002,9 +2002,7 @@ impl MemoryContext {
     #[inline]
     fn charge(&self, n: usize) -> Result<(), AllocError> {
         let acct = &*self.acct;
-        if acct.check_limit(n).is_err() {
-            limit_refused(acct.name.get(), n);
-        }
+        acct.check_limit(n)?;
         let self_new = acct.self_used.get() + n;
         acct.self_used.set(self_new);
         if self_new > acct.self_peak.get() {
@@ -2245,18 +2243,19 @@ fn alloc_ceiling_exceeded(size: usize) -> ! {
     panic!("invalid memory alloc request size {size}")
 }
 
-// A refused memory limit (pgrust.session/database/runtime_memory_limit) is a
-// catchable ERROR — 53200 with the limit named in the hint, built by
-// oom_named exactly as the fallible lanes report it — raised by unwinding, so
-// the statement boundary recovers it like any other ERROR. Returning
-// AllocError here left every infallible lane (PgVec::push, extend, resize,
-// hashbrown growth) to handle_alloc_error, i.e. an abort of the whole server:
-// observed 2026-10-09 in the PGRun beta ("memory allocation of 16 bytes
-// failed", SIGABRT) — one statement over its session limit ended every
-// branch database in the runtime. Same precedent as alloc_ceiling_exceeded.
+// mcxt.c: a failed palloc is an ERROR ("out of memory", 53200), recovered at
+// the statement boundary. Every backend failure — a refused
+// pgrust.session/database/runtime_memory_limit (the hint names it), a context
+// limit, or the system refusing a block — reaches here from the Allocator
+// boundary and unwinds with the PgError oom_named builds. Returning AllocError
+// instead left every infallible lane (PgVec::push, extend, resize, hashbrown
+// growth) to handle_alloc_error, i.e. an abort of the whole server: observed
+// 2026-10-09 in the PGRun beta ("memory allocation of 16 bytes failed",
+// SIGABRT) — one statement over its session limit ended every branch database
+// in the runtime. Same precedent as alloc_ceiling_exceeded.
 #[cold]
 #[inline(never)]
-fn limit_refused(context_name: &str, request: usize) -> ! {
+fn alloc_failed(context_name: &str, request: usize) -> ! {
     let err = oom_named(context_name, request);
     #[cfg(any(feature = "std", test))]
     {
@@ -2297,7 +2296,10 @@ unsafe impl Allocator for Mcx<'_> {
         if layout.size() > MAX_ALLOC_SIZE {
             alloc_ceiling_exceeded(layout.size());
         }
-        self.allocate_unchecked(layout)
+        match self.allocate_unchecked(layout) {
+            Ok(p) => Ok(p),
+            Err(AllocError) => alloc_failed(self.0.acct.name.get(), layout.size()),
+        }
     }
 
     unsafe fn deallocate(&self, ptr: NonNull<u8>, layout: Layout) {
@@ -2335,55 +2337,61 @@ unsafe impl Allocator for Mcx<'_> {
         old_layout: Layout,
         new_layout: Layout,
     ) -> Result<NonNull<[u8]>, AllocError> {
+        let grown = (|| -> Result<NonNull<[u8]>, AllocError> {
         // C repalloc's MaxAllocSize admission: unbounded growth (PgVec::push,
-        // try_reserve) reallocates through here, so the ceiling must hold on
-        // grow as well as allocate. Huge growth opts out via vec_reserve_huge.
-        if new_layout.size() > MAX_ALLOC_SIZE {
-            alloc_ceiling_exceeded(new_layout.size());
-        }
-        self.0.check_live();
-        #[cfg(debug_assertions)]
-        self.0.check_not_freed(ptr, old_layout, true);
-        self.0.is_reset.set(false);
-        match &self.0.backend {
-            Backend::Aset(set) => {
-                let delta = new_layout.size() - old_layout.size();
-                self.0.charge(delta)?;
-                // SAFETY: single-statement borrow, never re-entered (aset_mut).
-                let result =
-                    unsafe { aset_mut(set) }.realloc(ptr, old_layout, new_layout, &self.0.acct);
-                if result.is_err() {
-                    self.0.uncharge(delta);
+            // try_reserve) reallocates through here, so the ceiling must hold on
+            // grow as well as allocate. Huge growth opts out via vec_reserve_huge.
+            if new_layout.size() > MAX_ALLOC_SIZE {
+                alloc_ceiling_exceeded(new_layout.size());
+            }
+            self.0.check_live();
+            #[cfg(debug_assertions)]
+            self.0.check_not_freed(ptr, old_layout, true);
+            self.0.is_reset.set(false);
+            match &self.0.backend {
+                Backend::Aset(set) => {
+                    let delta = new_layout.size() - old_layout.size();
+                    self.0.charge(delta)?;
+                    // SAFETY: single-statement borrow, never re-entered (aset_mut).
+                    let result =
+                        unsafe { aset_mut(set) }.realloc(ptr, old_layout, new_layout, &self.0.acct);
+                    if result.is_err() {
+                        self.0.uncharge(delta);
+                    }
+                    result
                 }
-                result
-            }
-            Backend::Malloc => {
-                let delta = new_layout.size() - old_layout.size();
-                self.0.charge(delta)?;
-                let result = Global.grow(ptr, old_layout, new_layout);
-                if result.is_err() {
-                    self.0.uncharge(delta);
+                Backend::Malloc => {
+                    let delta = new_layout.size() - old_layout.size();
+                    self.0.charge(delta)?;
+                    let result = Global.grow(ptr, old_layout, new_layout);
+                    if result.is_err() {
+                        self.0.uncharge(delta);
+                    }
+                    result
                 }
-                result
-            }
-            Backend::Bump(a) | Backend::BumpDrop(a, _) | Backend::BumpForget(a) => {
-                // SAFETY: single-statement borrow (bump_mut); ptr/layouts per trait contract.
-                unsafe { bump_mut(a).grow(ptr, old_layout, new_layout, &self.0.acct) }
-            }
-            // SAFETY: single-statement borrow (as bump_mut); ptr/layouts per trait contract.
-            Backend::Generation(a) => unsafe {
-                (*a.get()).grow(ptr, old_layout, new_layout, &self.0.acct)
-            },
-            // slab.c: realloc only tolerates the identical chunk size.
-            Backend::Slab(_) => {
-                if old_layout.size() == new_layout.size()
-                    && ptr.as_ptr() as usize % new_layout.align() == 0
-                {
-                    Ok(NonNull::slice_from_raw_parts(ptr, new_layout.size()))
-                } else {
-                    Err(AllocError)
+                Backend::Bump(a) | Backend::BumpDrop(a, _) | Backend::BumpForget(a) => {
+                    // SAFETY: single-statement borrow (bump_mut); ptr/layouts per trait contract.
+                    unsafe { bump_mut(a).grow(ptr, old_layout, new_layout, &self.0.acct) }
+                }
+                // SAFETY: single-statement borrow (as bump_mut); ptr/layouts per trait contract.
+                Backend::Generation(a) => unsafe {
+                    (*a.get()).grow(ptr, old_layout, new_layout, &self.0.acct)
+                },
+                // slab.c: realloc only tolerates the identical chunk size.
+                Backend::Slab(_) => {
+                    if old_layout.size() == new_layout.size()
+                        && ptr.as_ptr() as usize % new_layout.align() == 0
+                    {
+                        Ok(NonNull::slice_from_raw_parts(ptr, new_layout.size()))
+                    } else {
+                        Err(AllocError)
+                    }
                 }
             }
+        })();
+        match grown {
+            Ok(p) => Ok(p),
+            Err(AllocError) => alloc_failed(self.0.acct.name.get(), new_layout.size()),
         }
     }
 
@@ -2517,7 +2525,10 @@ impl Mcx<'_> {
         if layout.size() > MAX_ALLOC_HUGE_SIZE {
             alloc_ceiling_exceeded(layout.size());
         }
-        self.allocate_unchecked(layout).map(|p| p.cast::<u8>())
+        match self.allocate_unchecked(layout) {
+            Ok(p) => Ok(p.cast::<u8>()),
+            Err(AllocError) => alloc_failed(self.0.acct.name.get(), layout.size()),
+        }
     }
 }
 

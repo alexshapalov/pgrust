@@ -71,6 +71,22 @@ fn accounting_multiple_collections_compose() {
     assert_eq!(ctx.used(), 0);
 }
 
+
+// A refused limit raises (unwinds) the 53200 PgError — never returns Err — so
+// infallible lanes recover at the statement boundary instead of aborting the
+// server (see limit_refused). Tests observe it with catch_unwind.
+fn refused(f: impl FnOnce()) -> ::types_error::PgError {
+    let hook = std::panic::take_hook();
+    std::panic::set_hook(alloc::boxed::Box::new(|_| {}));
+    // Mcx handles hold UnsafeCell state; the test observes only the payload.
+    let r = std::panic::catch_unwind(std::panic::AssertUnwindSafe(f));
+    std::panic::set_hook(hook);
+    match r {
+        Ok(()) => panic!("limit not enforced"),
+        Err(payload) => ::types_error::pg_error_from_panic(payload).unwrap_or_else(|p| panic!("not a PgError payload: {:?}", p.downcast_ref::<&str>())),
+    }
+}
+
 #[test]
 fn limit_enforced_via_try_reserve() {
     let ctx = MemoryContext::new("limited").with_limit(1024);
@@ -79,8 +95,8 @@ fn limit_enforced_via_try_reserve() {
     v.try_reserve_exact(1024).expect("exactly at limit is fine");
     assert_eq!(ctx.used(), 1024);
     let mut w: PgVec<u8> = PgVec::new_in(mcx);
-    let err = w.try_reserve_exact(1);
-    assert!(err.is_err(), "limit must reject the 1025th byte");
+    let e = refused(move || { let _ = w.try_reserve_exact(1); });
+    assert_eq!(e.sqlstate, ERRCODE_OUT_OF_MEMORY, "limit must reject the 1025th byte");
     assert_eq!(ctx.used(), 1024, "failed reservation charged nothing");
 }
 
@@ -89,10 +105,7 @@ fn oom_error_shape_matches_mcxt_c() {
     let ctx = MemoryContext::new("ExprContext").with_limit(8);
     let mcx = ctx.mcx();
     let mut v: PgVec<u8> = PgVec::new_in(mcx);
-    let e = match v.try_reserve_exact(64) {
-        Err(_) => mcx.oom(64),
-        Ok(()) => panic!("limit not enforced"),
-    };
+    let e = refused(move || { let _ = v.try_reserve_exact(64); });
     assert_eq!(e.sqlstate, ERRCODE_OUT_OF_MEMORY);
     assert_eq!(e.message, "out of memory");
     assert_eq!(
@@ -256,10 +269,11 @@ fn ancestor_limit_caps_descendants() {
     let child = root.new_child("batch");
 
     let _a = vec_with_capacity_in::<u8>(root.mcx(), 600).unwrap();
-    let mut v: PgVec<u8> = PgVec::new_in(child.mcx());
-    assert!(v.try_reserve_exact(500).is_err(), "600+500 exceeds ancestor limit");
+    let child_mcx = child.mcx();
+    refused(move || { let mut v: PgVec<u8> = PgVec::new_in(child_mcx); let _ = v.try_reserve_exact(500); });
     assert_eq!(root.subtree_used(), 600, "failed charge applied nothing");
     assert_eq!(child.subtree_used(), 0);
+    let mut v: PgVec<u8> = PgVec::new_in(child.mcx());
     v.try_reserve_exact(400).expect("exactly at the ancestor limit");
     assert_eq!(root.subtree_used(), 1000);
 }
@@ -515,16 +529,18 @@ fn hotpath_limit_flag_lifecycle_and_enforcement() {
 
     {
         let limited = MemoryContext::new("limited").with_limit(256);
-        let mut w: PgVec<u8> = PgVec::new_in(limited.mcx());
-        assert!(w.try_reserve_exact(257).is_err(), "over limit rejected");
+        let lm = limited.mcx();
+        refused(move || { let mut w: PgVec<u8> = PgVec::new_in(lm); let _ = w.try_reserve_exact(257); });
         assert_eq!(limited.used(), 0, "failed charge applied nothing");
+        let mut w: PgVec<u8> = PgVec::new_in(limited.mcx());
         w.try_reserve_exact(256).expect("at limit ok");
         assert_eq!(limited.used(), 256);
 
         let cap_root = MemoryContext::new("cap").with_limit(100);
         let kid = cap_root.new_child("kid");
+        let km = kid.mcx();
+        refused(move || { let mut k: PgVec<u8> = PgVec::new_in(km); let _ = k.try_reserve_exact(101); });
         let mut k: PgVec<u8> = PgVec::new_in(kid.mcx());
-        assert!(k.try_reserve_exact(101).is_err(), "ancestor limit caps kid");
         k.try_reserve_exact(100).expect("at ancestor limit ok");
         assert_eq!(cap_root.subtree_used(), 100);
     }
@@ -961,13 +977,17 @@ mod owned {
     #[test]
     fn build_failure_passes_through_and_drops_context() {
         let root = MemoryContext::new("root");
-        let r = McxOwned::<PlanTy>::try_new(root.new_child("doomed").with_limit(8), |mcx| {
-            let mut nodes: PgVec<u64> = PgVec::new_in(mcx);
-            nodes.try_reserve_exact(64).map_err(|_| mcx.oom(512))?;
-            nodes.extend(0..64);
-            Ok(Plan { nodes })
+        // The limit refusal unwinds through the builder; the doomed child is
+        // dropped by unwinding and nothing stays charged.
+        let doomed = root.new_child("doomed").with_limit(8);
+        super::refused(move || {
+            let _ = McxOwned::<PlanTy>::try_new(doomed, |mcx| {
+                let mut nodes: PgVec<u64> = PgVec::new_in(mcx);
+                nodes.try_reserve_exact(64).map_err(|_| mcx.oom(512))?;
+                nodes.extend(0..64);
+                Ok(Plan { nodes })
+            });
         });
-        assert!(r.is_err());
         assert_eq!(root.subtree_used(), 0);
     }
 
@@ -1884,11 +1904,21 @@ fn allocated_subtree_counts_malloc_children() {
 #[test]
 fn limits_refuse_only_enforced_threads_and_name_the_ceiling() {
     const MB: usize = 1 << 20;
-    // Err carries the out-of-memory error's hint, which names the ceiling.
+    // A refusal unwinds with the out-of-memory error (alloc_failed); its hint
+    // names the ceiling. Err carries that hint.
     let alloc = |bytes: usize| -> Result<(), Option<std::string::String>> {
         let ctx = MemoryContext::new("limit-probe");
-        let r: PgResult<PgVec<'_, u8>> = vec_with_capacity_in(ctx.mcx(), bytes);
-        r.map(|_| ()).map_err(|e| e.hint.clone())
+        let hook = std::panic::take_hook();
+        std::panic::set_hook(alloc::boxed::Box::new(|_| {}));
+        let r = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            let r: PgResult<PgVec<'_, u8>> = vec_with_capacity_in(ctx.mcx(), bytes);
+            r.map(|_| ()).map_err(|e| e.hint.clone())
+        }));
+        std::panic::set_hook(hook);
+        match r {
+            Ok(inner) => inner,
+            Err(payload) => Err(::types_error::pg_error_from_panic(payload).ok().and_then(|e| e.hint)),
+        }
     };
     let session_hint = Some(std::string::String::from("The session reached pgrust.session_memory_limit."));
     let database_hint = Some(
