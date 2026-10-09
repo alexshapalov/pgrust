@@ -39,7 +39,7 @@ pub(crate) unsafe fn bt_simpledel_pass<'mcx>(
     maxoff: OffsetNumber,
 ) -> PgResult<()> {
     let page = buf.page();
-    let deadblocks = bt_deadblocks(mcx, &page, deletable, newitem)?;
+    let deadblocks = bt_deadblocks(&page, deletable, newitem);
 
     let mut delstate = TM_IndexDeleteOp {
         irel: rel.alias(),
@@ -47,8 +47,9 @@ pub(crate) unsafe fn bt_simpledel_pass<'mcx>(
         bottomup: false,
         bottomupfreespace: 0,
         ndeltids: 0,
-        deltids: vec_with_capacity_in(mcx, MaxTIDsPerBTreePage)?,
-        status: vec_with_capacity_in(mcx, MaxTIDsPerBTreePage)?,
+        // Freed at return (C pfrees these); never in the bump query context.
+        deltids: Vec::with_capacity(MaxTIDsPerBTreePage),
+        status: Vec::with_capacity(MaxTIDsPerBTreePage),
     };
 
     for offnum in minoff..=maxoff {
@@ -101,13 +102,13 @@ pub(crate) unsafe fn bt_simpledel_pass<'mcx>(
 }
 
 /// _bt_deadblocks.
-unsafe fn bt_deadblocks<'mcx>(
-    mcx: Mcx<'mcx>,
+unsafe fn bt_deadblocks(
     page: &PageRef<'_>,
     deletable: &[OffsetNumber],
     newitem: ITup,
-) -> PgResult<PgVec<'mcx, BlockNumber>> {
-    let mut tidblocks: PgVec<'mcx, BlockNumber> = vec_with_capacity_in(mcx, deletable.len() + 1)?;
+) -> Vec<BlockNumber> {
+    // Per-call scratch (C pallocs and pfrees it); plain Vec, see TM_IndexDeleteOp.
+    let mut tidblocks: Vec<BlockNumber> = Vec::with_capacity(deletable.len() + 1);
 
     debug_assert!(!bt_tuple_is_posting(newitem) && !bt_tuple_is_pivot(newitem));
     tidblocks.push(ItemPointerGetBlockNumber(&t_tid(newitem)));
@@ -128,7 +129,7 @@ unsafe fn bt_deadblocks<'mcx>(
 
     tidblocks.sort_unstable();
     tidblocks.dedup();
-    Ok(tidblocks)
+    tidblocks
 }
 
 /// _bt_delitems_delete_check.

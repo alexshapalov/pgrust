@@ -516,8 +516,9 @@ pub fn index_compute_xid_horizon_for_tuples<'mcx>(
         bottomup: false,
         bottomupfreespace: 0,
         ndeltids: 0,
-        deltids: mcx::vec_with_capacity_in(mcx, itemnos.len())?,
-        status: mcx::vec_with_capacity_in(mcx, itemnos.len())?,
+        // Freed at return (C pfrees these); never in the bump query context.
+        deltids: Vec::with_capacity(itemnos.len()),
+        status: Vec::with_capacity(itemnos.len()),
     };
 
     // Identify what the index tuples about to be deleted point to.

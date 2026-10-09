@@ -2,7 +2,7 @@
 //! _bt_bottomupdel_pass. Loud: _bt_update_posting (vacuum lane).
 
 use ::bufmgr_seams::{self as bufmgr, BufferPin};
-use ::mcx::{vec_with_capacity_in, Mcx};
+use ::mcx::Mcx;
 use ::tableam::{TM_IndexDelete, TM_IndexDeleteOp, TM_IndexStatus};
 use ::types_core::{OffsetNumber, BLCKSZ};
 use ::types_error::{PgError, PgResult};
@@ -203,8 +203,9 @@ pub(crate) unsafe fn bt_bottomupdel_pass<'mcx>(
         bottomup: true,
         bottomupfreespace: (BLCKSZ / 16).max(newitemsz) as i32,
         ndeltids: 0,
-        deltids: vec_with_capacity_in(mcx, MaxTIDsPerBTreePage)?,
-        status: vec_with_capacity_in(mcx, MaxTIDsPerBTreePage)?,
+        // Freed at return (C pfrees these); never in the bump query context.
+        deltids: Vec::with_capacity(MaxTIDsPerBTreePage),
+        status: Vec::with_capacity(MaxTIDsPerBTreePage),
     };
 
     let minoff = P_FIRSTDATAKEY(&opaque);

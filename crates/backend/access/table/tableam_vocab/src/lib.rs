@@ -108,8 +108,14 @@ pub struct TM_IndexDeleteOp<'mcx> {
     pub bottomup: bool,
     pub bottomupfreespace: i32,
     pub ndeltids: i32,
-    pub deltids: PgVec<'mcx, TM_IndexDelete>,
-    pub status: PgVec<'mcx, TM_IndexStatus>,
+    // Scratch arrays for one deletion pass, allocated and freed per call like
+    // C's palloc/pfree pair in _bt_bottomupdel_pass / _bt_simpledel_pass. Plain
+    // Vec, not PgVec: the executor's query context is a bump context (frees are
+    // no-ops until the statement ends), and one pass per index page of a
+    // packed table added ~20 KB per modified row to a large UPDATE (PGRun
+    // beta, 2026-10-09: 53200 at 128 MB after ~100k non-HOT updates).
+    pub deltids: Vec<TM_IndexDelete>,
+    pub status: Vec<TM_IndexStatus>,
 }
 
 // C `Snapshot`: None is InvalidSnapshot/SnapshotAny; Rc = snapmgr's refcount (rule 2.3).

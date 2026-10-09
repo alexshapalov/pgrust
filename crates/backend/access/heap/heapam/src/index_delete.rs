@@ -331,15 +331,16 @@ fn bottomup_sort_and_shrink_cmp(
 // bottomup_sort_and_shrink: regroup deltids by promising-ness of their heap
 // blocks and keep only the BOTTOMUP_MAX_NBLOCKS best blocks.
 fn bottomup_sort_and_shrink<'mcx>(
-    mcx: Mcx<'mcx>,
+    _mcx: Mcx<'mcx>,
     delstate: &mut TM_IndexDeleteOp<'mcx>,
 ) -> PgResult<usize> {
     debug_assert!(delstate.bottomup);
     debug_assert!(delstate.ndeltids > 0);
     let n = delstate.ndeltids as usize;
 
-    let mut blockgroups: ::mcx::PgVec<'mcx, IndexDeleteCounts> =
-        ::mcx::vec_with_capacity_in(mcx, n)?;
+    // Per-call scratch (C pallocs and pfrees both arrays): plain Vec, never
+    // the bump query context — see TM_IndexDeleteOp.
+    let mut blockgroups: Vec<IndexDeleteCounts> = Vec::with_capacity(n);
     let mut curblock = InvalidBlockNumber;
     for i in 0..n {
         let ideltid = &delstate.deltids[i];
@@ -381,7 +382,7 @@ fn bottomup_sort_and_shrink<'mcx>(
     let nblocksfavorable =
         bottomup_nblocksfavorable(&blockgroups[..nblockgroups], &delstate.deltids);
 
-    let mut reordered: ::mcx::PgVec<'mcx, TM_IndexDelete> = ::mcx::vec_with_capacity_in(mcx, n)?;
+    let mut reordered: Vec<TM_IndexDelete> = Vec::with_capacity(n);
     for group in &blockgroups[..nblockgroups] {
         let first = group.ifirsttid as usize;
         reordered.extend_from_slice(&delstate.deltids[first..first + group.ntids as usize]);
