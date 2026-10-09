@@ -2002,7 +2002,9 @@ impl MemoryContext {
     #[inline]
     fn charge(&self, n: usize) -> Result<(), AllocError> {
         let acct = &*self.acct;
-        acct.check_limit(n)?;
+        if acct.check_limit(n).is_err() {
+            limit_refused(acct.name.get(), n);
+        }
         let self_new = acct.self_used.get() + n;
         acct.self_used.set(self_new);
         if self_new > acct.self_peak.get() {
@@ -2241,6 +2243,29 @@ impl fmt::Debug for Mcx<'_> {
 #[inline(never)]
 fn alloc_ceiling_exceeded(size: usize) -> ! {
     panic!("invalid memory alloc request size {size}")
+}
+
+// A refused memory limit (pgrust.session/database/runtime_memory_limit) is a
+// catchable ERROR — 53200 with the limit named in the hint, built by
+// oom_named exactly as the fallible lanes report it — raised by unwinding, so
+// the statement boundary recovers it like any other ERROR. Returning
+// AllocError here left every infallible lane (PgVec::push, extend, resize,
+// hashbrown growth) to handle_alloc_error, i.e. an abort of the whole server:
+// observed 2026-10-09 in the PGRun beta ("memory allocation of 16 bytes
+// failed", SIGABRT) — one statement over its session limit ended every
+// branch database in the runtime. Same precedent as alloc_ceiling_exceeded.
+#[cold]
+#[inline(never)]
+fn limit_refused(context_name: &str, request: usize) -> ! {
+    let err = oom_named(context_name, request);
+    #[cfg(any(feature = "std", test))]
+    {
+        std::panic::panic_any(err)
+    }
+    #[cfg(not(any(feature = "std", test)))]
+    {
+        panic!("{}", err.message())
+    }
 }
 
 // SAFETY contract for callers: one-statement &mut, never re-entered; one context, one thread.
