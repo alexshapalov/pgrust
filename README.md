@@ -1,7 +1,8 @@
 <h1 align="center">PGX</h1>
 
 <p align="center">
-  <strong>One Postgres-compatible runtime, thousands of disposable databases.</strong>
+  <strong>Postgres for agents.</strong><br>
+  One Postgres-compatible runtime, thousands of disposable databases.
 </p>
 
 <p align="center">
@@ -23,6 +24,88 @@ Prisma, SQLAlchemy and node-postgres run their full migrate → test →
 schema-change lifecycles on it unchanged.
 
 PGX is the database engine behind PGRun branches.
+
+> A database should be cheap enough to allocate like an object, not
+> provision like a server.
+
+## Why PGX
+
+Agent workflows, test suites, CI jobs and preview environments create
+databases constantly and throw them away minutes or hours later. Giving
+each one its own PostgreSQL server costs a process, tens of megabytes and
+a cold start every time. Traditional PostgreSQL is built to keep one
+database running for years; PGX is built to create one in milliseconds,
+use it briefly and delete it.
+
+Instead of
+
+```text
+1 database → 1 PostgreSQL server
+```
+
+PGX runs
+
+```text
+1 PGX runtime → hundreds or thousands of isolated databases
+```
+
+Immutable state is shared. Each database pays mainly for what makes it
+different.
+
+## At a glance
+
+```text
+~6.2 ms      warm database mint, p50
+~70 KB       memory per untouched idle database
+~128 KB      memory per idle database that has been queried
+1,000        isolated databases on a 4 vCPU / 8 GB VM
+128–155 MB   total runtime memory with 1,000 untouched databases
+~213 MB      after all 1,000 have been used
+
+10 GB        template
+~674 ms      copy-on-write branch ready
+~13.6 MB     initial additional physical storage
+
+219 / 231    PostgreSQL regression tests byte-exact
+0            result differences (the other 12 differ in EXPLAIN text only)
+```
+
+These describe measured configurations and workloads, not a claim that
+PGX is faster than PostgreSQL in general. The detail and the scripts are
+under Benchmarks.
+
+## Disposable Postgres
+
+PGX is built around a different database lifecycle:
+
+```text
+sealed template
+      ↓
+   mint database        milliseconds, copy-on-write
+      ↓
+agent / CI / test       minutes or hours
+      ↓
+    discard             dropped a grace period after the last session
+```
+
+A database is created from a sealed template without copying it. On
+Linux, ZFS block cloning lets a branch share every unchanged block with
+its template, so a branch of a 10 GB database is ready in under a second
+and starts at about 14 MB of its own storage.
+
+## Built for agents
+
+A coding agent's database workload looks like this, and many agents do it
+at once:
+
+```text
+create database → run migrations → change schema → load fixtures
+→ run tests → inspect results → throw the database away
+```
+
+PGX optimizes for that lifecycle rather than for a long-running
+production primary. Every agent, every pull request and every test run
+can have its own real Postgres-compatible database.
 
 ## Benchmarks
 
@@ -82,6 +165,21 @@ hundreds of times less physical storage than a full copy.
 | Django 5.2, Prisma 6, SQLAlchemy 2, node-postgres, Rails-shaped SQL | pass |
 | All framework runs | **36 / 36** |
 
+Transactional behaviour follows PostgreSQL, including transactional DDL
+and temporary tables:
+
+```sql
+BEGIN;
+CREATE TEMP TABLE pgx_test (id integer PRIMARY KEY, value text);
+INSERT INTO pgx_test VALUES (1, 'PGX works');
+SAVEPOINT before_update;
+UPDATE pgx_test SET value = 'changed' WHERE id = 1;
+ROLLBACK TO SAVEPOINT before_update;
+SELECT value FROM pgx_test WHERE id = 1;   -- 'PGX works'
+ROLLBACK;
+SELECT to_regclass('pg_temp.pgx_test');    -- NULL: the table was rolled back
+```
+
 ### Isolation
 
 - **Memory limits.** Session, database and runtime limits refuse runaway
@@ -104,11 +202,20 @@ PGX is not trying to beat Postgres on single queries.
 
 Whole framework lifecycles take 0–15 % longer than on PostgreSQL 18.
 
+PGX concentrates on database creation latency, density, memory
+efficiency, copy-on-write storage, high churn and isolation between
+tenants. For application lifecycle workloads it stays close enough to
+PostgreSQL while making large numbers of isolated databases dramatically
+cheaper to keep alive.
+
 The full report:
 [`docs/pgx/linux-results.md`](docs/pgx/linux-results.md). The frozen v0.1
 numbers: [`docs/pgx/v0.1-baseline.md`](docs/pgx/v0.1-baseline.md).
 
 ## How it works
+
+The central idea: **share everything immutable, pay for divergence.** It
+applies to memory and to storage alike.
 
 - **Shared runtime.** Databases are isolated by name, roles and limits
   inside one process with a thread per connection. A database costs its
@@ -122,15 +229,35 @@ numbers: [`docs/pgx/v0.1-baseline.md`](docs/pgx/v0.1-baseline.md).
   period after their last session.
 - **Copy-on-write storage.** `file_copy_method = clone` turns database
   creation into ZFS block clones, so a branch shares every unchanged block
-  with its template.
+  with its template and its cost grows with divergence:
+
+  ```text
+  template
+  ├── branch A → only changed blocks
+  ├── branch B → only changed blocks
+  └── branch C → only changed blocks
+  ```
 - **Limits at every level.** Session, database and runtime memory limits
   inside the engine, connection limits per database, and a Linux cgroup
-  around the runtime.
+  around the runtime. Memory-heavy work fails with a PostgreSQL-style
+  error instead of taking the host down:
+
+  ```text
+  session → database / runtime → Linux cgroup
+  ```
 - **Machine-readable status.** `pgrust_runtime_status()` returns JSON with
   databases, sessions, memory against limits, and warm-pool and mint
   counters.
 
 ## Status
+
+PGX is **beta software**. It already powers PGX branches in PGRun's
+friendly beta. The current focus is PostgreSQL compatibility,
+Rails/application compatibility, concurrency semantics, lifecycle
+correctness, predictable resource containment and real agent workloads.
+Correctness and reproducibility come before benchmark marketing: if PGX
+behaves differently from PostgreSQL for a supported workload, we want a
+reproducible test case (see Contributing).
 
 **PGX v0.1 is for disposable databases:** agent, CI, PR, test and preview
 databases built from sanitized copies of production. Use it where losing
@@ -146,7 +273,32 @@ database:
   PL/Perl and PL/Tcl are not available.
 
 Keep Postgres as the source of truth for data you can't afford to lose.
-The full list is in [`docs/pgx/v0.1-readiness.md`](docs/pgx/v0.1-readiness.md).
+If you need a long-lived production database, use PostgreSQL or a managed
+PostgreSQL service. If you need hundreds or thousands of databases that
+live for minutes or hours, PGX is the workload we are building for. The
+full list is in [`docs/pgx/v0.1-readiness.md`](docs/pgx/v0.1-readiness.md).
+
+## PGX + PGRun
+
+PGX is the database engine behind PGX branches in [PGRun](https://pgrun.dev).
+PGRun adds the control plane around it:
+
+```text
+production / source database
+        ↓
+safe copy with masking
+        ↓
+sealed template
+        ↓
+PGX
+        ↓
+one branch per agent, PR or CI job
+        ↓
+automatic expiry
+```
+
+PGRun handles orchestration, routing, templates, lifecycle, access and
+branch management. PGX is the runtime. They are separate projects.
 
 ## Quickstart
 
@@ -246,6 +398,36 @@ difference is classified as plan-only or semantic.
 | [`zfs-cow.md`](docs/pgx/zfs-cow.md) | copy-on-write branch cost and the recordsize trade-off |
 | [`linux-limits.md`](docs/pgx/linux-limits.md) | memory limits and the cgroup backstop |
 
+## Contributing
+
+PGX is early, and the most useful contribution is a concrete
+compatibility case. If something works on PostgreSQL 18 and behaves
+differently on PGX, open an issue with:
+
+```text
+PostgreSQL version
+PGX version
+minimal SQL reproduction
+expected result
+actual result
+```
+
+The areas where a case helps most: MVCC, locking, deadlocks, isolation
+levels, transactional DDL, ORMs (Rails, Django, Prisma, SQLAlchemy),
+schema migrations and client compatibility. Every real compatibility bug
+becomes a permanent regression test.
+
+## Origin
+
+PGX is built on [pgrust](https://github.com/malisper/pgrust), a
+PostgreSQL-compatible database written in Rust. We are grateful to the
+pgrust project and its contributors for the foundation PGX builds on.
+PGX narrows that foundation to one problem, high-density disposable
+Postgres-compatible databases for agents and tests, and its own changes
+concentrate on shared database state, lifecycle and churn, density,
+memory containment, copy-on-write branching, fast minting and agent/test
+compatibility.
+
 ## License
 
 PGX is licensed under [AGPL-3.0](LICENSE). Portions derived from PostgreSQL
@@ -253,5 +435,7 @@ remain under the PostgreSQL License; see [`NOTICE`](NOTICE).
 
 ---
 
-PGX is a fork of [pgrust](https://github.com/malisper/pgrust), a Rust
-re-implementation of Postgres.
+Production PostgreSQL is optimized to live for years. PGX is optimized to
+live for minutes.
+
+**One runtime. Thousands of isolated databases. Postgres for agents.**
